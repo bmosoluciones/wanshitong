@@ -1,3 +1,5 @@
+![logo](docs/images/WanShiTongLogo-small.png)
+
 # WanShiTong
 
 > A lightweight, private knowledge-management system.
