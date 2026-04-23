@@ -1,0 +1,68 @@
+{# Navigation item componente reutilizable #}
+
+{%- macro nav_item(url, label, icon=None, active=False) -%}
+    <a href="{{ url }}" class="nav-item {% if active %}nav-item-active{% endif %}">
+        {% if icon %}
+            <span class="nav-icon">{{ icon }}</span>
+        {% endif %}
+        <span>{{ label }}</span>
+    </a>
+{%- endmacro -%}
+
+{%- macro nav_divider() -%}
+    <div class="nav-divider"></div>
+{%- endmacro -%}
+
+{%- macro nav_section(label) -%}
+    <div class="nav-section-label">{{ label }}</div>
+{%- endmacro -%}
+
+<style>
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    color: var(--text);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.nav-item:hover {
+    background: var(--bg);
+    color: var(--primary);
+}
+
+.nav-item-active {
+    background: var(--bg);
+    color: var(--primary);
+    font-weight: 500;
+    border-left: 3px solid var(--primary);
+    padding-left: calc(var(--spacing-md) - 3px);
+}
+
+.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--border);
+    margin: var(--spacing-md) 0;
+}
+
+.nav-section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: var(--spacing-md) var(--spacing-md);
+    margin-top: var(--spacing-md);
+    letter-spacing: 0.5px;
+}
+</style>

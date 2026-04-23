@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Categorías') }} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>{{ _('Categorías') }}</h2>
+        <a href="{{ url_for('admin.nueva_categoria') }}" class="btn btn-primary">{{ _('+ Nueva categoría') }}</a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{{ _('Nombre') }}</th>
+                <th>{{ _('Slug') }}</th>
+                <th>{{ _('Padre') }}</th>
+                <th>{{ _('Grupos') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in categorias %}
+            <tr>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.slug or '—' }}</td>
+                <td>{{ c.parent.nombre if c.parent else '—' }}</td>
+                <td>{{ c.grupos | length }}</td>
+                <td>
+                    <a href="{{ url_for('admin.editar_categoria', cat_id=c.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
+                    <form method="post" action="{{ url_for('admin.eliminar_categoria', cat_id=c.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar categoría?') }}')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

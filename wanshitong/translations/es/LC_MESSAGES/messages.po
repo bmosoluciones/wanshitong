@@ -1,0 +1,407 @@
+# Spanish translations for WanShiTong.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the WanShiTong project.
+# WanShiTong contributors, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WanShiTong 0.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-23 18:47+0000\n"
+"PO-Revision-Date: 2026-04-22 20:32+0000\n"
+"Last-Translator: WanShiTong contributors\n"
+"Language: es\n"
+"Language-Team: Spanish\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#~ msgid "Favor iniciar sesión para acceder al sistema."
+#~ msgstr ""
+
+#~ msgid "La contraseña es requerida al crear un usuario."
+#~ msgstr ""
+
+#~ msgid "Usuario creado exitosamente."
+#~ msgstr ""
+
+#~ msgid "Usuario actualizado exitosamente."
+#~ msgstr ""
+
+#~ msgid "No puede eliminar su propio usuario."
+#~ msgstr ""
+
+#~ msgid "Usuario eliminado."
+#~ msgstr ""
+
+#~ msgid "Grupo creado exitosamente."
+#~ msgstr ""
+
+#~ msgid "Grupo actualizado exitosamente."
+#~ msgstr ""
+
+#~ msgid "Grupo eliminado."
+#~ msgstr ""
+
+#~ msgid "Usuario agregado al grupo."
+#~ msgstr ""
+
+#~ msgid "Usuario removido del grupo."
+#~ msgstr ""
+
+#~ msgid "Ninguna"
+#~ msgstr ""
+
+#~ msgid "Categoría creada exitosamente."
+#~ msgstr ""
+
+#~ msgid "Categoría actualizada exitosamente."
+#~ msgstr ""
+
+#~ msgid "Categoría eliminada."
+#~ msgstr ""
+
+#~ msgid "Usuario o contraseña incorrectos."
+#~ msgstr ""
+
+#~ msgid "Sesión cerrada correctamente."
+#~ msgstr ""
+
+#~ msgid "Sin categoría"
+#~ msgstr ""
+
+#~ msgid "Versión inicial"
+#~ msgstr ""
+
+#~ msgid "Documento creado exitosamente."
+#~ msgstr ""
+
+#~ msgid "Documento actualizado exitosamente."
+#~ msgstr ""
+
+#~ msgid "Documento eliminado."
+#~ msgstr ""
+
+#~ msgid "Antes de restaurar versión "
+#~ msgstr ""
+
+#~ msgid "Versión restaurada exitosamente."
+#~ msgstr ""
+
+#~ msgid "Ninguno"
+#~ msgstr ""
+
+#~ msgid "Debe seleccionar un usuario o un grupo."
+#~ msgstr ""
+
+#~ msgid "Permiso agregado."
+#~ msgstr ""
+
+#~ msgid "Permiso eliminado."
+#~ msgstr ""
+
+#~ msgid "Iniciar sesión"
+#~ msgstr ""
+
+#~ msgid "Título"
+#~ msgstr ""
+
+#~ msgid "Contenido"
+#~ msgstr ""
+
+#~ msgid "Categoría"
+#~ msgstr ""
+
+#~ msgid "Visibilidad"
+#~ msgstr ""
+
+#~ msgid "Privado"
+#~ msgstr ""
+
+#~ msgid "Público"
+#~ msgstr ""
+
+#~ msgid "Estado"
+#~ msgstr ""
+
+#~ msgid "Borrador"
+#~ msgstr ""
+
+#~ msgid "Publicado"
+#~ msgstr ""
+
+#~ msgid "Archivado"
+#~ msgstr ""
+
+#~ msgid "Etiquetas (separadas por comas)"
+#~ msgstr ""
+
+#~ msgid "Descripción del cambio"
+#~ msgstr ""
+
+#~ msgid "Guardar"
+#~ msgstr ""
+
+#~ msgid "Usuario"
+#~ msgstr ""
+
+#~ msgid "Nombre"
+#~ msgstr ""
+
+#~ msgid "Apellido"
+#~ msgstr ""
+
+#~ msgid "Correo electrónico"
+#~ msgstr ""
+
+#~ msgid "Rol"
+#~ msgstr ""
+
+#~ msgid "Administrador"
+#~ msgstr ""
+
+#~ msgid "Editor"
+#~ msgstr ""
+
+#~ msgid "Consulta"
+#~ msgstr ""
+
+#~ msgid "Activo"
+#~ msgstr ""
+
+#~ msgid "Contraseña"
+#~ msgstr ""
+
+#~ msgid "Descripción"
+#~ msgstr ""
+
+#~ msgid "Categoría padre"
+#~ msgstr ""
+
+#~ msgid "Buscar"
+#~ msgstr ""
+
+#~ msgid "Todos"
+#~ msgstr ""
+
+#~ msgid "Etiqueta"
+#~ msgstr ""
+
+#~ msgid "Grupo"
+#~ msgstr ""
+
+#~ msgid "Permiso"
+#~ msgstr ""
+
+#~ msgid "Lectura"
+#~ msgstr ""
+
+#~ msgid "Edición"
+#~ msgstr ""
+
+#~ msgid "Agregar permiso"
+#~ msgstr ""
+
+#~ msgid "WanShiTong"
+#~ msgstr ""
+
+#~ msgid "Cerrar Sesión"
+#~ msgstr ""
+
+#~ msgid "Inicio"
+#~ msgstr ""
+
+#~ msgid "Documentos"
+#~ msgstr ""
+
+#~ msgid "Nuevo documento"
+#~ msgstr ""
+
+#~ msgid "Administración"
+#~ msgstr ""
+
+#~ msgid "Usuarios"
+#~ msgstr ""
+
+#~ msgid "Grupos"
+#~ msgstr ""
+
+#~ msgid "Categorías"
+#~ msgstr ""
+
+#~ msgid "Panel principal"
+#~ msgstr ""
+
+#~ msgid "+ Nuevo documento"
+#~ msgstr ""
+
+#~ msgid "Documentos recientes"
+#~ msgstr ""
+
+#~ msgid "Autor"
+#~ msgstr ""
+
+#~ msgid "No hay documentos disponibles."
+#~ msgstr ""
+
+#~ msgid "Ver todos los documentos"
+#~ msgstr ""
+
+#~ msgid "Editar categoría"
+#~ msgstr ""
+
+#~ msgid "Nueva categoría"
+#~ msgstr ""
+
+#~ msgid "Editar"
+#~ msgstr ""
+
+#~ msgid "Nueva"
+#~ msgstr ""
+
+#~ msgid "Cancelar"
+#~ msgstr ""
+
+#~ msgid "+ Nueva categoría"
+#~ msgstr ""
+
+#~ msgid "Padre"
+#~ msgstr ""
+
+#~ msgid "¿Eliminar categoría?"
+#~ msgstr ""
+
+#~ msgid "Eliminar"
+#~ msgstr ""
+
+#~ msgid "Editar grupo"
+#~ msgstr ""
+
+#~ msgid "Nuevo grupo"
+#~ msgstr ""
+
+#~ msgid "Nuevo"
+#~ msgstr ""
+
+#~ msgid "Miembros del grupo"
+#~ msgstr ""
+
+#~ msgid "Quitar"
+#~ msgstr ""
+
+#~ msgid "Sin miembros."
+#~ msgstr ""
+
+#~ msgid "+ Nuevo grupo"
+#~ msgstr ""
+
+#~ msgid "Miembros"
+#~ msgstr ""
+
+#~ msgid "¿Eliminar grupo?"
+#~ msgstr ""
+
+#~ msgid "Editar usuario"
+#~ msgstr ""
+
+#~ msgid "Nuevo usuario"
+#~ msgstr ""
+
+#~ msgid "+ Nuevo usuario"
+#~ msgstr ""
+
+#~ msgid "Correo"
+#~ msgstr ""
+
+#~ msgid "Sí"
+#~ msgstr ""
+
+#~ msgid "No"
+#~ msgstr ""
+
+#~ msgid "¿Eliminar usuario?"
+#~ msgstr ""
+
+#~ msgid "Introduce tus credenciales para acceder."
+#~ msgstr ""
+
+#~ msgid "Usuario o correo electrónico"
+#~ msgstr ""
+
+#~ msgid "Editar documento"
+#~ msgstr ""
+
+#~ msgid "Historial"
+#~ msgstr ""
+
+#~ msgid "Historial de versiones"
+#~ msgstr ""
+
+#~ msgid "Versión actual"
+#~ msgstr ""
+
+#~ msgid "Versión"
+#~ msgstr ""
+
+#~ msgid "Modificado por"
+#~ msgstr ""
+
+#~ msgid "Fecha"
+#~ msgstr ""
+
+#~ msgid "Ver"
+#~ msgstr ""
+
+#~ msgid "No hay versiones previas."
+#~ msgstr ""
+
+#~ msgid "+ Nuevo"
+#~ msgstr ""
+
+#~ msgid "Buscar..."
+#~ msgstr ""
+
+#~ msgid "Todos los estados"
+#~ msgstr ""
+
+#~ msgid "No se encontraron documentos."
+#~ msgstr ""
+
+#~ msgid "Permisos"
+#~ msgstr ""
+
+#~ msgid "Permisos del documento"
+#~ msgstr ""
+
+#~ msgid "Permisos actuales"
+#~ msgstr ""
+
+#~ msgid "Sujeto"
+#~ msgstr ""
+
+#~ msgid "Tipo"
+#~ msgstr ""
+
+#~ msgid "Sin permisos explícitos."
+#~ msgstr ""
+
+#~ msgid "Creado"
+#~ msgstr ""
+
+#~ msgid "Modificado"
+#~ msgstr ""
+
+#~ msgid "¿Eliminar este documento?"
+#~ msgstr ""
+
+#~ msgid "Guardado por"
+#~ msgstr ""
+
+#~ msgid "¿Restaurar esta versión?"
+#~ msgstr ""
+
+#~ msgid "Restaurar esta versión"
+#~ msgstr ""
+

@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Documentos') }} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-top">
+        <h1>{{ _('Documentos') }}</h1>
+        {% if current_user.tipo in ('admin', 'editor') %}
+        <a href="{{ url_for('documentos.nuevo') }}" class="btn btn-primary">{{ _('+ Nuevo') }}</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filtros -->
+<form method="get" action="{{ url_for('documentos.lista') }}" class="filters-form">
+    <div class="filters-row">
+        <input type="text" name="q" class="filters-input" placeholder="{{ _('Buscar documentos...') }}" value="{{ request.args.get('q', '') }}">
+        
+        <select name="categoria_id" class="filters-select">
+            {% for val, label in form.categoria_id.choices %}
+            <option value="{{ val }}" {% if request.args.get('categoria_id') == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="estado" class="filters-select">
+            <option value="">{{ _('Todos los estados') }}</option>
+            <option value="draft" {% if request.args.get('estado') == 'draft' %}selected{% endif %}>{{ _('Borrador') }}</option>
+            <option value="public" {% if request.args.get('estado') == 'public' %}selected{% endif %}>{{ _('Publicado') }}</option>
+            <option value="archived" {% if request.args.get('estado') == 'archived' %}selected{% endif %}>{{ _('Archivado') }}</option>
+        </select>
+        
+        <input type="text" name="etiqueta" class="filters-input" placeholder="{{ _('Etiqueta') }}" value="{{ request.args.get('etiqueta', '') }}">
+        
+        <button type="submit" class="btn btn-primary filters-btn">{{ _('Buscar') }}</button>
+    </div>
+</form>
+
+<!-- Lista de documentos -->
+{% if documentos %}
+<div class="documents-list">
+    {% for doc in documentos %}
+    <a href="{{ url_for('documentos.ver', doc_id=doc.id) }}" class="document-item">
+        <div class="document-header">
+            <div>
+                <h3 class="document-title">{{ doc.titulo }}</h3>
+                {% if doc.categoria %}
+                <p class="document-category">{{ doc.categoria.nombre }}</p>
+                {% endif %}
+            </div>
+            <div class="document-badges">
+                {% if doc.estado == 'draft' %}
+                    <span class="badge badge-gray">{{ _('Borrador') }}</span>
+                {% elif doc.estado == 'public' %}
+                    <span class="badge badge-success">{{ _('Publicado') }}</span>
+                {% elif doc.estado == 'archived' %}
+                    <span class="badge">{{ _('Archivado') }}</span>
+                {% endif %}
+                
+                {% if doc.visibilidad == 'private' %}
+                    <span class="badge badge-primary">🔒 {{ _('Privado') }}</span>
+                {% elif doc.visibilidad == 'shared' %}
+                    <span class="badge badge-primary">👥 {{ _('Compartido') }}</span>
+                {% elif doc.visibilidad == 'public' %}
+                    <span class="badge badge-primary">🌐 {{ _('Público') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <p class="document-meta">
+            <span class="text-muted"><strong>{{ doc.autor.usuario }}</strong></span>
+            <span class="meta-separator">•</span>
+            <span class="text-muted">{{ doc.creado }}</span>
+        </p>
+        
+        {% if doc.etiquetas %}
+        <div class="document-tags">
+            {% for tag in doc.etiquetas %}
+            <span class="tag">{{ tag.nombre }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p class="text-muted">{{ _('No se encontraron documentos.') }}</p>
+</div>
+{% endif %}
+
+<style>
+.page-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.page-header-top h1 {
+    margin: 0;
+}
+
+.filters-form {
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+}
+
+.filters-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: var(--spacing-md);
+}
+
+.filters-input,
+.filters-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    background: var(--bg);
+    color: var(--text);
+}
+
+.filters-input:focus,
+.filters-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.filters-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+}
+
+.documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.document-item {
+    display: block;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.document-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+}
+
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.document-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.document-category {
+    margin: var(--spacing-sm) 0 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}
+
+.document-badges {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.document-meta {
+    margin: var(--spacing-sm) 0;
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}
+
+.meta-separator {
+    margin: 0 var(--spacing-sm);
+}
+
+.document-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--surface);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.empty-state {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--muted);
+}
+
+@media (max-width: 1024px) {
+    .filters-row {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filters-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-btn {
+        width: 100%;
+    }
+
+    .document-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .document-badges {
+        justify-content: flex-start;
+    }
+}
+</style>
+{% endblock %}
+

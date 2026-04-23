@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if usuario %}{{ _('Editar usuario') }}{% else %}{{ _('Nuevo usuario') }}{% endif %} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.usuarios') }}">{{ _('Usuarios') }}</a></li>
+            <li class="breadcrumb-item active">{% if usuario %}{{ _('Editar') }}{% else %}{{ _('Nuevo') }}{% endif %}</li>
+        </ol>
+    </nav>
+    <h2>{% if usuario %}{{ _('Editar usuario') }}{% else %}{{ _('Nuevo usuario') }}{% endif %}</h2>
+    <form method="post" class="mt-3">
+        {{ form.hidden_tag() }}
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.usuario.label(class_='form-label') }}
+                {{ form.usuario(class_='form-control') }}
+            </div>
+            <div class="col-md-6">
+                {{ form.correo_electronico.label(class_='form-label') }}
+                {{ form.correo_electronico(class_='form-control') }}
+            </div>
+            <div class="col-md-6">
+                {{ form.nombre.label(class_='form-label') }}
+                {{ form.nombre(class_='form-control') }}
+            </div>
+            <div class="col-md-6">
+                {{ form.apellido.label(class_='form-label') }}
+                {{ form.apellido(class_='form-control') }}
+            </div>
+            <div class="col-md-4">
+                {{ form.tipo.label(class_='form-label') }}
+                {{ form.tipo(class_='form-select') }}
+            </div>
+            <div class="col-md-4">
+                {{ form.password.label(class_='form-label') }}
+                {{ form.password(class_='form-control', placeholder=_('Dejar vacío para no cambiar') if usuario else '') }}
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check">
+                    {{ form.activo(class_='form-check-input') }}
+                    {{ form.activo.label(class_='form-check-label') }}
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 d-flex gap-2">
+            {{ form.submit(class_='btn btn-primary') }}
+            <a href="{{ url_for('admin.usuarios') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

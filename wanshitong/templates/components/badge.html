@@ -1,0 +1,32 @@
+{# Badges componente reutilizable #}
+
+{# Macro para badge de estado de documento #}
+{%- macro badge_status(status) -%}
+    {% if status == 'draft' %}
+        <span class="badge badge-gray">{{ _('Borrador') }}</span>
+    {% elif status == 'published' %}
+        <span class="badge badge-success">{{ _('Publicado') }}</span>
+    {% elif status == 'archived' %}
+        <span class="badge">{{ _('Archivado') }}</span>
+    {% else %}
+        <span class="badge">{{ status }}</span>
+    {% endif %}
+{%- endmacro -%}
+
+{# Macro para badge de permiso #}
+{%- macro badge_permission(permission) -%}
+    {% if permission == 'private' %}
+        <span class="badge badge-primary">🔒 {{ _('Privado') }}</span>
+    {% elif permission == 'shared' %}
+        <span class="badge badge-primary">👥 {{ _('Compartido') }}</span>
+    {% elif permission == 'public' %}
+        <span class="badge badge-primary">🌐 {{ _('Público') }}</span>
+    {% else %}
+        <span class="badge">{{ permission }}</span>
+    {% endif %}
+{%- endmacro -%}
+
+{# Macro flexible para badge genérico #}
+{%- macro badge(text, variant='gray') -%}
+    <span class="badge badge-{{ variant }}">{{ text }}</span>
+{%- endmacro -%}

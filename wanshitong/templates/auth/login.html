@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="{{ get_locale() }}">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>{{ _('Iniciar sesión') }} — {{ site_title }}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom minimalista -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #ffffff;
+            padding: var(--spacing-lg);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: none;
+        }
+
+        .login-header {
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .login-brand {
+            width: 176px;
+            height: 176px;
+            object-fit: contain;
+            margin: 0 auto var(--spacing-md);
+            display: block;
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            margin: 0 0 var(--spacing-sm) 0;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: var(--font-size-sm);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: var(--font-size-sm);
+            color: var(--text);
+        }
+
+        .form-group input {
+            padding: var(--spacing-md);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--muted);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-button:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid var(--danger);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .language-selector {
+            position: absolute;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+        }
+
+        .language-selector a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            transition: color 0.2s;
+        }
+
+        .language-selector a:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Language selector -->
+    <div class="language-selector">
+        <a href="?lang={% if get_locale() == 'es' %}en{% else %}es{% endif %}">
+            {% if get_locale() == 'es' %}EN{% else %}ES{% endif %}
+        </a>
+    </div>
+
+    <!-- Login container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <img src="{{ site_logo_url }}" alt="{{ site_title }}" class="login-brand">
+                <h1>{{ site_title }}</h1>
+                <p>{{ _('Gestor de Conocimiento') }}</p>
+            </div>
+
+            <!-- Flash messages -->
+            {%- set flashed = get_flashed_messages(with_categories=true) -%}
+            {% if flashed %}
+            <div class="alert">
+                {{ flashed[0][1] }}
+            </div>
+            {% endif %}
+
+            <!-- Login form -->
+            <form class="login-form" method="post" action="{{ url_for('auth.login') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    <label for="{{ form.email.id }}">{{ _('Usuario o correo electrónico') }}</label>
+                    {{ form.email(id='email', class_='', autocomplete='username', placeholder=_('tu-usuario o correo@ejemplo.com')) }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password.id }}">{{ _('Contraseña') }}</label>
+                    {{ form.password(id='password', class_='', autocomplete='current-password', placeholder=_('Tu contraseña')) }}
+                </div>
+
+                <button type="submit" class="login-button">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

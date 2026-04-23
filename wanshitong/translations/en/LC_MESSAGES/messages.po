@@ -1,0 +1,407 @@
+# English translations for WanShiTong.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the WanShiTong project.
+# WanShiTong contributors, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: WanShiTong 0.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-23 18:47+0000\n"
+"PO-Revision-Date: 2026-04-22 20:32+0000\n"
+"Last-Translator: WanShiTong contributors\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#~ msgid "Favor iniciar sesión para acceder al sistema."
+#~ msgstr "Please log in to access the system."
+
+#~ msgid "La contraseña es requerida al crear un usuario."
+#~ msgstr "A password is required when creating a user."
+
+#~ msgid "Usuario creado exitosamente."
+#~ msgstr "User created successfully."
+
+#~ msgid "Usuario actualizado exitosamente."
+#~ msgstr "User updated successfully."
+
+#~ msgid "No puede eliminar su propio usuario."
+#~ msgstr "You cannot delete your own account."
+
+#~ msgid "Usuario eliminado."
+#~ msgstr "User deleted."
+
+#~ msgid "Grupo creado exitosamente."
+#~ msgstr "Group created successfully."
+
+#~ msgid "Grupo actualizado exitosamente."
+#~ msgstr "Group updated successfully."
+
+#~ msgid "Grupo eliminado."
+#~ msgstr "Group deleted."
+
+#~ msgid "Usuario agregado al grupo."
+#~ msgstr "User added to group."
+
+#~ msgid "Usuario removido del grupo."
+#~ msgstr "User removed from group."
+
+#~ msgid "Ninguna"
+#~ msgstr "None"
+
+#~ msgid "Categoría creada exitosamente."
+#~ msgstr "Category created successfully."
+
+#~ msgid "Categoría actualizada exitosamente."
+#~ msgstr "Category updated successfully."
+
+#~ msgid "Categoría eliminada."
+#~ msgstr "Category deleted."
+
+#~ msgid "Usuario o contraseña incorrectos."
+#~ msgstr "Incorrect username or password."
+
+#~ msgid "Sesión cerrada correctamente."
+#~ msgstr "You have been logged out."
+
+#~ msgid "Sin categoría"
+#~ msgstr "No category"
+
+#~ msgid "Versión inicial"
+#~ msgstr "Initial version"
+
+#~ msgid "Documento creado exitosamente."
+#~ msgstr "Document created successfully."
+
+#~ msgid "Documento actualizado exitosamente."
+#~ msgstr "Document updated successfully."
+
+#~ msgid "Documento eliminado."
+#~ msgstr "Document deleted."
+
+#~ msgid "Antes de restaurar versión "
+#~ msgstr "Before restoring version "
+
+#~ msgid "Versión restaurada exitosamente."
+#~ msgstr "Version restored successfully."
+
+#~ msgid "Ninguno"
+#~ msgstr "None"
+
+#~ msgid "Debe seleccionar un usuario o un grupo."
+#~ msgstr "You must select a user or a group."
+
+#~ msgid "Permiso agregado."
+#~ msgstr "Permission added."
+
+#~ msgid "Permiso eliminado."
+#~ msgstr "Permission removed."
+
+#~ msgid "Iniciar sesión"
+#~ msgstr "Log in"
+
+#~ msgid "Título"
+#~ msgstr "Title"
+
+#~ msgid "Contenido"
+#~ msgstr "Content"
+
+#~ msgid "Categoría"
+#~ msgstr "Category"
+
+#~ msgid "Visibilidad"
+#~ msgstr "Visibility"
+
+#~ msgid "Privado"
+#~ msgstr "Private"
+
+#~ msgid "Público"
+#~ msgstr "Public"
+
+#~ msgid "Estado"
+#~ msgstr "Status"
+
+#~ msgid "Borrador"
+#~ msgstr "Draft"
+
+#~ msgid "Publicado"
+#~ msgstr "Published"
+
+#~ msgid "Archivado"
+#~ msgstr "Archived"
+
+#~ msgid "Etiquetas (separadas por comas)"
+#~ msgstr "Tags (comma-separated)"
+
+#~ msgid "Descripción del cambio"
+#~ msgstr "Change description"
+
+#~ msgid "Guardar"
+#~ msgstr "Save"
+
+#~ msgid "Usuario"
+#~ msgstr "User"
+
+#~ msgid "Nombre"
+#~ msgstr "Name"
+
+#~ msgid "Apellido"
+#~ msgstr "Last name"
+
+#~ msgid "Correo electrónico"
+#~ msgstr "Email address"
+
+#~ msgid "Rol"
+#~ msgstr "Role"
+
+#~ msgid "Administrador"
+#~ msgstr "Administrator"
+
+#~ msgid "Editor"
+#~ msgstr "Editor"
+
+#~ msgid "Consulta"
+#~ msgstr "Read-only"
+
+#~ msgid "Activo"
+#~ msgstr "Active"
+
+#~ msgid "Contraseña"
+#~ msgstr "Password"
+
+#~ msgid "Descripción"
+#~ msgstr "Description"
+
+#~ msgid "Categoría padre"
+#~ msgstr "Parent category"
+
+#~ msgid "Buscar"
+#~ msgstr "Search"
+
+#~ msgid "Todos"
+#~ msgstr "All"
+
+#~ msgid "Etiqueta"
+#~ msgstr "Tag"
+
+#~ msgid "Grupo"
+#~ msgstr "Group"
+
+#~ msgid "Permiso"
+#~ msgstr "Permission"
+
+#~ msgid "Lectura"
+#~ msgstr "Read"
+
+#~ msgid "Edición"
+#~ msgstr "Edit"
+
+#~ msgid "Agregar permiso"
+#~ msgstr "Add permission"
+
+#~ msgid "WanShiTong"
+#~ msgstr "WanShiTong"
+
+#~ msgid "Cerrar Sesión"
+#~ msgstr "Log out"
+
+#~ msgid "Inicio"
+#~ msgstr "Home"
+
+#~ msgid "Documentos"
+#~ msgstr "Documents"
+
+#~ msgid "Nuevo documento"
+#~ msgstr "New document"
+
+#~ msgid "Administración"
+#~ msgstr "Administration"
+
+#~ msgid "Usuarios"
+#~ msgstr "Users"
+
+#~ msgid "Grupos"
+#~ msgstr "Groups"
+
+#~ msgid "Categorías"
+#~ msgstr "Categories"
+
+#~ msgid "Panel principal"
+#~ msgstr "Dashboard"
+
+#~ msgid "+ Nuevo documento"
+#~ msgstr "+ New document"
+
+#~ msgid "Documentos recientes"
+#~ msgstr "Recent documents"
+
+#~ msgid "Autor"
+#~ msgstr "Author"
+
+#~ msgid "No hay documentos disponibles."
+#~ msgstr "No documents available."
+
+#~ msgid "Ver todos los documentos"
+#~ msgstr "View all documents"
+
+#~ msgid "Editar categoría"
+#~ msgstr "Edit category"
+
+#~ msgid "Nueva categoría"
+#~ msgstr "New category"
+
+#~ msgid "Editar"
+#~ msgstr "Edit"
+
+#~ msgid "Nueva"
+#~ msgstr "New"
+
+#~ msgid "Cancelar"
+#~ msgstr "Cancel"
+
+#~ msgid "+ Nueva categoría"
+#~ msgstr "+ New category"
+
+#~ msgid "Padre"
+#~ msgstr "Parent"
+
+#~ msgid "¿Eliminar categoría?"
+#~ msgstr "Delete this category?"
+
+#~ msgid "Eliminar"
+#~ msgstr "Delete"
+
+#~ msgid "Editar grupo"
+#~ msgstr "Edit group"
+
+#~ msgid "Nuevo grupo"
+#~ msgstr "New group"
+
+#~ msgid "Nuevo"
+#~ msgstr "New"
+
+#~ msgid "Miembros del grupo"
+#~ msgstr "Group members"
+
+#~ msgid "Quitar"
+#~ msgstr "Remove"
+
+#~ msgid "Sin miembros."
+#~ msgstr "No members."
+
+#~ msgid "+ Nuevo grupo"
+#~ msgstr "+ New group"
+
+#~ msgid "Miembros"
+#~ msgstr "Members"
+
+#~ msgid "¿Eliminar grupo?"
+#~ msgstr "Delete this group?"
+
+#~ msgid "Editar usuario"
+#~ msgstr "Edit user"
+
+#~ msgid "Nuevo usuario"
+#~ msgstr "New user"
+
+#~ msgid "+ Nuevo usuario"
+#~ msgstr "+ New user"
+
+#~ msgid "Correo"
+#~ msgstr "Email"
+
+#~ msgid "Sí"
+#~ msgstr "Yes"
+
+#~ msgid "No"
+#~ msgstr "No"
+
+#~ msgid "¿Eliminar usuario?"
+#~ msgstr "Delete this user?"
+
+#~ msgid "Introduce tus credenciales para acceder."
+#~ msgstr "Enter your credentials to access the system."
+
+#~ msgid "Usuario o correo electrónico"
+#~ msgstr "Username or email address"
+
+#~ msgid "Editar documento"
+#~ msgstr "Edit document"
+
+#~ msgid "Historial"
+#~ msgstr "History"
+
+#~ msgid "Historial de versiones"
+#~ msgstr "Version history"
+
+#~ msgid "Versión actual"
+#~ msgstr "Current version"
+
+#~ msgid "Versión"
+#~ msgstr "Version"
+
+#~ msgid "Modificado por"
+#~ msgstr "Modified by"
+
+#~ msgid "Fecha"
+#~ msgstr "Date"
+
+#~ msgid "Ver"
+#~ msgstr "View"
+
+#~ msgid "No hay versiones previas."
+#~ msgstr "No previous versions."
+
+#~ msgid "+ Nuevo"
+#~ msgstr "+ New"
+
+#~ msgid "Buscar..."
+#~ msgstr "Search..."
+
+#~ msgid "Todos los estados"
+#~ msgstr "All statuses"
+
+#~ msgid "No se encontraron documentos."
+#~ msgstr "No documents found."
+
+#~ msgid "Permisos"
+#~ msgstr "Permissions"
+
+#~ msgid "Permisos del documento"
+#~ msgstr "Document permissions"
+
+#~ msgid "Permisos actuales"
+#~ msgstr "Current permissions"
+
+#~ msgid "Sujeto"
+#~ msgstr "Subject"
+
+#~ msgid "Tipo"
+#~ msgstr "Type"
+
+#~ msgid "Sin permisos explícitos."
+#~ msgstr "No explicit permissions."
+
+#~ msgid "Creado"
+#~ msgstr "Created"
+
+#~ msgid "Modificado"
+#~ msgstr "Modified"
+
+#~ msgid "¿Eliminar este documento?"
+#~ msgstr "Delete this document?"
+
+#~ msgid "Guardado por"
+#~ msgstr "Saved by"
+
+#~ msgid "¿Restaurar esta versión?"
+#~ msgstr "Restore this version?"
+
+#~ msgid "Restaurar esta versión"
+#~ msgstr "Restore this version"
+

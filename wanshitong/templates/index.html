@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-top">
+        <h1>{{ _('Panel principal') }}</h1>
+        {% if current_user.tipo in ('admin', 'editor') %}
+        <a href="{{ url_for('documentos.nuevo') }}" class="btn btn-primary">{{ _('+ Nuevo documento') }}</a>
+        {% endif %}
+    </div>
+</div>
+
+<section class="content-section">
+    <div class="dashboard-overview">
+        <h2 class="section-title">{{ _('Tablero') }}</h2>
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="dashboard-card-title">{{ _('Documentos totales') }}</div>
+                <div class="dashboard-card-value">{{ summary.documents }}</div>
+                <div class="dashboard-card-meta">{{ _('Todos los documentos') }}</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card-title">{{ _('Documentos activos') }}</div>
+                <div class="dashboard-card-value">{{ summary.active }}</div>
+                <div class="dashboard-card-meta">{{ _('No archivados') }}</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card-title">{{ _('Categorías') }}</div>
+                <div class="dashboard-card-value">{{ summary.categories }}</div>
+                <div class="dashboard-card-meta">{{ _('Espacios y categorías') }}</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card-title">{{ _('Etiquetas') }}</div>
+                <div class="dashboard-card-value">{{ summary.tags }}</div>
+                <div class="dashboard-card-meta">{{ _('Marcas activas') }}</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card-title">{{ _('Usuarios') }}</div>
+                <div class="dashboard-card-value">{{ summary.users }}</div>
+                <div class="dashboard-card-meta">{{ _('Cuentas registradas') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">{{ _('Documentos recientes') }}</h2>
+    
+    {% if recientes %}
+    <div class="documents-list">
+        {% for doc in recientes %}
+        <a href="{{ url_for('documentos.ver', doc_id=doc.id) }}" class="document-item">
+            <div class="document-header">
+                <h3 class="document-title">{{ doc.titulo }}</h3>
+                <div class="document-badges">
+                    {% if doc.estado == 'draft' %}
+                        <span class="badge badge-gray">{{ _('Borrador') }}</span>
+                    {% elif doc.estado == 'public' %}
+                        <span class="badge badge-success">{{ _('Publicado') }}</span>
+                    {% elif doc.estado == 'archived' %}
+                        <span class="badge">{{ _('Archivado') }}</span>
+                    {% endif %}
+                    
+                    {% if doc.visibilidad == 'private' %}
+                        <span class="badge badge-primary">🔒 {{ _('Privado') }}</span>
+                    {% elif doc.visibilidad == 'shared' %}
+                        <span class="badge badge-primary">👥 {{ _('Compartido') }}</span>
+                    {% elif doc.visibilidad == 'public' %}
+                        <span class="badge badge-primary">🌐 {{ _('Público') }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <p class="document-meta">
+                <span class="text-muted">{{ _('Autor') }}: <strong>{{ doc.autor.usuario }}</strong></span>
+                <span class="meta-separator">•</span>
+                <span class="text-muted" title="{{ doc.creado }}">{{ doc.creado }}</span>
+            </p>
+            
+            {% if doc.etiquetas %}
+            <div class="document-tags">
+                {% for tag in doc.etiquetas %}
+                <span class="tag">{{ tag.nombre }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p class="text-muted">{{ _('No hay documentos disponibles.') }}</p>
+    </div>
+    {% endif %}
+    
+    <div class="content-footer">
+        <a href="{{ url_for('documentos.lista') }}" class="btn btn-outline">{{ _('Ver todos los documentos') }}</a>
+    </div>
+</section>
+
+<style>
+.page-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.page-header-top h1 {
+    margin: 0;
+}
+
+.section-title {
+    margin: var(--spacing-lg) 0 var(--spacing-lg) 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dashboard-overview {
+    margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-md);
+}
+
+.dashboard-card {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.dashboard-card-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: var(--spacing-sm);
+}
+
+.dashboard-card-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.dashboard-card-meta {
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}
+
+.content-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.document-item {
+    display: block;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.document-item:hover {
+    border-color: var(--primary);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+}
+
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.document-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.document-badges {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.document-meta {
+    margin: var(--spacing-sm) 0;
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}
+
+.meta-separator {
+    margin: 0 var(--spacing-sm);
+}
+
+.document-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--surface);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.empty-state {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--muted);
+}
+
+.content-footer {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+    .page-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .document-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .document-badges {
+        justify-content: flex-start;
+    }
+}
+</style>
+{% endblock %}
+

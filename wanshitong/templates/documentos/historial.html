@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Historial') }}: {{ doc.titulo }} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('documentos.lista') }}">{{ _('Documentos') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('documentos.ver', doc_id=doc.id) }}">{{ doc.titulo }}</a></li>
+            <li class="breadcrumb-item active">{{ _('Historial') }}</li>
+        </ol>
+    </nav>
+
+    <h2>{{ _('Historial de versiones') }}: {{ doc.titulo }}</h2>
+    <p class="text-muted">{{ _('Versión actual') }}: v{{ doc.numero_version }}</p>
+
+    {% if versiones %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{{ _('Versión') }}</th>
+                <th>{{ _('Título') }}</th>
+                <th>{{ _('Modificado por') }}</th>
+                <th>{{ _('Fecha') }}</th>
+                <th>{{ _('Descripción') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ver in versiones %}
+            <tr>
+                <td>v{{ ver.numero_version }}</td>
+                <td>{{ ver.titulo }}</td>
+                <td>{{ ver.modificado_por.usuario if ver.modificado_por else '—' }}</td>
+                <td>{{ ver.creado }}</td>
+                <td>{{ ver.descripcion_cambio or '—' }}</td>
+                <td>
+                    <a href="{{ url_for('documentos.ver_version', doc_id=doc.id, ver_id=ver.id) }}" class="btn btn-sm btn-outline-secondary">{{ _('Ver') }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">{{ _('No hay versiones previas.') }}</p>
+    {% endif %}
+</div>
+{% endblock %}

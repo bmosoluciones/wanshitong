@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ doc.titulo }} — WanShiTong{% endblock %}
+
+{% block content %}
+<article class="doc-view">
+
+    {# Topbar con acciones discretas #}
+    <div class="doc-view-topbar">
+        <nav class="doc-breadcrumb">
+            {% if category_path %}
+                {% for node in category_path %}
+                    <a href="{{ url_for('documentos.lista', categoria_id=node.id) }}">{{ node.nombre }}</a>
+                    {% if not loop.last %}<span>/</span>{% endif %}
+                {% endfor %}
+            {% else %}
+                <a href="{{ url_for('documentos.lista') }}">{{ _('Documentos') }}</a>
+            {% endif %}
+        </nav>
+
+        <div class="doc-view-actions">
+            {% if puede_editar %}
+            <a href="{{ url_for('documentos.editar', doc_id=doc.id) }}" class="btn btn-primary btn-small">{{ _('Editar') }}</a>
+            <a href="{{ url_for('documentos.historial', doc_id=doc.id) }}" class="btn btn-outline btn-small">{{ _('Historial') }}</a>
+            <a href="{{ url_for('documentos.permisos', doc_id=doc.id) }}" class="btn btn-outline btn-small">{{ _('Permisos') }}</a>
+            <form method="post" action="{{ url_for('documentos.eliminar', doc_id=doc.id) }}"
+                onsubmit="return confirm('{{ _('¿Eliminar este documento?') }}')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline btn-small" style="color:var(--danger);border-color:var(--danger)">{{ _('Eliminar') }}</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="doc-view-body">
+        {# Título #}
+        <h1 class="doc-view-title">{{ doc.titulo }}</h1>
+
+            {# Metadata inline #}
+            <div class="doc-view-meta">
+                {% if doc.estado == 'draft' %}
+                    <span class="meta-pill"><span class="meta-status-dot dot-draft"></span>{{ _('Borrador') }}</span>
+                {% elif doc.estado == 'public' %}
+                    <span class="meta-pill"><span class="meta-status-dot dot-public"></span>{{ _('Publicado') }}</span>
+                {% elif doc.estado == 'archived' %}
+                    <span class="meta-pill"><span class="meta-status-dot dot-archived"></span>{{ _('Archivado') }}</span>
+                {% endif %}
+
+                {% if doc.visibilidad == 'privado' %}
+                    <span class="meta-pill">🔒 {{ _('Privado') }}</span>
+                {% else %}
+                    <span class="meta-pill">🌐 {{ _('Público') }}</span>
+                {% endif %}
+
+                {% if doc.categoria %}
+                    <span class="meta-pill">{{ doc.categoria.nombre }}</span>
+                {% endif %}
+
+                {% for tag in doc.etiquetas %}
+                    <span class="meta-pill">#{{ tag.nombre }}</span>
+                {% endfor %}
+
+                <span class="doc-view-byline">
+                    {{ doc.autor.usuario }} · v{{ doc.numero_version }}
+                    {% if doc.modificado %} · {{ doc.modificado.strftime('%Y-%m-%d') }}{% endif %}
+                </span>
+            </div>
+
+            <hr class="doc-divider">
+
+        <div class="markdown-body">
+            {{ html_contenido | safe }}
+        </div>
+    </div>
+</article>
+
+<style>
+.content-wrapper {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.doc-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+}
+
+.doc-view-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.doc-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+    min-width: 0;
+}
+
+.doc-breadcrumb a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.doc-view-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.doc-view-body {
+    width: 100%;
+    padding: var(--spacing-xl);
+    box-sizing: border-box;
+}
+
+.doc-view-title {
+    font-size: clamp(2.25rem, 2.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.12;
+    margin: 0 0 var(--spacing-lg) 0;
+}
+
+.doc-view-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+}
+
+.meta-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-draft    { background: #ffa726; }
+.dot-public   { background: var(--success); }
+.dot-archived { background: var(--muted); }
+
+.doc-view-byline {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: var(--spacing-sm);
+}
+
+.doc-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: var(--spacing-lg) 0 var(--spacing-xl) 0;
+}
+
+.markdown-body {
+    min-height: 70vh;
+    color: var(--text);
+}
+
+@media (max-width: 768px) {
+    .doc-view-topbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .doc-view-actions {
+        justify-content: space-between;
+    }
+
+    .doc-view-title {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}

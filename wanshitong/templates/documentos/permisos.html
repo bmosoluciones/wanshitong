@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Permisos') }}: {{ doc.titulo }} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('documentos.lista') }}">{{ _('Documentos') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('documentos.ver', doc_id=doc.id) }}">{{ doc.titulo }}</a></li>
+            <li class="breadcrumb-item active">{{ _('Permisos') }}</li>
+        </ol>
+    </nav>
+
+    <h2>{{ _('Permisos del documento') }}: {{ doc.titulo }}</h2>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h5>{{ _('Agregar permiso') }}</h5>
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.usuario_id.label(class_='form-label') }}
+                        {{ form.usuario_id(class_='form-select') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.grupo_id.label(class_='form-label') }}
+                        {{ form.grupo_id(class_='form-select') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.tipo_permiso.label(class_='form-label') }}
+                        {{ form.tipo_permiso(class_='form-select') }}
+                    </div>
+                    {{ form.submit(class_='btn btn-primary') }}
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h5>{{ _('Permisos actuales') }}</h5>
+            {% if permisos %}
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>{{ _('Sujeto') }}</th>
+                        <th>{{ _('Tipo') }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in permisos %}
+                    <tr>
+                        <td>
+                            {% if p.usuario %}
+                            👤 {{ p.usuario.usuario }}
+                            {% elif p.grupo %}
+                            👥 {{ p.grupo.nombre }}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ p.tipo_permiso }}</span></td>
+                        <td>
+                            <form method="post" action="{{ url_for('documentos.eliminar_permiso', doc_id=doc.id, perm_id=p.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger">{{ _('Quitar') }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">{{ _('Sin permisos explícitos.') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

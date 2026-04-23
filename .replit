@@ -1,0 +1,16 @@
+modules = ["nodejs-20", "python-3.11"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["gh"]
+
+[[ports]]
+localPort = 5000
+externalPort = 8099
+exposeLocalhost = true
+
+[[ports]]
+localPort = 8080
+externalPort = 80

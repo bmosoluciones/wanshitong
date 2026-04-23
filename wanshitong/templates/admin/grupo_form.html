@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if grupo %}{{ _('Editar grupo') }}{% else %}{{ _('Nuevo grupo') }}{% endif %} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.grupos') }}">{{ _('Grupos') }}</a></li>
+            <li class="breadcrumb-item active">{% if grupo %}{{ _('Editar') }}{% else %}{{ _('Nuevo') }}{% endif %}</li>
+        </ol>
+    </nav>
+    <h2>{% if grupo %}{{ _('Editar grupo') }}: {{ grupo.nombre }}{% else %}{{ _('Nuevo grupo') }}{% endif %}</h2>
+
+    <form method="post" class="mt-3">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.nombre.label(class_='form-label') }}
+            {{ form.nombre(class_='form-control') }}
+        </div>
+        <div class="mb-3">
+            {{ form.descripcion.label(class_='form-label') }}
+            {{ form.descripcion(class_='form-control', rows=3) }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.usuario_ids.label.text }}</label>
+            {{ form.usuario_ids(class_='d-none', multiple=true, id='selected-user-ids') }}
+
+            <div class="input-group mb-2">
+                <select id="available-user" class="form-select">
+                    <option value="">{{ _('Selecciona un usuario activo') }}</option>
+                    {% for uid, uname in form.usuario_ids.choices %}
+                    <option value="{{ uid }}">{{ uname }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-outline-primary" onclick="addUserToGroup()">{{ _('Agregar') }}</button>
+            </div>
+
+            <div id="selected-users" class="d-flex flex-wrap gap-2"></div>
+            <div class="form-text">{{ _('Usuarios actualmente asignados al grupo.') }}</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.categoria_ids.label.text }}</label>
+            <div class="row row-cols-1 row-cols-md-3 g-2">
+                {% for cid, cname in form.categoria_ids.choices %}
+                <div class="col">
+                    <label class="form-check border rounded p-2 w-100">
+                        <input class="form-check-input" type="checkbox" name="{{ form.categoria_ids.name }}" value="{{ cid }}" {% if cid in (form.categoria_ids.data or []) %}checked{% endif %}>
+                        <span class="form-check-label ms-1">{{ cname }}</span>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="form-text">{{ _('Estas categorías definen el acceso del grupo a documentos privados.') }}</div>
+        </div>
+        <div class="d-flex gap-2">
+            {{ form.submit(class_='btn btn-primary') }}
+            <a href="{{ url_for('admin.grupos') }}" class="btn btn-outline-secondary">{{ _('Cancelar') }}</a>
+        </div>
+    </form>
+
+    {% if grupo %}
+    <hr class="mt-4">
+    <h5>{{ _('Miembros del grupo') }}</h5>
+    {% set todos_usuarios = grupo.usuarios %}
+    {% if todos_usuarios %}
+    <table class="table table-sm">
+        <tbody>
+            {% for u in todos_usuarios %}
+            <tr>
+                <td>{{ u.usuario }} — {{ u.nombre }} {{ u.apellido }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('admin.eliminar_miembro', grupo_id=grupo.id, user_id=u.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-outline-danger">{{ _('Quitar') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">{{ _('Sin miembros.') }}</p>
+    {% endif %}
+
+    <hr class="mt-4">
+    <h5>{{ _('Categorías con acceso') }}</h5>
+    {% if grupo.categorias %}
+    <ul class="list-group">
+        {% for categoria in grupo.categorias %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ categoria.nombre }}</span>
+            <span class="badge text-bg-light">{{ categoria.slug or '—' }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted">{{ _('Sin categorías asignadas.') }}</p>
+    {% endif %}
+    {% endif %}
+</div>
+
+<script>
+function selectedUserMap() {
+    const select = document.getElementById('selected-user-ids');
+    const map = new Map();
+    Array.from(select.options).forEach((opt) => {
+        if (opt.selected) map.set(opt.value, opt.textContent);
+    });
+    return map;
+}
+
+function renderSelectedUsers() {
+    const container = document.getElementById('selected-users');
+    const users = selectedUserMap();
+    container.innerHTML = '';
+    users.forEach((name, id) => {
+        const chip = document.createElement('span');
+        chip.className = 'badge text-bg-light border d-inline-flex align-items-center gap-2 p-2';
+        chip.innerHTML = `${name} <button type="button" class="btn btn-sm p-0" aria-label="remove" onclick="removeUserFromGroup('${id}')">✕</button>`;
+        container.appendChild(chip);
+    });
+}
+
+function addUserToGroup() {
+    const picker = document.getElementById('available-user');
+    const select = document.getElementById('selected-user-ids');
+    if (!picker.value) return;
+    const target = Array.from(select.options).find((opt) => opt.value === picker.value);
+    if (target) target.selected = true;
+    renderSelectedUsers();
+}
+
+function removeUserFromGroup(userId) {
+    const select = document.getElementById('selected-user-ids');
+    const target = Array.from(select.options).find((opt) => opt.value === userId);
+    if (target) target.selected = false;
+    renderSelectedUsers();
+}
+
+document.addEventListener('DOMContentLoaded', renderSelectedUsers);
+</script>
+{% endblock %}

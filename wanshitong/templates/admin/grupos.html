@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Grupos') }} — WanShiTong{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>{{ _('Grupos') }}</h2>
+        <a href="{{ url_for('admin.nuevo_grupo') }}" class="btn btn-primary">{{ _('+ Nuevo grupo') }}</a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>{{ _('Nombre') }}</th>
+                <th>{{ _('Descripción') }}</th>
+                <th>{{ _('Miembros') }}</th>
+                <th>{{ _('Categorías') }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in grupos %}
+            <tr>
+                <td>{{ g.nombre }}</td>
+                <td>{{ g.descripcion or '—' }}</td>
+                <td>{{ g.usuarios | length }}</td>
+                <td>{{ g.categorias | length }}</td>
+                <td>
+                    <a href="{{ url_for('admin.editar_grupo', grupo_id=g.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
+                    <form method="post" action="{{ url_for('admin.eliminar_grupo', grupo_id=g.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar grupo?') }}')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
