@@ -4,6 +4,11 @@
 
 Store, organise, and share Markdown documents inside your team.
 
+![Home page](docs/images/home.png)
+
+
+![Editor page](docs/images/editor.png)
+
 ---
 
 ## Features
