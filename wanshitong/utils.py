@@ -14,7 +14,7 @@ from wanshitong.model import AppConfig, Usuario, database
 DEFAULT_SETTINGS = {
     "site_title": {"value": "WanShiTong", "type": "string"},
     "site_logo_filename": {"value": "", "type": "string"},
-    "default_language": {"value": "en", "type": "string"},
+    "default_language": {"value": "es", "type": "string"},
     "uploads_enabled": {"value": "1", "type": "bool"},
     "max_upload_size_mb": {"value": "10", "type": "int"},
 }

@@ -52,7 +52,7 @@ babel = Babel()
 csrf = CSRFProtect()
 
 SUPPORTED_LOCALES = ("es", "en")
-DEFAULT_LOCALE = "en"
+DEFAULT_LOCALE = "es"
 
 EXPECTED_SCHEMA = {
     "usuario": {"theme_preference", "avatar_extension", "ultimo_acceso"},
