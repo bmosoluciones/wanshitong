@@ -169,7 +169,9 @@ def create_app(config) -> Flask:
 
     app.config.setdefault("BABEL_DEFAULT_LOCALE", app.config["APP_DEFAULT_LOCALE"])
     app.config.setdefault("BABEL_SUPPORTED_LOCALES", list(SUPPORTED_LOCALES))
-    app.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", "translations")
+    app.config.setdefault(
+        "BABEL_TRANSLATION_DIRECTORIES", str(Path(app.root_path) / "translations")
+    )
 
     babel.init_app(app, locale_selector=_get_locale)
     session_manager.init_app(app)

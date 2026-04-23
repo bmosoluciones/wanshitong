@@ -47,8 +47,8 @@ Key Python dependencies (see `requirements.txt` for the full list):
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/williamjmorenor/WanShiTong.git
-cd WanShiTong
+git clone https://github.com/bmosoluciones/wanshitong.git
+cd wanshitong
 
 # 2. Create and activate a virtual environment
 python -m venv .venv
@@ -94,7 +94,7 @@ Tests use an **in-memory SQLite database** so no external services are required.
 ## Configuration
 
 The application reads configuration from environment variables.
-A file-based config (`app.conf`) is also supported — see `app/config.py` for search paths.
+A file-based config (`app.conf`) is also supported — see `wanshitong/config.py` for search paths.
 
 | Variable | Default | Description |
 |---|---|---|
@@ -119,15 +119,19 @@ The active locale is resolved in this order:
 To recompile translations after editing `.po` files:
 
 ```bash
-pybabel compile -d app/translations
+# From the repository root
+pybabel compile -d wanshitong/translations
 ```
 
-To extract new strings and update existing catalogs:
+To extract new strings and update existing catalogs (sources are inside the
+`wanshitong` package):
 
 ```bash
-pybabel extract -F babel.cfg -k lazy_gettext -o messages.pot .
-pybabel update -i messages.pot -d app/translations
-pybabel compile -d app/translations
+# From the repository root
+# babel.cfg is written relative to the `wanshitong` source dir passed below
+pybabel extract -F babel.cfg -k lazy_gettext -o wanshitong/translations/messages.pot wanshitong
+pybabel update -i wanshitong/translations/messages.pot -d wanshitong/translations
+pybabel compile -d wanshitong/translations
 ```
 
 ---

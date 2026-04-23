@@ -17,5 +17,15 @@ build-backend = "setuptools.build_meta"
 dependencies = {file = ["requirements.txt"]}
 version = {attr = "wanshitong.version.__version__"}
 
+[tool.setuptools.packages.find]
+include = ["wanshitong*"]
+
+[tool.setuptools.package-data]
+wanshitong = [
+	"translations/**/*.po",
+	"translations/**/*.mo",
+	"translations/**/*.pot",
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]

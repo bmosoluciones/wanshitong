@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: WanShiTong 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 18:47+0000\n"
+"POT-Creation-Date: 2026-04-23 13:55-0600\n"
 "PO-Revision-Date: 2026-04-22 20:32+0000\n"
 "Last-Translator: WanShiTong contributors\n"
 "Language: en\n"
@@ -17,6 +17,939 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: wanshitong/__init__.py:108
+msgid "Favor iniciar sesión para acceder al sistema."
+msgstr "Please log in to access the system."
+
+#: wanshitong/admin.py:106
+msgid "Formato de logo no soportado."
+msgstr "Unsupported logo format."
+
+#: wanshitong/admin.py:114
+msgid "Configuración actualizada exitosamente."
+msgstr "Settings updated successfully."
+
+#: wanshitong/admin.py:161
+msgid "La contraseña es requerida al crear un usuario."
+msgstr "A password is required when creating a user."
+
+#: wanshitong/admin.py:167
+msgid "Usuario creado exitosamente."
+msgstr "User created successfully."
+
+#: wanshitong/admin.py:192
+msgid "Usuario actualizado exitosamente."
+msgstr "User updated successfully."
+
+#: wanshitong/admin.py:207
+msgid "No puede eliminar su propio usuario."
+msgstr "You cannot delete your own account."
+
+#: wanshitong/admin.py:211
+msgid "Usuario eliminado."
+msgstr "User deleted."
+
+#: wanshitong/admin.py:245
+msgid "Grupo creado exitosamente."
+msgstr "Group created successfully."
+
+#: wanshitong/admin.py:270
+msgid "Grupo actualizado exitosamente."
+msgstr "Group updated successfully."
+
+#: wanshitong/admin.py:284
+msgid "Grupo eliminado."
+msgstr "Group deleted."
+
+#: wanshitong/admin.py:299
+msgid "Usuario agregado al grupo."
+msgstr "User added to group."
+
+#: wanshitong/admin.py:314
+msgid "Usuario removido del grupo."
+msgstr "User removed from group."
+
+#: wanshitong/admin.py:343 wanshitong/admin.py:381 wanshitong/admin.py:436
+#: wanshitong/admin.py:470
+msgid "Ninguna"
+msgstr "None"
+
+#: wanshitong/admin.py:358
+msgid "Categoría creada exitosamente."
+msgstr "Category created successfully."
+
+#: wanshitong/admin.py:396
+msgid "Categoría actualizada exitosamente."
+msgstr "Category updated successfully."
+
+#: wanshitong/admin.py:410
+msgid "Categoría eliminada."
+msgstr "Category deleted."
+
+#: wanshitong/admin.py:447
+msgid "Etiqueta creada exitosamente."
+msgstr "Tag created successfully."
+
+#: wanshitong/admin.py:479
+msgid "Etiqueta actualizada exitosamente."
+msgstr "Tag updated successfully."
+
+#: wanshitong/admin.py:493
+msgid "Etiqueta eliminada."
+msgstr "Tag deleted."
+
+#: wanshitong/auth.py:62
+msgid "Usuario o contraseña incorrectos."
+msgstr "Incorrect username or password."
+
+#: wanshitong/auth.py:71
+msgid "Sesión cerrada correctamente."
+msgstr "You have been logged out."
+
+#: wanshitong/auth.py:101
+msgid "Formato de imagen no soportado."
+msgstr "Unsupported image format."
+
+#: wanshitong/auth.py:107
+msgid "La imagen excede el tamaño máximo permitido."
+msgstr "The image exceeds the maximum allowed size."
+
+#: wanshitong/auth.py:112
+msgid "Perfil actualizado exitosamente."
+msgstr "Profile updated successfully."
+
+#: wanshitong/documentos.py:61
+msgid "Sin categoría"
+msgstr "No category"
+
+#: wanshitong/documentos.py:157
+msgid "Versión inicial"
+msgstr "Initial version"
+
+#: wanshitong/documentos.py:164
+msgid "Documento creado exitosamente."
+msgstr "Document created successfully."
+
+#: wanshitong/documentos.py:229
+msgid "Documento actualizado exitosamente."
+msgstr "Document updated successfully."
+
+#: wanshitong/documentos.py:246
+msgid "Documento eliminado."
+msgstr "Document deleted."
+
+#: wanshitong/documentos.py:311
+msgid "Antes de restaurar versión "
+msgstr "Before restoring version "
+
+#: wanshitong/documentos.py:320
+msgid "Versión restaurada exitosamente."
+msgstr "Version restored successfully."
+
+#: wanshitong/documentos.py:336 wanshitong/documentos.py:337
+msgid "Ninguno"
+msgstr "None"
+
+#: wanshitong/documentos.py:344
+msgid "Debe seleccionar un grupo."
+msgstr "You must select a group."
+
+#: wanshitong/documentos.py:354
+msgid "Permiso agregado."
+msgstr "Permission added."
+
+#: wanshitong/documentos.py:387
+msgid "Permiso eliminado."
+msgstr "Permission removed."
+
+#: wanshitong/forms.py:22 wanshitong/templates/auth/login.html:9
+msgid "Iniciar sesión"
+msgstr "Log in"
+
+#: wanshitong/forms.py:26 wanshitong/templates/documentos/historial.html:23
+msgid "Título"
+msgstr "Title"
+
+#: wanshitong/forms.py:27
+msgid "Contenido"
+msgstr "Content"
+
+#: wanshitong/forms.py:28 wanshitong/forms.py:140
+#: wanshitong/templates/documentos/editar.html:116
+msgid "Categoría"
+msgstr "Category"
+
+#: wanshitong/forms.py:30 wanshitong/templates/documentos/editar.html:125
+msgid "Visibilidad"
+msgstr "Visibility"
+
+#: wanshitong/forms.py:31 wanshitong/templates/components/badge.html:19
+#: wanshitong/templates/documentos/lista.html:61
+#: wanshitong/templates/documentos/ver.html:50
+#: wanshitong/templates/index.html:63
+msgid "Privado"
+msgstr "Private"
+
+#: wanshitong/forms.py:31 wanshitong/templates/components/badge.html:23
+#: wanshitong/templates/documentos/lista.html:65
+#: wanshitong/templates/documentos/ver.html:52
+#: wanshitong/templates/index.html:67
+msgid "Público"
+msgstr "Public"
+
+#: wanshitong/forms.py:35 wanshitong/forms.py:142
+#: wanshitong/templates/documentos/editar.html:134
+msgid "Estado"
+msgstr "Status"
+
+#: wanshitong/forms.py:37 wanshitong/forms.py:145
+#: wanshitong/templates/components/badge.html:6
+#: wanshitong/templates/documentos/editar.html:188
+#: wanshitong/templates/documentos/editar.html:189
+#: wanshitong/templates/documentos/lista.html:28
+#: wanshitong/templates/documentos/lista.html:53
+#: wanshitong/templates/documentos/ver.html:42
+#: wanshitong/templates/index.html:55
+msgid "Borrador"
+msgstr "Draft"
+
+#: wanshitong/forms.py:38 wanshitong/forms.py:146
+#: wanshitong/templates/components/badge.html:8
+#: wanshitong/templates/documentos/lista.html:29
+#: wanshitong/templates/documentos/lista.html:55
+#: wanshitong/templates/documentos/ver.html:44
+#: wanshitong/templates/index.html:57
+msgid "Publicado"
+msgstr "Published"
+
+#: wanshitong/forms.py:39 wanshitong/forms.py:147
+#: wanshitong/templates/components/badge.html:10
+#: wanshitong/templates/documentos/lista.html:30
+#: wanshitong/templates/documentos/lista.html:57
+#: wanshitong/templates/documentos/ver.html:46
+#: wanshitong/templates/index.html:59
+msgid "Archivado"
+msgstr "Archived"
+
+#: wanshitong/forms.py:44
+msgid "Etiquetas (separadas por comas)"
+msgstr "Tags (comma-separated)"
+
+#: wanshitong/forms.py:47
+msgid "Descripción del cambio"
+msgstr "Change description"
+
+#: wanshitong/forms.py:49 wanshitong/forms.py:70 wanshitong/forms.py:82
+#: wanshitong/forms.py:94 wanshitong/forms.py:103
+#: wanshitong/templates/documentos/editar.html:29
+msgid "Guardar"
+msgstr "Save"
+
+#: wanshitong/forms.py:53 wanshitong/forms.py:156
+#: wanshitong/templates/admin/usuarios.html:14
+msgid "Usuario"
+msgstr "User"
+
+#: wanshitong/forms.py:54 wanshitong/forms.py:74 wanshitong/forms.py:86
+#: wanshitong/forms.py:98 wanshitong/forms.py:126
+#: wanshitong/templates/admin/categorias.html:14
+#: wanshitong/templates/admin/etiquetas.html:14
+#: wanshitong/templates/admin/grupos.html:14
+#: wanshitong/templates/admin/usuarios.html:15
+msgid "Nombre"
+msgstr "Name"
+
+#: wanshitong/forms.py:55 wanshitong/forms.py:127
+msgid "Apellido"
+msgstr "Last name"
+
+#: wanshitong/forms.py:57 wanshitong/forms.py:129
+msgid "Correo electrónico"
+msgstr "Email address"
+
+#: wanshitong/forms.py:60 wanshitong/templates/admin/usuarios.html:17
+msgid "Rol"
+msgstr "Role"
+
+#: wanshitong/forms.py:62
+msgid "Administrador"
+msgstr "Administrator"
+
+#: wanshitong/forms.py:63 wanshitong/templates/documentos/editar.html:94
+msgid "Editor"
+msgstr "Editor"
+
+#: wanshitong/forms.py:64
+msgid "Consulta"
+msgstr "Read-only"
+
+#: wanshitong/forms.py:68 wanshitong/templates/admin/usuarios.html:18
+msgid "Activo"
+msgstr "Active"
+
+#: wanshitong/forms.py:69 wanshitong/templates/auth/login.html:193
+msgid "Contraseña"
+msgstr "Password"
+
+#: wanshitong/forms.py:75 wanshitong/templates/admin/grupos.html:15
+#: wanshitong/templates/documentos/historial.html:26
+msgid "Descripción"
+msgstr "Description"
+
+#: wanshitong/forms.py:77 wanshitong/templates/admin/grupos.html:16
+msgid "Miembros"
+msgstr "Members"
+
+#: wanshitong/forms.py:80
+msgid "Categorías accesibles"
+msgstr "Accessible categories"
+
+#: wanshitong/forms.py:87 wanshitong/forms.py:99
+#: wanshitong/templates/admin/categorias.html:15
+#: wanshitong/templates/admin/etiquetas.html:15
+msgid "Slug"
+msgstr "Slug"
+
+#: wanshitong/forms.py:88 wanshitong/forms.py:100
+msgid "Ícono"
+msgstr "Icon"
+
+#: wanshitong/forms.py:89 wanshitong/forms.py:101
+msgid "Color"
+msgstr "Color"
+
+#: wanshitong/forms.py:90
+msgid "Categoría padre"
+msgstr "Parent category"
+
+#: wanshitong/forms.py:92
+msgid "Grupos con acceso"
+msgstr "Groups with access"
+
+#: wanshitong/forms.py:102
+msgid "Etiqueta padre"
+msgstr "Parent tag"
+
+#: wanshitong/forms.py:108
+msgid "Título del sitio"
+msgstr "Site title"
+
+#: wanshitong/forms.py:110
+msgid "Logo del sitio"
+msgstr "Site logo"
+
+#: wanshitong/forms.py:112
+msgid "Idioma por defecto"
+msgstr "Default language"
+
+#: wanshitong/forms.py:116
+msgid "Permitir carga de archivos"
+msgstr "Allow file uploads"
+
+#: wanshitong/forms.py:118
+msgid "Tamaño máximo de archivos (MB)"
+msgstr "Maximum file size (MB)"
+
+#: wanshitong/forms.py:122
+msgid "Guardar configuración"
+msgstr "Save settings"
+
+#: wanshitong/forms.py:132
+msgid "Nueva contraseña"
+msgstr "New password"
+
+#: wanshitong/forms.py:134
+msgid "Imagen de perfil"
+msgstr "Profile image"
+
+#: wanshitong/forms.py:135
+msgid "Guardar perfil"
+msgstr "Save profile"
+
+#: wanshitong/forms.py:139 wanshitong/forms.py:152
+#: wanshitong/templates/documentos/lista.html:35
+msgid "Buscar"
+msgstr "Search"
+
+#: wanshitong/forms.py:144
+msgid "Todos"
+msgstr "All"
+
+#: wanshitong/forms.py:151 wanshitong/templates/documentos/lista.html:33
+msgid "Etiqueta"
+msgstr "Tag"
+
+#: wanshitong/forms.py:157
+msgid "Grupo"
+msgstr "Group"
+
+#: wanshitong/forms.py:159
+msgid "Permiso"
+msgstr "Permission"
+
+#: wanshitong/forms.py:160
+msgid "Lectura"
+msgstr "Read"
+
+#: wanshitong/forms.py:160
+msgid "Edición"
+msgstr "Edit"
+
+#: wanshitong/forms.py:163 wanshitong/templates/documentos/permisos.html:20
+msgid "Agregar permiso"
+msgstr "Add permission"
+
+#: wanshitong/templates/base.html:43
+msgid "Use light theme"
+msgstr "Use light theme"
+
+#: wanshitong/templates/base.html:43
+msgid "Use dark theme"
+msgstr "Use dark theme"
+
+#: wanshitong/templates/base.html:56
+msgid "Salir"
+msgstr "Log out"
+
+#: wanshitong/templates/base.html:72
+msgid "Espacios"
+msgstr "Spaces"
+
+#: wanshitong/templates/base.html:74
+#: wanshitong/templates/documentos/editar.html:3
+msgid "Nuevo documento"
+msgstr "New document"
+
+#: wanshitong/templates/base.html:130
+msgid "Administración"
+msgstr "Administration"
+
+#: wanshitong/templates/admin/usuario_form.html:9
+#: wanshitong/templates/admin/usuarios.html:3
+#: wanshitong/templates/admin/usuarios.html:8
+#: wanshitong/templates/base.html:134 wanshitong/templates/index.html:38
+msgid "Usuarios"
+msgstr "Users"
+
+#: wanshitong/templates/admin/categorias.html:17
+#: wanshitong/templates/admin/grupo_form.html:9
+#: wanshitong/templates/admin/grupos.html:3
+#: wanshitong/templates/admin/grupos.html:8 wanshitong/templates/base.html:135
+msgid "Grupos"
+msgstr "Groups"
+
+#: wanshitong/templates/admin/categoria_form.html:9
+#: wanshitong/templates/admin/categorias.html:3
+#: wanshitong/templates/admin/categorias.html:8
+#: wanshitong/templates/admin/grupos.html:17 wanshitong/templates/base.html:136
+#: wanshitong/templates/index.html:28
+msgid "Categorías"
+msgstr "Categories"
+
+#: wanshitong/templates/admin/etiqueta_form.html:9
+#: wanshitong/templates/admin/etiquetas.html:3
+#: wanshitong/templates/admin/etiquetas.html:8
+#: wanshitong/templates/base.html:137
+#: wanshitong/templates/documentos/editar.html:143
+#: wanshitong/templates/index.html:33
+msgid "Etiquetas"
+msgstr "Tags"
+
+#: wanshitong/templates/admin/configuracion.html:3
+#: wanshitong/templates/admin/configuracion.html:9
+#: wanshitong/templates/base.html:138
+msgid "Configuración"
+msgstr "Settings"
+
+#: wanshitong/templates/index.html:6
+msgid "Panel principal"
+msgstr "Dashboard"
+
+#: wanshitong/templates/index.html:8
+msgid "+ Nuevo documento"
+msgstr "+ New document"
+
+#: wanshitong/templates/index.html:15
+msgid "Tablero"
+msgstr "Dashboard"
+
+#: wanshitong/templates/index.html:18
+msgid "Documentos totales"
+msgstr "Total documents"
+
+#: wanshitong/templates/index.html:20
+msgid "Todos los documentos"
+msgstr "All documents"
+
+#: wanshitong/templates/index.html:23
+msgid "Documentos activos"
+msgstr "Active documents"
+
+#: wanshitong/templates/index.html:25
+msgid "No archivados"
+msgstr "Not archived"
+
+#: wanshitong/templates/index.html:30
+msgid "Espacios y categorías"
+msgstr "Spaces and categories"
+
+#: wanshitong/templates/index.html:35
+msgid "Marcas activas"
+msgstr "Active tags"
+
+#: wanshitong/templates/index.html:40
+msgid "Cuentas registradas"
+msgstr "Registered accounts"
+
+#: wanshitong/templates/index.html:45
+msgid "Documentos recientes"
+msgstr "Recent documents"
+
+#: wanshitong/templates/components/badge.html:21
+#: wanshitong/templates/documentos/lista.html:63
+#: wanshitong/templates/index.html:65
+msgid "Compartido"
+msgstr "Shared"
+
+#: wanshitong/templates/index.html:73
+msgid "Autor"
+msgstr "Author"
+
+#: wanshitong/templates/index.html:90
+msgid "No hay documentos disponibles."
+msgstr "No documents available."
+
+#: wanshitong/templates/index.html:95
+msgid "Ver todos los documentos"
+msgstr "View all documents"
+
+#: wanshitong/templates/admin/categoria_form.html:3
+#: wanshitong/templates/admin/categoria_form.html:13
+msgid "Editar categoría"
+msgstr "Edit category"
+
+#: wanshitong/templates/admin/categoria_form.html:3
+#: wanshitong/templates/admin/categoria_form.html:13
+msgid "Nueva categoría"
+msgstr "New category"
+
+#: wanshitong/templates/admin/categoria_form.html:10
+#: wanshitong/templates/admin/categorias.html:29
+#: wanshitong/templates/admin/etiqueta_form.html:10
+#: wanshitong/templates/admin/etiquetas.html:34
+#: wanshitong/templates/admin/grupo_form.html:10
+#: wanshitong/templates/admin/grupos.html:29
+#: wanshitong/templates/admin/usuario_form.html:10
+#: wanshitong/templates/admin/usuarios.html:31
+#: wanshitong/templates/documentos/ver.html:23
+msgid "Editar"
+msgstr "Edit"
+
+#: wanshitong/templates/admin/categoria_form.html:10
+#: wanshitong/templates/admin/etiqueta_form.html:10
+msgid "Nueva"
+msgstr "New"
+
+#: wanshitong/templates/admin/categoria_form.html:27
+#: wanshitong/templates/admin/etiqueta_form.html:28
+msgid "Buscar icono..."
+msgstr "Search icon..."
+
+#: wanshitong/templates/admin/categoria_form.html:95
+msgid ""
+"Solo miembros de estos grupos podrán acceder a documentos privados de "
+"esta categoría."
+msgstr ""
+
+#: wanshitong/templates/admin/categoria_form.html:99
+#: wanshitong/templates/admin/configuracion.html:56
+#: wanshitong/templates/admin/etiqueta_form.html:86
+#: wanshitong/templates/admin/grupo_form.html:60
+#: wanshitong/templates/admin/usuario_form.html:50
+#: wanshitong/templates/documentos/editar.html:33
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: wanshitong/templates/admin/categorias.html:9
+msgid "+ Nueva categoría"
+msgstr "+ New category"
+
+#: wanshitong/templates/admin/categorias.html:16
+#: wanshitong/templates/admin/etiquetas.html:16
+msgid "Padre"
+msgstr "Parent"
+
+#: wanshitong/templates/admin/categorias.html:30
+msgid "¿Eliminar categoría?"
+msgstr "Delete this category?"
+
+#: wanshitong/templates/admin/categorias.html:32
+#: wanshitong/templates/admin/etiquetas.html:37
+#: wanshitong/templates/admin/grupos.html:32
+#: wanshitong/templates/admin/usuarios.html:35
+#: wanshitong/templates/documentos/ver.html:29
+msgid "Eliminar"
+msgstr "Delete"
+
+#: wanshitong/templates/admin/configuracion.html:10
+msgid "General"
+msgstr "General"
+
+#: wanshitong/templates/admin/configuracion.html:15
+msgid "Configuración general"
+msgstr "General settings"
+
+#: wanshitong/templates/admin/configuracion.html:28
+msgid ""
+"Si subes un logo personalizado, se utilizará en la barra lateral y el "
+"login. El favicon permanecerá estático."
+msgstr ""
+
+#: wanshitong/templates/admin/configuracion.html:49
+msgid "Logo personalizado activo"
+msgstr "Custom logo active"
+
+#: wanshitong/templates/admin/configuracion.html:49
+msgid "Logo predeterminado activo"
+msgstr "Default logo active"
+
+#: wanshitong/templates/admin/etiqueta_form.html:3
+#: wanshitong/templates/admin/etiqueta_form.html:13
+msgid "Editar etiqueta"
+msgstr "Edit tag"
+
+#: wanshitong/templates/admin/etiqueta_form.html:3
+#: wanshitong/templates/admin/etiqueta_form.html:13
+msgid "Nueva etiqueta"
+msgstr "New tag"
+
+#: wanshitong/templates/admin/etiquetas.html:9
+msgid "+ Nueva etiqueta"
+msgstr "+ New tag"
+
+#: wanshitong/templates/admin/etiquetas.html:17
+msgid "Visual"
+msgstr "Visual"
+
+#: wanshitong/templates/admin/etiquetas.html:35
+msgid "¿Eliminar etiqueta?"
+msgstr "Delete tag?"
+
+#: wanshitong/templates/admin/grupo_form.html:3
+#: wanshitong/templates/admin/grupo_form.html:13
+msgid "Editar grupo"
+msgstr "Edit group"
+
+#: wanshitong/templates/admin/grupo_form.html:3
+#: wanshitong/templates/admin/grupo_form.html:13
+msgid "Nuevo grupo"
+msgstr "New group"
+
+#: wanshitong/templates/admin/grupo_form.html:10
+#: wanshitong/templates/admin/usuario_form.html:10
+msgid "Nuevo"
+msgstr "New"
+
+#: wanshitong/templates/admin/grupo_form.html:32
+msgid "Selecciona un usuario activo"
+msgstr "Select an active user"
+
+#: wanshitong/templates/admin/grupo_form.html:37
+msgid "Agregar"
+msgstr "Add"
+
+#: wanshitong/templates/admin/grupo_form.html:41
+msgid "Usuarios actualmente asignados al grupo."
+msgstr "Users currently assigned to the group."
+
+#: wanshitong/templates/admin/grupo_form.html:56
+msgid "Estas categorías definen el acceso del grupo a documentos privados."
+msgstr "These categories define the group's access to private documents."
+
+#: wanshitong/templates/admin/grupo_form.html:66
+msgid "Miembros del grupo"
+msgstr "Group members"
+
+#: wanshitong/templates/admin/grupo_form.html:77
+#: wanshitong/templates/documentos/permisos.html:65
+msgid "Quitar"
+msgstr "Remove"
+
+#: wanshitong/templates/admin/grupo_form.html:85
+msgid "Sin miembros."
+msgstr "No members."
+
+#: wanshitong/templates/admin/grupo_form.html:89
+msgid "Categorías con acceso"
+msgstr "Categories with access"
+
+#: wanshitong/templates/admin/grupo_form.html:100
+msgid "Sin categorías asignadas."
+msgstr "No categories assigned."
+
+#: wanshitong/templates/admin/grupos.html:9
+msgid "+ Nuevo grupo"
+msgstr "+ New group"
+
+#: wanshitong/templates/admin/grupos.html:30
+msgid "¿Eliminar grupo?"
+msgstr "Delete this group?"
+
+#: wanshitong/templates/admin/usuario_form.html:3
+#: wanshitong/templates/admin/usuario_form.html:13
+msgid "Editar usuario"
+msgstr "Edit user"
+
+#: wanshitong/templates/admin/usuario_form.html:3
+#: wanshitong/templates/admin/usuario_form.html:13
+msgid "Nuevo usuario"
+msgstr "New user"
+
+#: wanshitong/templates/admin/usuario_form.html:39
+msgid "Dejar vacío para no cambiar"
+msgstr "Leave blank to keep unchanged"
+
+#: wanshitong/templates/admin/usuarios.html:9
+msgid "+ Nuevo usuario"
+msgstr "+ New user"
+
+#: wanshitong/templates/admin/usuarios.html:16
+msgid "Correo"
+msgstr "Email"
+
+#: wanshitong/templates/admin/usuarios.html:29
+msgid "Sí"
+msgstr "Yes"
+
+#: wanshitong/templates/admin/usuarios.html:29
+msgid "No"
+msgstr "No"
+
+#: wanshitong/templates/admin/usuarios.html:33
+msgid "¿Eliminar usuario?"
+msgstr "Delete this user?"
+
+#: wanshitong/templates/auth/login.html:172
+msgid "Gestor de Conocimiento"
+msgstr "Knowledge Manager"
+
+#: wanshitong/templates/auth/login.html:188
+msgid "Usuario o correo electrónico"
+msgstr "Username or email address"
+
+#: wanshitong/templates/auth/login.html:189
+msgid "tu-usuario o correo@ejemplo.com"
+msgstr "your-user or email@example.com"
+
+#: wanshitong/templates/auth/login.html:194
+msgid "Tu contraseña"
+msgstr "Your password"
+
+#: wanshitong/templates/auth/profile.html:3
+#: wanshitong/templates/auth/profile.html:9
+msgid "My profile"
+msgstr "My profile"
+
+#: wanshitong/templates/auth/profile.html:10
+msgid "Update your personal data, password, and avatar."
+msgstr "Update your personal data, password, and avatar."
+
+#: wanshitong/templates/auth/profile.html:18
+msgid "Current avatar"
+msgstr "Current avatar"
+
+#: wanshitong/templates/auth/profile.html:28
+msgid "Allowed formats: png, jpg, jpeg, gif, webp."
+msgstr "Allowed formats: png, jpg, jpeg, gif, webp."
+
+#: wanshitong/templates/auth/profile.html:47
+msgid "Leave blank to keep the current password"
+msgstr "Leave blank to keep the current password"
+
+#: wanshitong/templates/auth/profile.html:55
+msgid "Cancel"
+msgstr "Cancel"
+
+#: wanshitong/templates/documentos/editar.html:23
+#: wanshitong/templates/documentos/historial.html:9
+#: wanshitong/templates/documentos/lista.html:3
+#: wanshitong/templates/documentos/lista.html:8
+#: wanshitong/templates/documentos/permisos.html:9
+#: wanshitong/templates/documentos/ver.html:17
+#: wanshitong/templates/documentos/ver_version.html:9
+msgid "Documentos"
+msgstr "Documents"
+
+#: wanshitong/templates/documentos/editar.html:25
+msgid "Sin título"
+msgstr "Untitled"
+
+#: wanshitong/templates/documentos/editar.html:31
+#: wanshitong/templates/documentos/historial.html:39
+msgid "Ver"
+msgstr "View"
+
+#: wanshitong/templates/documentos/editar.html:36
+msgid "Cerrar propiedades"
+msgstr "Close properties"
+
+#: wanshitong/templates/documentos/editar.html:36
+#: wanshitong/templates/documentos/editar.html:105
+msgid "Propiedades"
+msgstr "Properties"
+
+#: wanshitong/templates/documentos/editar.html:48
+msgid "Escribe el título..."
+msgstr "Type the title..."
+
+#: wanshitong/templates/documentos/editar.html:78
+msgid "Escribe en Markdown..."
+msgstr "Write in Markdown..."
+
+#: wanshitong/templates/documentos/editar.html:95
+msgid "Split"
+msgstr "Split"
+
+#: wanshitong/templates/documentos/editar.html:96
+msgid "Vista"
+msgstr "View"
+
+#: wanshitong/templates/documentos/editar.html:98
+msgid "palabras"
+msgstr "words"
+
+#: wanshitong/templates/documentos/editar.html:146
+msgid "separadas por comas"
+msgstr "comma-separated"
+
+#: wanshitong/templates/documentos/editar.html:150
+msgid "Nota del cambio"
+msgstr "Change note"
+
+#: wanshitong/templates/documentos/editar.html:152
+msgid "Opcional"
+msgstr "Optional"
+
+#: wanshitong/templates/documentos/editar.html:157
+#: wanshitong/templates/documentos/historial.html:3
+#: wanshitong/templates/documentos/historial.html:11
+#: wanshitong/templates/documentos/ver.html:24
+#: wanshitong/templates/documentos/ver_version.html:11
+msgid "Historial"
+msgstr "History"
+
+#: wanshitong/templates/documentos/editar.html:158
+#: wanshitong/templates/documentos/permisos.html:3
+#: wanshitong/templates/documentos/permisos.html:11
+#: wanshitong/templates/documentos/ver.html:25
+msgid "Permisos"
+msgstr "Permissions"
+
+#: wanshitong/templates/documentos/editar.html:248
+msgid "Guarda primero el documento para subir imágenes"
+msgstr "Save the document first to upload images"
+
+#: wanshitong/templates/documentos/editar.html:256
+msgid "Subiendo imagen…"
+msgstr "Uploading image\u2026"
+
+#: wanshitong/templates/documentos/editar.html:267
+#: wanshitong/templates/documentos/editar.html:280
+msgid "No se pudo subir la imagen"
+msgstr "Could not upload image"
+
+#: wanshitong/templates/documentos/editar.html:277
+msgid "Imagen subida"
+msgstr "Image uploaded"
+
+#: wanshitong/templates/documentos/editar.html:319
+msgid "Escribe un título"
+msgstr "Enter a title"
+
+#: wanshitong/templates/documentos/editar.html:325
+msgid "Guardando…"
+msgstr "Saving\u2026"
+
+#: wanshitong/templates/documentos/editar.html:348
+msgid "URL del enlace:"
+msgstr "Link URL:"
+
+#: wanshitong/templates/documentos/historial.html:15
+msgid "Historial de versiones"
+msgstr "Version history"
+
+#: wanshitong/templates/documentos/historial.html:16
+msgid "Versión actual"
+msgstr "Current version"
+
+#: wanshitong/templates/documentos/historial.html:22
+msgid "Versión"
+msgstr "Version"
+
+#: wanshitong/templates/documentos/historial.html:24
+msgid "Modificado por"
+msgstr "Modified by"
+
+#: wanshitong/templates/documentos/historial.html:25
+msgid "Fecha"
+msgstr "Date"
+
+#: wanshitong/templates/documentos/historial.html:46
+msgid "No hay versiones previas."
+msgstr "No previous versions."
+
+#: wanshitong/templates/documentos/lista.html:10
+msgid "+ Nuevo"
+msgstr "+ New"
+
+#: wanshitong/templates/documentos/lista.html:18
+msgid "Buscar documentos..."
+msgstr "Search documents..."
+
+#: wanshitong/templates/documentos/lista.html:27
+msgid "Todos los estados"
+msgstr "All statuses"
+
+#: wanshitong/templates/documentos/lista.html:88
+msgid "No se encontraron documentos."
+msgstr "No documents found."
+
+#: wanshitong/templates/documentos/permisos.html:15
+msgid "Permisos del documento"
+msgstr "Document permissions"
+
+#: wanshitong/templates/documentos/permisos.html:41
+msgid "Permisos actuales"
+msgstr "Current permissions"
+
+#: wanshitong/templates/documentos/permisos.html:46
+msgid "Sujeto"
+msgstr "Subject"
+
+#: wanshitong/templates/documentos/permisos.html:47
+msgid "Tipo"
+msgstr "Type"
+
+#: wanshitong/templates/documentos/permisos.html:73
+msgid "Sin permisos explícitos."
+msgstr "No explicit permissions."
+
+#: wanshitong/templates/documentos/ver.html:27
+msgid "¿Eliminar este documento?"
+msgstr "Delete this document?"
+
+#: wanshitong/templates/documentos/ver_version.html:20
+msgid "Guardado por"
+msgstr "Saved by"
+
+#: wanshitong/templates/documentos/ver_version.html:26
+msgid "¿Restaurar esta versión?"
+msgstr "Restore this version?"
+
+#: wanshitong/templates/documentos/ver_version.html:28
+msgid "Restaurar esta versión"
+msgstr "Restore this version"
 
 #~ msgid "Favor iniciar sesión para acceder al sistema."
 #~ msgstr "Please log in to access the system."
