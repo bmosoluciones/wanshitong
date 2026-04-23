@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
 """
 App
 ===
@@ -8,9 +10,19 @@ Minimal app package for template projects.
 from __future__ import annotations
 
 from os import environ
+
 from pathlib import Path
 
-from flask import Flask, abort, flash, redirect, request, send_from_directory, session, url_for
+from flask import (
+    Flask,
+    abort,
+    flash,
+    redirect,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask_babel import Babel
 from flask_login import current_user
 from flask_login import LoginManager
@@ -27,7 +39,12 @@ from wanshitong.i18n import _
 from wanshitong.model import AppConfig, Categoria, Documento, Usuario, db
 from wanshitong.log import log
 from wanshitong.acl import puede_acceder_categoria, puede_leer
-from wanshitong.utils import avatar_url, ensure_default_settings, get_setting, site_logo_url
+from wanshitong.utils import (
+    avatar_url,
+    ensure_default_settings,
+    get_setting,
+    site_logo_url,
+)
 
 session_manager = Session()
 login_manager = LoginManager()
@@ -111,7 +128,9 @@ def create_app(config) -> Flask:
     app.config.setdefault("UPLOADS_ENABLED", True)
     app.config.setdefault("MAX_UPLOAD_SIZE_MB", 10)
     app.config.setdefault("AUTO_REBUILD_SCHEMA", not app.config.get("TESTING", False))
-    app.config.setdefault("UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads")
+    app.config.setdefault(
+        "UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads"
+    )
 
     log.trace("create_app: initializing app")
     db.init_app(app)
@@ -121,7 +140,9 @@ def create_app(config) -> Flask:
             f"create_app: SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}"
         )
     except Exception:
-        log.trace("create_app: could not read SQLALCHEMY_DATABASE_URI from wanshitong.config")
+        log.trace(
+            "create_app: could not read SQLALCHEMY_DATABASE_URI from wanshitong.config"
+        )
 
     try:
         log.trace("create_app: calling ensure_database_initialized")
@@ -185,7 +206,9 @@ def create_app(config) -> Flask:
 
             for documento in documentos:
                 if puede_leer(documento, current_user):
-                    docs_by_category.setdefault(documento.categoria_id, []).append(documento)
+                    docs_by_category.setdefault(documento.categoria_id, []).append(
+                        documento
+                    )
 
             def build_doc_node(documento: Documento) -> dict:
                 is_active = current_doc_id == documento.id
@@ -204,7 +227,9 @@ def create_app(config) -> Flask:
 
             def build_space_tree(parent_id: str | None, depth: int = 0) -> list[dict]:
                 result: list[dict] = []
-                for categoria in sorted(by_parent.get(parent_id, []), key=lambda c: c.nombre):
+                for categoria in sorted(
+                    by_parent.get(parent_id, []), key=lambda c: c.nombre
+                ):
                     child_nodes = build_space_tree(categoria.id, depth + 1)
                     document_nodes = [
                         build_doc_node(documento)
@@ -226,10 +251,14 @@ def create_app(config) -> Flask:
                             "kind": "category",
                             "id": categoria.id,
                             "label": categoria.nombre,
-                            "url": url_for("documentos.lista", categoria_id=categoria.id),
+                            "url": url_for(
+                                "documentos.lista", categoria_id=categoria.id
+                            ),
                             "children": child_nodes + document_nodes,
                             "is_active": category_is_active,
-                            "is_open": depth == 0 or category_is_active or has_active_descendant,
+                            "is_open": depth == 0
+                            or category_is_active
+                            or has_active_descendant,
                             "is_space": depth == 0,
                             "badge": categoria.icono or categoria.nombre[:1].upper(),
                             "color": categoria.color or "#7c3aed",
@@ -279,7 +308,9 @@ def create_app(config) -> Flask:
 
     @app.route("/media/avatars/<path:filename>")
     def media_avatar(filename: str):
-        return send_from_directory(Path(app.config["UPLOADS_ROOT"]) / "avatars", filename)
+        return send_from_directory(
+            Path(app.config["UPLOADS_ROOT"]) / "avatars", filename
+        )
 
     @app.route("/media/site/<path:filename>")
     def media_site_logo(filename: str):
@@ -294,7 +325,9 @@ def create_app(config) -> Flask:
             return redirect(url_for("auth.login"))
         if not puede_leer(doc, current_user):
             abort(403)
-        return send_from_directory(Path(app.config["UPLOADS_ROOT"]) / "documents" / doc_id, filename)
+        return send_from_directory(
+            Path(app.config["UPLOADS_ROOT"]) / "documents" / doc_id, filename
+        )
 
     app.register_blueprint(auth, url_prefix="")
     app.register_blueprint(app_blueprint, url_prefix="/")
@@ -395,5 +428,3 @@ def _schema_reset_required(app: Flask) -> bool:
             return True
 
     return False
-
-

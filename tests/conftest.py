@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 """Shared pytest fixtures for the test suite."""
 
 import pytest

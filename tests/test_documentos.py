@@ -1,9 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 """Tests for documents CRUD and ACL."""
 
 import pytest
 
 from wanshitong import create_app, ensure_database_initialized
-from wanshitong.model import Categoria, Documento, Etiqueta, Grupo, PermisoDocumento, Usuario, VersionDocumento, db
+from wanshitong.model import (
+    Categoria,
+    Documento,
+    Etiqueta,
+    Grupo,
+    PermisoDocumento,
+    Usuario,
+    VersionDocumento,
+    db,
+)
 from wanshitong.auth import proteger_passwd
 from wanshitong.acl import puede_leer, puede_editar
 
@@ -12,7 +24,9 @@ from wanshitong.acl import puede_leer, puede_editar
 def usuarios(app):
     """Create test users."""
     with app.app_context():
-        admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalar_one()
+        admin = db.session.execute(
+            db.select(Usuario).filter_by(tipo="admin")
+        ).scalar_one()
 
         editor = Usuario()
         editor.usuario = "editor1"
@@ -46,6 +60,7 @@ def _get_usuario(app, user_id):
 
 
 # ─── Model tests ─────────────────────────────────────────────────────────────
+
 
 class TestModelos:
     def test_crear_categoria(self, app):
@@ -84,7 +99,9 @@ class TestModelos:
     def test_usuario_en_grupo(self, app, usuarios):
         with app.app_context():
             editor = db.session.get(Usuario, usuarios["editor"])
-            grupo = db.session.execute(db.select(Grupo).filter_by(nombre="Devs")).scalar_one()
+            grupo = db.session.execute(
+                db.select(Grupo).filter_by(nombre="Devs")
+            ).scalar_one()
             grupo.usuarios.append(editor)
             db.session.commit()
             assert editor in grupo.usuarios
@@ -128,6 +145,7 @@ class TestModelos:
 
 
 # ─── ACL tests ───────────────────────────────────────────────────────────────
+
 
 class TestACL:
     def _crear_doc(self, app, autor_id, estado="draft", visibilidad="privado"):
@@ -233,9 +251,11 @@ class TestACL:
 
 # ─── Markdown rendering tests ────────────────────────────────────────────────
 
+
 class TestMarkdown:
     def test_render_markdown_basic(self):
         from wanshitong.md_utils import render_markdown
+
         html = render_markdown("# Título\n\nPárrafo de prueba.")
         assert "<h1>" in html
         assert "Título" in html
@@ -243,6 +263,7 @@ class TestMarkdown:
 
     def test_render_markdown_sanitizes_script(self):
         from wanshitong.md_utils import render_markdown
+
         html = render_markdown("<script>alert('xss')</script>")
         # bleach removes the script tag (the main XSS vector)
         assert "<script>" not in html
@@ -250,17 +271,20 @@ class TestMarkdown:
 
     def test_render_markdown_tables(self):
         from wanshitong.md_utils import render_markdown
+
         md = "| A | B |\n|---|---|\n| 1 | 2 |"
         html = render_markdown(md)
         assert "<table>" in html
 
     def test_render_markdown_code(self):
         from wanshitong.md_utils import render_markdown
+
         html = render_markdown("```python\nprint('hello')\n```")
         assert "<code" in html
 
 
 # ─── Version history tests ───────────────────────────────────────────────────
+
 
 class TestVersionado:
     def test_guardar_version(self, app, usuarios):
@@ -300,7 +324,13 @@ class TestVersionado:
             db.session.add(version2)
             db.session.commit()
 
-            versiones = db.session.execute(
-                db.select(VersionDocumento).where(VersionDocumento.documento_id == doc.id)
-            ).scalars().all()
+            versiones = (
+                db.session.execute(
+                    db.select(VersionDocumento).where(
+                        VersionDocumento.documento_id == doc.id
+                    )
+                )
+                .scalars()
+                .all()
+            )
             assert len(versiones) == 2

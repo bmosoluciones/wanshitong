@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 """Admin blueprint for user, group, and category management."""
 
 from __future__ import annotations
@@ -5,15 +8,36 @@ from __future__ import annotations
 from functools import wraps
 from pathlib import Path
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 from wanshitong.auth import proteger_passwd
-from wanshitong.forms import AppSettingsForm, CategoriaForm, EtiquetaForm, GrupoForm, UsuarioForm
+from wanshitong.forms import (
+    AppSettingsForm,
+    CategoriaForm,
+    EtiquetaForm,
+    GrupoForm,
+    UsuarioForm,
+)
 from wanshitong.i18n import _
 from wanshitong.model import AppConfig, Categoria, Etiqueta, Grupo, Usuario, database
-from wanshitong.utils import ALLOWED_IMAGE_EXTENSIONS, ensure_default_settings, set_setting, site_asset_dir, slugify
+from wanshitong.utils import (
+    ALLOWED_IMAGE_EXTENSIONS,
+    ensure_default_settings,
+    set_setting,
+    site_asset_dir,
+    slugify,
+)
 
 admin = Blueprint("admin", __name__)
 
@@ -93,9 +117,7 @@ def configuracion():
     if form.site_title.data is None:
         form.site_title.data = _get_setting_value("site_title", "WanShiTong")
         form.default_language.data = _get_setting_value("default_language", "en")
-        form.uploads_enabled.data = (
-            _get_setting_value("uploads_enabled", "1") == "1"
-        )
+        form.uploads_enabled.data = _get_setting_value("uploads_enabled", "1") == "1"
         form.max_upload_size_mb.data = _get_setting_value("max_upload_size_mb", "10")
 
     return render_template(
@@ -323,7 +345,9 @@ def nueva_categoria():
     if form.validate_on_submit():
         cat = Categoria()
         cat.nombre = form.nombre.data
-        cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
+        cat.slug = slugify(
+            (form.slug.data or "").strip() or form.nombre.data, "category"
+        )
         cat.icono = (form.icono.data or "").strip() or None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
@@ -360,7 +384,9 @@ def editar_categoria(cat_id):
         form.grupo_ids.data = [grupo.id for grupo in cat.grupos]
     if form.validate_on_submit():
         cat.nombre = form.nombre.data
-        cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
+        cat.slug = slugify(
+            (form.slug.data or "").strip() or form.nombre.data, "category"
+        )
         cat.icono = (form.icono.data or "").strip() or None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None

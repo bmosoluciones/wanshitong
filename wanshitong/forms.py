@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import (
@@ -125,7 +128,9 @@ class ProfileForm(FlaskForm):
     correo_electronico = StringField(
         _("Correo electrónico"), validators=[Optional(), Email(), Length(max=150)]
     )
-    password = PasswordField(_("Nueva contraseña"), validators=[Optional(), Length(min=6)])
+    password = PasswordField(
+        _("Nueva contraseña"), validators=[Optional(), Length(min=6)]
+    )
     avatar = FileField(_("Imagen de perfil"))
     submit = SubmitField(_("Guardar perfil"))
 

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 import pytest
 
 from wanshitong import create_app, ensure_database_initialized
@@ -13,7 +16,9 @@ def test_ensure_database_creates_admin(app):
     # Ensure database initialized creates admin user
     with app.app_context():
         ensure_database_initialized(app)
-        admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalar_one_or_none()
+        admin = db.session.execute(
+            db.select(Usuario).filter_by(tipo="admin")
+        ).scalar_one_or_none()
         assert admin is not None
         assert admin.tipo == "admin"
 

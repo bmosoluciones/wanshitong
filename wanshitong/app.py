@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 """App module."""
 
 from __future__ import annotations
@@ -28,12 +31,7 @@ def index():
     published_count = sum(1 for doc in documentos if doc.estado == "public")
     category_ids = {doc.categoria_id for doc in documentos if doc.categoria_id}
     category_count = len(category_ids)
-    tag_ids = {
-        tag.id
-        for doc in documentos
-        for tag in doc.etiquetas
-        if tag.id
-    }
+    tag_ids = {tag.id for doc in documentos for tag in doc.etiquetas if tag.id}
     tag_count = len(tag_ids)
 
     return render_template(

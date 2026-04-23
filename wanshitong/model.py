@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 """Data model for the app package."""
 
 from __future__ import annotations
@@ -260,9 +263,13 @@ class VersionDocumento(database.Model, BaseTabla):
 
 class AppConfig(database.Model, BaseTabla):
     __tablename__ = "app_config"
-    __table_args__ = (database.UniqueConstraint("clave", name="app_config_clave_unica"),)
+    __table_args__ = (
+        database.UniqueConstraint("clave", name="app_config_clave_unica"),
+    )
 
-    clave = database.Column(database.String(100), nullable=False, unique=True, index=True)
+    clave = database.Column(
+        database.String(100), nullable=False, unique=True, index=True
+    )
     valor = database.Column(database.Text, nullable=True)
     tipo = database.Column(database.String(20), nullable=False, default="string")
     descripcion = database.Column(database.String(255), nullable=True)

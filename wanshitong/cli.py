@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
+
 from __future__ import annotations
 
 import secrets
@@ -68,7 +71,9 @@ def list_users() -> None:
             .all()
         )
         for user in users:
-            click.echo(f"{user.usuario}\t{user.tipo}\t{'active' if user.activo else 'inactive'}")
+            click.echo(
+                f"{user.usuario}\t{user.tipo}\t{'active' if user.activo else 'inactive'}"
+            )
 
 
 @main.command("sync-schema")
