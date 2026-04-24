@@ -22,6 +22,8 @@ include = ["wanshitong*"]
 
 [tool.setuptools.package-data]
 wanshitong = [
+	"templates/**/*.html",
+	"static/**/*",
 	"translations/**/*.po",
 	"translations/**/*.mo",
 	"translations/**/*.pot",
