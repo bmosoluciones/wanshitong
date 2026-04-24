@@ -143,6 +143,12 @@ pybabel compile -d wanshitong/translations
 
 ---
 
+### Why the name?
+
+ > [Wan Shi Tong](https://avatar.fandom.com/wiki/Wan_Shi_Tong) is an ancient, wise, and powerful spirit who collect information for his Library.
+
+## Content
+
 ## License
 
 Apache-2.0 — see [LICENSE](LICENSE).
