@@ -7,11 +7,15 @@ from __future__ import annotations
 
 from functools import wraps
 from pathlib import Path
+from platform import platform as os_platform
+from sys import version as py_version
+from typing import cast
 
 from flask import (
     Blueprint,
     abort,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -19,6 +23,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy import text
 from werkzeug.utils import secure_filename
 
 from wanshitong.auth import proteger_passwd
@@ -141,6 +146,53 @@ def _store_site_logo(uploaded_file, extension: str) -> str:
     filename = f"logo.{extension}"
     uploaded_file.save(directory / filename)
     return filename
+
+
+@admin.route("/system")
+@login_required
+@solo_admin
+def system_info():
+    engine_name = _database_engine_name()
+    sqlite_path = _sqlite_database_path()
+    db_status = "ok"
+    try:
+        database.session.execute(text("SELECT 1"))
+    except Exception:
+        database.session.rollback()
+        db_status = "error"
+
+    payload = {
+        "system": os_platform(),
+        "python_version": py_version.split()[0],
+        "database": {
+            "engine": engine_name,
+            "status": db_status,
+        },
+    }
+    if sqlite_path:
+        payload["database"]["sqlite_path"] = sqlite_path
+    return jsonify(payload), 200
+
+
+def _database_engine_name() -> str:
+    dialect = (database.engine.url.get_backend_name() or "").lower()
+    if dialect.startswith("postgres"):
+        return "PostgreSQL"
+    if dialect.startswith("mysql"):
+        return "MySQL"
+    if dialect.startswith("sqlite"):
+        return "SQLite"
+    return dialect or "Unknown"
+
+
+def _sqlite_database_path() -> str | None:
+    url = database.engine.url
+    if (url.get_backend_name() or "").lower() != "sqlite":
+        return None
+    database_path = url.database
+    if database_path in (None, "", ":memory:"):
+        return database_path or ":memory:"
+    return str(Path(cast(str, database_path)).resolve())
 
 
 @admin.route("/u/new", methods=["GET", "POST"])

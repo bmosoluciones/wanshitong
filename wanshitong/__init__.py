@@ -12,11 +12,14 @@ from __future__ import annotations
 from os import environ
 
 from pathlib import Path
+from platform import platform as os_platform
+from sys import version as py_version
 
 from flask import (
     Flask,
     abort,
     flash,
+    jsonify,
     redirect,
     request,
     send_from_directory,
@@ -28,7 +31,7 @@ from flask_login import current_user
 from flask_login import LoginManager
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 
 from wanshitong.app import app as app_blueprint
 from wanshitong.auth import auth
@@ -45,6 +48,7 @@ from wanshitong.utils import (
     get_setting,
     site_logo_url,
 )
+from wanshitong.version import __version__
 
 session_manager = Session()
 login_manager = LoginManager()
@@ -53,6 +57,8 @@ csrf = CSRFProtect()
 
 SUPPORTED_LOCALES = ("es", "en")
 DEFAULT_LOCALE = "es"
+APP_LICENSE = "Apache-2.0"
+SOURCE_CODE_URL = "https://github.com/bmosoluciones/wanshitong"
 
 EXPECTED_SCHEMA = {
     "usuario": {"theme_preference", "avatar_extension", "ultimo_acceso"},
@@ -132,24 +138,24 @@ def create_app(config) -> Flask:
         "UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads"
     )
 
-    log.trace("create_app: initializing app")
+    log.info("create_app: initializing app")
     db.init_app(app)
 
     try:
-        log.trace(
+        log.info(
             f"create_app: SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}"
         )
     except Exception:
-        log.trace(
+        log.warning(
             "create_app: could not read SQLALCHEMY_DATABASE_URI from wanshitong.config"
         )
 
     try:
-        log.trace("create_app: calling ensure_database_initialized")
+        log.warning("create_app: calling ensure_database_initialized")
         ensure_database_initialized(app)
-        log.trace("create_app: ensure_database_initialized completed")
+        log.info("create_app: ensure_database_initialized completed")
     except Exception as exc:
-        log.trace(f"create_app: ensure_database_initialized raised: {exc}")
+        log.warning(f"create_app: ensure_database_initialized raised: {exc}")
         try:
             log.exception("create_app: ensure_database_initialized exception")
         except Exception:
@@ -277,6 +283,10 @@ def create_app(config) -> Flask:
             "get_locale": _flask_get_locale,
             "site_title": get_setting("site_title", app.config["APP_SITE_TITLE"]),
             "site_logo_url": site_logo_url(),
+            "app_name": "Wanshitong",
+            "app_version": __version__,
+            "app_license": APP_LICENSE,
+            "app_source_url": SOURCE_CODE_URL,
             "current_theme": (
                 current_user.theme_preference
                 if getattr(current_user, "is_authenticated", False)
@@ -291,11 +301,47 @@ def create_app(config) -> Flask:
             "nav_spaces": nav_spaces,
         }
 
+    @app.route("/health")
+    def health_check():
+        return jsonify({"status": "ok"}), 200
+
+    @app.route("/ready")
+    def readiness_check():
+        try:
+            db.session.execute(text("SELECT 1"))
+        except Exception:
+            db.session.rollback()
+            return (
+                jsonify(
+                    {
+                        "status": "not-ready",
+                        "database": "unreachable",
+                        "python": py_version.split()[0],
+                        "os": os_platform(),
+                    }
+                ),
+                503,
+            )
+
+        return (
+            jsonify(
+                {
+                    "status": "ready",
+                    "database": "ok",
+                    "python": py_version.split()[0],
+                    "os": os_platform(),
+                }
+            ),
+            200,
+        )
+
     @app.before_request
     def require_login_by_default():
         if request.endpoint is None:
             return None
         if request.endpoint == "static":
+            return None
+        if request.endpoint in {"health_check", "readiness_check"}:
             return None
         if request.endpoint.startswith("auth.") and request.endpoint == "auth.login":
             return None
@@ -353,32 +399,30 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
     with ctx.app_context():
         try:
             try:
-                log.trace(f"ensure_database_initialized: engine.url = {_db.engine.url}")
+                log.warning(
+                    f"ensure_database_initialized: engine.url = {_db.engine.url}"
+                )
             except Exception:
-                log.trace("ensure_database_initialized: could not read _db.engine.url")
+                log.warning(
+                    "ensure_database_initialized: could not read _db.engine.url"
+                )
 
             try:
                 db_uri = ctx.config.get("SQLALCHEMY_DATABASE_URI")
-                log.trace(
+                log.warning(
                     f"ensure_database_initialized: Flask SQLALCHEMY_DATABASE_URI = {db_uri}"
                 )
             except Exception:
-                log.trace(
+                log.warning(
                     "ensure_database_initialized: could not read SQLALCHEMY_DATABASE_URI from ctx.config"
                 )
 
-            if _schema_reset_required(ctx):
-                log.warning(
-                    "Schema drift detected in development database. Rebuilding schema."
-                )
-                _db.drop_all()
-
-            log.trace("ensure_database_initialized: calling create_all()")
+            log.warning("ensure_database_initialized: calling create_all()")
             _db.create_all()
-            log.trace("ensure_database_initialized: create_all() completed")
+            log.info("ensure_database_initialized: create_all() completed")
             ensure_default_settings()
         except Exception as exc:
-            log.trace(f"ensure_database_initialized: create_all() raised: {exc}")
+            log.warning(f"ensure_database_initialized: create_all() raised: {exc}")
             try:
                 log.exception("ensure_database_initialized: create_all() exception")
             except Exception:
@@ -391,6 +435,12 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
         if registro_admin is None:
             admin_user = _environ.get("ADMIN_USER", "app-admin")
             admin_pass = _environ.get("ADMIN_PASSWORD", "app-admin")
+            user_source = "env" if "ADMIN_USER" in _environ else "default"
+            pass_source = "env" if "ADMIN_PASSWORD" in _environ else "default"
+            log.warning(
+                "ensure_database_initialized: no admin user found, creating initial admin "
+                f"username='{admin_user}' (ADMIN_USER={user_source}, ADMIN_PASSWORD={pass_source})"
+            )
 
             nuevo = Usuario()
             nuevo.usuario = admin_user
@@ -403,6 +453,14 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
 
             _db.session.add(nuevo)
             _db.session.commit()
+            log.warning(
+                f"ensure_database_initialized: initial admin user '{admin_user}' created"
+            )
+        else:
+            log.info(
+                "ensure_database_initialized: admin user already exists; "
+                f"seed skipped (usuario='{registro_admin.usuario}')"
+            )
 
 
 def _schema_reset_required(app: Flask) -> bool:

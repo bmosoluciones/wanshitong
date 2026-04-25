@@ -25,12 +25,10 @@
         <div class="navbar-container">
             <!-- Logo + Sidebar Toggle -->
             <div class="navbar-left">
-                <button
-                    @click="sidebarOpen = !sidebarOpen"
-                    class="btn-hamburger"
-                    aria-label="Toggle sidebar">
+                <button @click="sidebarOpen = !sidebarOpen" class="btn-hamburger" aria-label="Toggle sidebar">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
                     </svg>
                 </button>
                 <a href="{{ url_for('app.index') }}" class="navbar-brand" aria-label="{{ site_title }}">
@@ -40,18 +38,34 @@
 
             <!-- Right: User + Language + Logout -->
             <div class="navbar-right">
-                <button type="button" class="navbar-icon-btn" @click="toggleTheme" :title="theme === 'dark' ? '{{ _('Use light theme') }}' : '{{ _('Use dark theme') }}'">
+                <button type="button" class="navbar-icon-btn" @click="toggleTheme"
+                    :title="theme === 'dark' ? '{{ _('Use light theme') }}' : '{{ _('Use dark theme') }}'">
                     <span x-show="theme === 'light'">◐</span>
                     <span x-show="theme === 'dark'">◑</span>
                 </button>
-                <a href="{{ url_for('auth.profile') }}" class="navbar-profile-link">
-                    {% if current_avatar_url %}
-                    <img src="{{ current_avatar_url }}" alt="{{ current_user.usuario }}" class="navbar-avatar">
-                    {% else %}
-                    <span class="navbar-avatar navbar-avatar-fallback">{{ current_user.usuario[:1].upper() }}</span>
-                    {% endif %}
-                    <span class="navbar-text">{{ current_user.usuario }}</span>
-                </a>
+
+                <div class="navbar-user-menu" @keydown.escape.window="userMenuOpen = false">
+                    <button type="button" class="navbar-profile-trigger" @click="userMenuOpen = !userMenuOpen"
+                        :aria-expanded="userMenuOpen" aria-haspopup="true">
+                        {% if current_avatar_url %}
+                        <img src="{{ current_avatar_url }}" alt="{{ current_user.usuario }}" class="navbar-avatar">
+                        {% else %}
+                        <span class="navbar-avatar navbar-avatar-fallback">{{ current_user.usuario[:1].upper() }}</span>
+                        {% endif %}
+                        <span class="navbar-text">{{ current_user.usuario }}</span>
+                        <span class="navbar-caret" x-text="userMenuOpen ? '▲' : '▼'"></span>
+                    </button>
+
+                    <div class="navbar-user-dropdown" x-show="userMenuOpen" x-cloak
+                        @click.outside="userMenuOpen = false">
+                        <a href="{{ url_for('auth.profile') }}" class="navbar-dropdown-item">{{ _('Mi perfil') }}</a>
+                        <button type="button" class="navbar-dropdown-item navbar-dropdown-button"
+                            @click="openSystemInfo(); userMenuOpen = false;">
+                            {{ _('Información') }}
+                        </button>
+                    </div>
+                </div>
+
                 <div class="navbar-divider"></div>
                 <a href="{{ url_for('auth.logout') }}" class="navbar-link">{{ _('Salir') }}</a>
             </div>
@@ -71,7 +85,8 @@
                 <div class="sidebar-panel-title-row">
                     <span class="sidebar-panel-title">{{ _('Espacios') }}</span>
                     {% if current_user.tipo in ('admin', 'editor') %}
-                    <a href="{{ url_for('documentos.nuevo') }}" class="sidebar-panel-action" aria-label="{{ _('Nuevo documento') }}">+</a>
+                    <a href="{{ url_for('documentos.nuevo') }}" class="sidebar-panel-action"
+                        aria-label="{{ _('Nuevo documento') }}">+</a>
                     {% endif %}
                 </div>
 
@@ -81,15 +96,19 @@
                     <li class="sidebar-tree-node" x-data="{ open: {{ 'true' if node.is_open else 'false' }} }">
                         <div class="sidebar-tree-row sidebar-tree-row-level-{{ level }}">
                             {% if node.children %}
-                            <button type="button" class="sidebar-tree-toggle" @click="open = !open" :aria-expanded="open">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" :style="open ? 'transform: rotate(90deg)' : ''">
-                                    <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <button type="button" class="sidebar-tree-toggle" @click="open = !open"
+                                :aria-expanded="open">
+                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
+                                    :style="open ? 'transform: rotate(90deg)' : ''">
+                                    <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.4"
+                                        stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </button>
                             {% else %}
                             <span class="sidebar-tree-toggle spacer"></span>
                             {% endif %}
-                            <a href="{{ node.url }}" class="sidebar-tree-link{% if node.is_active %} is-active{% endif %}{% if node.kind == 'document' %} is-document{% endif %}{% if node.is_space %} is-space{% endif %}">
+                            <a href="{{ node.url }}"
+                                class="sidebar-tree-link{% if node.is_active %} is-active{% endif %}{% if node.kind == 'document' %} is-document{% endif %}{% if node.is_space %} is-space{% endif %}">
                                 {% if node.is_space %}
                                 <span class="sidebar-space-badge" style="background-color: {{ node.color }};">
                                     {{ node.badge }}
@@ -101,8 +120,11 @@
                                 {% else %}
                                 <span class="sidebar-tree-icon sidebar-tree-icon-doc">
                                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                                        <path d="M5 2.5H9.5L12 5V13C12 13.2761 11.7761 13.5 11.5 13.5H5C4.72386 13.5 4.5 13.2761 4.5 13V3C4.5 2.72386 4.72386 2.5 5 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-                                        <path d="M9.5 2.75V5H11.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path
+                                            d="M5 2.5H9.5L12 5V13C12 13.2761 11.7761 13.5 11.5 13.5H5C4.72386 13.5 4.5 13.2761 4.5 13V3C4.5 2.72386 4.72386 2.5 5 2.5Z"
+                                            stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
+                                        <path d="M9.5 2.75V5H11.75" stroke="currentColor" stroke-width="1.2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                 </span>
                                 {% endif %}
@@ -135,7 +157,8 @@
                         <a href="{{ url_for('admin.grupos') }}" class="sidebar-admin-link">{{ _('Grupos') }}</a>
                         <a href="{{ url_for('admin.categorias') }}" class="sidebar-admin-link">{{ _('Categorías') }}</a>
                         <a href="{{ url_for('admin.etiquetas') }}" class="sidebar-admin-link">{{ _('Etiquetas') }}</a>
-                        <a href="{{ url_for('admin.configuracion') }}" class="sidebar-admin-link">{{ _('Configuración') }}</a>
+                        <a href="{{ url_for('admin.configuracion') }}"
+                            class="sidebar-admin-link">{{ _('Configuración') }}</a>
                     </div>
                 </div>
                 {% endif %}
@@ -166,7 +189,88 @@
     </div>
 
     <!-- Overlay para sidebar en mobile -->
-    <div class="sidebar-overlay" :class="{ 'sidebar-overlay-active': sidebarOpen && window.innerWidth < 768 }" @click="sidebarOpen = false"></div>
+    <div class="sidebar-overlay" :class="{ 'sidebar-overlay-active': sidebarOpen && window.innerWidth < 768 }"
+        @click="sidebarOpen = false"></div>
+
+    <div class="system-modal-backdrop" x-show="systemInfoOpen" x-cloak @click="closeSystemModal()">
+        <section class="system-modal" @click.stop>
+            <header class="system-modal-header">
+                <div class="system-modal-brand">
+                    <img src="{{ url_for('static', filename='WanShiTongLogo.png') }}" alt="{{ app_name }}"
+                        class="system-modal-logo-main">
+                    <div>
+                        <h2>{{ app_name }}</h2>
+                        <p>{{ _('Centro de información de la plataforma') }}</p>
+                    </div>
+                </div>
+                <button type="button" class="system-modal-close" @click="closeSystemModal()"
+                    aria-label="{{ _('Cerrar') }}">×</button>
+            </header>
+
+            <div class="system-modal-body">
+                <section class="system-about-card">
+                    <div class="system-about-grid">
+                        <div>
+                            <span class="system-label">{{ _('Aplicación') }}</span>
+                            <p class="system-value">{{ app_name }}</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Versión') }}</span>
+                            <p class="system-value">{{ app_version }}</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Licencia') }}</span>
+                            <p class="system-value">{{ app_license }}</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Código fuente') }}</span>
+                            <p class="system-value"><a href="{{ app_source_url }}" target="_blank"
+                                    rel="noopener noreferrer">{{ app_source_url }}</a></p>
+                        </div>
+                    </div>
+                </section>
+
+                {% if current_user.tipo == 'admin' %}
+                <section class="system-runtime-card">
+                    <div class="system-runtime-title-row">
+                        <h3>{{ _('Estado del sistema') }}</h3>
+                        <button type="button" class="btn btn-small btn-outline"
+                            @click="loadSystemInfo()">{{ _('Actualizar') }}</button>
+                    </div>
+                    <p class="system-loading" x-show="systemInfoLoading">{{ _('Consultando estado actual...') }}</p>
+                    <div class="system-runtime-grid" x-show="!systemInfoLoading && systemInfo">
+                        <div>
+                            <span class="system-label">{{ _('Sistema operativo') }}</span>
+                            <p class="system-value" x-text="systemInfo?.system || '-'">-</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Versión de Python') }}</span>
+                            <p class="system-value" x-text="systemInfo?.python_version || '-'">-</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Motor de base de datos') }}</span>
+                            <p class="system-value" x-text="systemInfo?.database?.engine || '-'">-</p>
+                        </div>
+                        <div>
+                            <span class="system-label">{{ _('Conexión de base de datos') }}</span>
+                            <p class="system-value" x-text="systemInfo?.database?.status || '-'">-</p>
+                        </div>
+                        <div x-show="systemInfo?.database?.sqlite_path" class="system-span-2">
+                            <span class="system-label">{{ _('Ruta SQLite') }}</span>
+                            <p class="system-value system-filepath" x-text="systemInfo?.database?.sqlite_path"></p>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+
+            <footer class="system-modal-footer">
+                <img src="{{ url_for('static', filename='BMOLogoSmall.png') }}" alt="BMO Soluciones"
+                    class="system-modal-logo-bmo">
+                <span>BMO Soluciones</span>
+            </footer>
+        </section>
+    </div>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -177,6 +281,10 @@
             return {
                 sidebarOpen: window.innerWidth >= 768,
                 theme: document.documentElement.dataset.theme || 'light',
+                userMenuOpen: false,
+                systemInfoOpen: false,
+                systemInfoLoading: false,
+                systemInfo: null,
                 init() {
                     document.documentElement.dataset.theme = this.theme;
                 },
@@ -192,14 +300,51 @@
                             },
                             body: JSON.stringify({ theme: this.theme }),
                         });
-                    } catch (_) {}
+                    } catch (_) { }
+                },
+                async openSystemInfo() {
+                    this.systemInfoOpen = true;
+                    {% if current_user.tipo == 'admin' %}
+                    if (!this.systemInfo) {
+                        await this.loadSystemInfo();
+                    }
+                    {% endif %}
+                },
+                closeSystemModal() {
+                    this.systemInfoOpen = false;
+                },
+                async loadSystemInfo() {
+                    this.systemInfoLoading = true;
+                    try {
+                        const response = await fetch('{{ url_for('admin.system_info') }}', {
+                            method: 'GET',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            },
+                        });
+                        if (!response.ok) {
+                            throw new Error('system info unavailable');
+                        }
+                        this.systemInfo = await response.json();
+                    } catch (_) {
+                        this.systemInfo = {
+                            system: 'n/a',
+                            python_version: 'n/a',
+                            database: {
+                                engine: 'n/a',
+                                status: 'error',
+                            },
+                        };
+                    } finally {
+                        this.systemInfoLoading = false;
+                    }
                 },
             };
         }
 
         document.addEventListener('alpine:init', () => {
             // Close sidebar on window resize (mobile)
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 const sidebarComponent = document.querySelector('[x-data]');
                 if (window.innerWidth < 768) {
                     Alpine.evaluate(sidebarComponent, 'sidebarOpen = false');
