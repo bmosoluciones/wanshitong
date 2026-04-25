@@ -109,9 +109,34 @@ def configuracion():
             extension = _validated_image_extension(logo_file.filename)
             if extension is None:
                 flash(str(_("Formato de logo no soportado.")), "error")
-                return render_template("admin/configuracion.html", form=form)
+                return render_template(
+                    "admin/configuracion.html",
+                    form=form,
+                    current_site_logo=_get_setting_value("site_logo_filename", ""),
+                    current_site_favicon=_get_setting_value(
+                        "site_favicon_filename", ""
+                    ),
+                )
             filename = _store_site_logo(logo_file, extension)
             set_setting("site_logo_filename", filename, current_user.usuario)
+
+        favicon_file = request.files.get(form.site_favicon.name)
+        if favicon_file and favicon_file.filename:
+            extension = _validated_favicon_extension(favicon_file.filename)
+            if extension is None:
+                flash(
+                    str(_("Formato de favicon no soportado. Use .ico o .png.")), "error"
+                )
+                return render_template(
+                    "admin/configuracion.html",
+                    form=form,
+                    current_site_logo=_get_setting_value("site_logo_filename", ""),
+                    current_site_favicon=_get_setting_value(
+                        "site_favicon_filename", ""
+                    ),
+                )
+            filename = _store_site_favicon(favicon_file, extension)
+            set_setting("site_favicon_filename", filename, current_user.usuario)
 
         session["lang"] = updates["default_language"]
         session.modified = True
@@ -129,6 +154,7 @@ def configuracion():
         "admin/configuracion.html",
         form=form,
         current_site_logo=_get_setting_value("site_logo_filename", ""),
+        current_site_favicon=_get_setting_value("site_favicon_filename", ""),
     )
 
 
@@ -144,6 +170,22 @@ def _store_site_logo(uploaded_file, extension: str) -> str:
     for existing in directory.glob("logo.*"):
         existing.unlink()
     filename = f"logo.{extension}"
+    uploaded_file.save(directory / filename)
+    return filename
+
+
+def _validated_favicon_extension(filename: str) -> str | None:
+    extension = Path(secure_filename(filename)).suffix.lower().lstrip(".")
+    if extension in {"ico", "png"}:
+        return extension
+    return None
+
+
+def _store_site_favicon(uploaded_file, extension: str) -> str:
+    directory = site_asset_dir()
+    for existing in directory.glob("favicon.*"):
+        existing.unlink()
+    filename = f"favicon.{extension}"
     uploaded_file.save(directory / filename)
     return filename
 
@@ -321,7 +363,15 @@ def editar_grupo(grupo_id):
         database.session.commit()
         flash(str(_("Grupo actualizado exitosamente.")), "success")
         return redirect(url_for("admin.grupos"))
-    return render_template("admin/grupo_form.html", form=form, grupo=grupo)
+    return render_template(
+        "admin/grupo_form.html",
+        form=form,
+        grupo=grupo,
+        categoria_paths={
+            categoria.id: _categoria_path_label(categoria)
+            for categoria in grupo.categorias
+        },
+    )
 
 
 @admin.route("/g/<grupo_id>/delete", methods=["POST"])
@@ -379,7 +429,8 @@ def categorias():
         .scalars()
         .all()
     )
-    return render_template("admin/categorias.html", categorias=lista)
+    categorias_rows = _categoria_hierarchy_rows(lista)
+    return render_template("admin/categorias.html", categorias_rows=categorias_rows)
 
 
 @admin.route("/c/new", methods=["GET", "POST"])
@@ -392,7 +443,7 @@ def nueva_categoria():
         .scalars()
         .all()
     )
-    form.parent_id.choices = [("", _("Ninguna"))] + [(c.id, c.nombre) for c in todas]
+    form.parent_id.choices = _categoria_parent_choices(todas)
     form.grupo_ids.choices = _grupo_choices()
     if form.validate_on_submit():
         cat = Categoria()
@@ -430,7 +481,7 @@ def editar_categoria(cat_id):
         .scalars()
         .all()
     )
-    form.parent_id.choices = [("", _("Ninguna"))] + [(c.id, c.nombre) for c in todas]
+    form.parent_id.choices = _categoria_parent_choices(todas)
     form.grupo_ids.choices = _grupo_choices()
     if not form.is_submitted():
         form.grupo_ids.data = [grupo.id for grupo in cat.grupos]
@@ -472,7 +523,8 @@ def etiquetas():
         .scalars()
         .all()
     )
-    return render_template("admin/etiquetas.html", etiquetas=lista)
+    etiquetas_rows = _etiqueta_hierarchy_rows(lista)
+    return render_template("admin/etiquetas.html", etiquetas_rows=etiquetas_rows)
 
 
 @admin.route("/t/new", methods=["GET", "POST"])
@@ -485,7 +537,7 @@ def nueva_etiqueta():
         .scalars()
         .all()
     )
-    form.parent_id.choices = [("", _("Ninguna"))] + [(t.id, t.nombre) for t in todas]
+    form.parent_id.choices = _etiqueta_parent_choices(todas)
     if form.validate_on_submit():
         tag = Etiqueta()
         tag.nombre = form.nombre.data.strip().lower()
@@ -519,7 +571,7 @@ def editar_etiqueta(tag_id):
         .scalars()
         .all()
     )
-    form.parent_id.choices = [("", _("Ninguna"))] + [(t.id, t.nombre) for t in todas]
+    form.parent_id.choices = _etiqueta_parent_choices(todas)
     if form.validate_on_submit():
         tag.nombre = form.nombre.data.strip().lower()
         tag.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
@@ -570,8 +622,96 @@ def _populate_group_form_choices(form: GrupoForm) -> None:
         (usuario.id, usuario.usuario) for usuario in usuarios if usuario.activo
     ]
     form.categoria_ids.choices = [
-        (categoria.id, categoria.nombre) for categoria in categorias
+        (categoria.id, _categoria_path_label(categoria))
+        for categoria, _, _ in _categoria_hierarchy_rows(categorias)
     ]
+
+
+def _hierarchy_rows(items, name_attr: str = "nombre") -> list[tuple[object, int, str]]:
+    by_parent: dict[str | None, list[object]] = {}
+    by_id: dict[str, object] = {}
+    for item in items:
+        item_id = cast(str, getattr(item, "id"))
+        item_parent_id = cast(str | None, getattr(item, "parent_id"))
+        by_id[item_id] = item
+        by_parent.setdefault(item_parent_id, []).append(item)
+
+    key_fn = lambda obj: cast(str, getattr(obj, name_attr)).lower()
+    for siblings in by_parent.values():
+        siblings.sort(key=key_fn)
+
+    roots: list[object] = []
+    for item in items:
+        parent_id = cast(str | None, getattr(item, "parent_id"))
+        if parent_id is None or parent_id not in by_id:
+            roots.append(item)
+    roots.sort(key=key_fn)
+
+    rows: list[tuple[object, int, str]] = []
+    visited: set[str] = set()
+
+    def walk(node: object, depth: int, parent_path: str = "") -> None:
+        node_id = cast(str, getattr(node, "id"))
+        if node_id in visited:
+            return
+        visited.add(node_id)
+        node_name = cast(str, getattr(node, name_attr))
+        path = f"{parent_path} / {node_name}" if parent_path else node_name
+        rows.append((node, depth, path))
+        for child in by_parent.get(node_id, []):
+            walk(child, depth + 1, path)
+
+    for root in roots:
+        walk(root, 0)
+
+    for item in sorted(items, key=key_fn):
+        item_id = cast(str, getattr(item, "id"))
+        if item_id not in visited:
+            walk(item, 0)
+
+    return rows
+
+
+def _indent_label(label: str, depth: int) -> str:
+    if depth <= 0:
+        return label
+    return f"{'- ' * depth}{label}"
+
+
+def _categoria_hierarchy_rows(
+    categorias: list[Categoria],
+) -> list[tuple[Categoria, int, str]]:
+    return cast(list[tuple[Categoria, int, str]], _hierarchy_rows(categorias))
+
+
+def _etiqueta_hierarchy_rows(
+    etiquetas: list[Etiqueta],
+) -> list[tuple[Etiqueta, int, str]]:
+    return cast(list[tuple[Etiqueta, int, str]], _hierarchy_rows(etiquetas))
+
+
+def _categoria_parent_choices(categorias: list[Categoria]) -> list[tuple[str, str]]:
+    return [("", _("Ninguna"))] + [
+        (categoria.id, _indent_label(categoria.nombre, depth))
+        for categoria, depth, _ in _categoria_hierarchy_rows(categorias)
+    ]
+
+
+def _etiqueta_parent_choices(etiquetas: list[Etiqueta]) -> list[tuple[str, str]]:
+    return [("", _("Ninguna"))] + [
+        (etiqueta.id, _indent_label(etiqueta.nombre, depth))
+        for etiqueta, depth, _ in _etiqueta_hierarchy_rows(etiquetas)
+    ]
+
+
+def _categoria_path_label(categoria: Categoria) -> str:
+    path: list[str] = []
+    current = categoria
+    while current is not None:
+        path.append(current.nombre)
+        current = current.parent
+    path.reverse()
+    return " / ".join(path)
 
 
 def _get_selected_usuarios(usuario_ids: list[str]) -> list[Usuario]:

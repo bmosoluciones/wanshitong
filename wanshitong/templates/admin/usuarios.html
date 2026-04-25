@@ -15,6 +15,7 @@
                 <th>{{ _('Nombre') }}</th>
                 <th>{{ _('Correo') }}</th>
                 <th>{{ _('Rol') }}</th>
+                <th>{{ _('Grupos') }}</th>
                 <th>{{ _('Activo') }}</th>
                 <th></th>
             </tr>
@@ -26,11 +27,21 @@
                 <td>{{ u.nombre }} {{ u.apellido }}</td>
                 <td>{{ u.correo_electronico or '—' }}</td>
                 <td><span class="badge bg-secondary">{{ u.tipo }}</span></td>
-                <td>{% if u.activo %}<span class="badge bg-success">{{ _('Sí') }}</span>{% else %}<span class="badge bg-danger">{{ _('No') }}</span>{% endif %}</td>
                 <td>
-                    <a href="{{ url_for('admin.editar_usuario', user_id=u.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
+                    {% if u.grupos %}
+                    {{ u.grupos | sort(attribute='nombre') | map(attribute='nombre') | join(', ') }}
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+                <td>{% if u.activo %}<span class="badge bg-success">{{ _('Sí') }}</span>{% else %}<span
+                        class="badge bg-danger">{{ _('No') }}</span>{% endif %}</td>
+                <td>
+                    <a href="{{ url_for('admin.editar_usuario', user_id=u.id) }}"
+                        class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
                     {% if u.id != current_user.id %}
-                    <form method="post" action="{{ url_for('admin.eliminar_usuario', user_id=u.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar usuario?') }}')">
+                    <form method="post" action="{{ url_for('admin.eliminar_usuario', user_id=u.id) }}" class="d-inline"
+                        onsubmit="return confirm('{{ _('¿Eliminar usuario?') }}')">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
                     </form>

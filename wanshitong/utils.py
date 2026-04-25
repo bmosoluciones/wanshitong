@@ -14,6 +14,7 @@ from wanshitong.model import AppConfig, Usuario, database
 DEFAULT_SETTINGS = {
     "site_title": {"value": "WanShiTong", "type": "string"},
     "site_logo_filename": {"value": "", "type": "string"},
+    "site_favicon_filename": {"value": "", "type": "string"},
     "default_language": {"value": "es", "type": "string"},
     "uploads_enabled": {"value": "1", "type": "bool"},
     "max_upload_size_mb": {"value": "10", "type": "int"},
@@ -124,3 +125,18 @@ def site_logo_url() -> str:
     if logo_filename:
         return url_for("media_site_logo", filename=logo_filename)
     return url_for("static", filename="WanShiTongLogo.png")
+
+
+def site_favicon_url() -> str:
+    favicon_filename = get_setting("site_favicon_filename", "")
+    if favicon_filename:
+        return url_for("media_site_logo", filename=favicon_filename)
+    return url_for("static", filename="favicon.ico")
+
+
+def site_favicon_mime_type() -> str:
+    favicon_filename = get_setting("site_favicon_filename", "")
+    suffix = Path(favicon_filename).suffix.lower()
+    if suffix == ".png":
+        return "image/png"
+    return "image/x-icon"

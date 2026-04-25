@@ -108,6 +108,7 @@ class AppSettingsForm(FlaskForm):
         _("Título del sitio"), validators=[DataRequired(), Length(max=150)]
     )
     site_logo = FileField(_("Logo del sitio"))
+    site_favicon = FileField(_("Favicon del sitio"))
     default_language = SelectField(
         _("Idioma por defecto"),
         choices=[("en", "English"), ("es", "Español")],

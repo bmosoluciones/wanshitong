@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="{{ site_favicon_mime_type }}" href="{{ site_favicon_url }}">
+    <link rel="shortcut icon" href="{{ site_favicon_url }}">
     <title>{% block title %}{{ site_title }}{% endblock %}</title>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,10 +121,12 @@
                                 <span class="sidebar-tree-icon sidebar-tree-icon-doc">
                                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
                                         <path
-                                            d="M5 2.5H9.5L12 5V13C12 13.2761 11.7761 13.5 11.5 13.5H5C4.72386 13.5 4.5 13.2761 4.5 13V3C4.5 2.72386 4.72386 2.5 5 2.5Z"
+                                            d="M4 2.5h6.4L12.5 4.6V13a1 1 0 0 1-1 1H4.9a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"
                                             stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
-                                        <path d="M9.5 2.75V5H11.75" stroke="currentColor" stroke-width="1.2"
+                                        <path d="M10.4 2.5V4.6H12.5" stroke="currentColor" stroke-width="1.2"
                                             stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M6.1 7.1h4.4M6.1 9.1h4.4M6.1 11.1h3" stroke="currentColor"
+                                            stroke-width="1.1" stroke-linecap="round" />
                                     </svg>
                                 </span>
                                 {% endif %}

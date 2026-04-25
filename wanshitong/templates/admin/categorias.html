@@ -19,15 +19,21 @@
             </tr>
         </thead>
         <tbody>
-            {% for c in categorias %}
+            {% for c, level, path in categorias_rows %}
             <tr>
-                <td>{{ c.nombre }}</td>
+                <td>
+                    <span style="padding-left: {{ level * 18 }}px; display: inline-block;">
+                        {{ c.nombre }}
+                    </span>
+                </td>
                 <td>{{ c.slug or '—' }}</td>
                 <td>{{ c.parent.nombre if c.parent else '—' }}</td>
                 <td>{{ c.grupos | length }}</td>
                 <td>
-                    <a href="{{ url_for('admin.editar_categoria', cat_id=c.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
-                    <form method="post" action="{{ url_for('admin.eliminar_categoria', cat_id=c.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar categoría?') }}')">
+                    <a href="{{ url_for('admin.editar_categoria', cat_id=c.id) }}"
+                        class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
+                    <form method="post" action="{{ url_for('admin.eliminar_categoria', cat_id=c.id) }}" class="d-inline"
+                        onsubmit="return confirm('{{ _('¿Eliminar categoría?') }}')">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
                     </form>

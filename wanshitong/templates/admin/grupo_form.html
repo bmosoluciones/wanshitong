@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if grupo %}{{ _('Editar grupo') }}{% else %}{{ _('Nuevo grupo') }}{% endif %} — WanShiTong{% endblock %}
+{% block title %}{% if grupo %}{{ _('Editar grupo') }}{% else %}{{ _('Nuevo grupo') }}{% endif %} —
+WanShiTong{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -34,7 +35,8 @@
                     <option value="{{ uid }}">{{ uname }}</option>
                     {% endfor %}
                 </select>
-                <button type="button" class="btn btn-outline-primary" onclick="addUserToGroup()">{{ _('Agregar') }}</button>
+                <button type="button" class="btn btn-outline-primary"
+                    onclick="addUserToGroup()">{{ _('Agregar') }}</button>
             </div>
 
             <div id="selected-users" class="d-flex flex-wrap gap-2"></div>
@@ -46,8 +48,9 @@
             <div class="row row-cols-1 row-cols-md-3 g-2">
                 {% for cid, cname in form.categoria_ids.choices %}
                 <div class="col">
-                    <label class="form-check border rounded p-2 w-100">
-                        <input class="form-check-input" type="checkbox" name="{{ form.categoria_ids.name }}" value="{{ cid }}" {% if cid in (form.categoria_ids.data or []) %}checked{% endif %}>
+                    <label class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ form.categoria_ids.name }}"
+                            value="{{ cid }}" {% if cid in (form.categoria_ids.data or []) %}checked{% endif %}>
                         <span class="form-check-label ms-1">{{ cname }}</span>
                     </label>
                 </div>
@@ -72,7 +75,9 @@
             <tr>
                 <td>{{ u.usuario }} — {{ u.nombre }} {{ u.apellido }}</td>
                 <td>
-                    <form method="post" action="{{ url_for('admin.eliminar_miembro', grupo_id=grupo.id, user_id=u.id) }}" class="d-inline">
+                    <form method="post"
+                        action="{{ url_for('admin.eliminar_miembro', grupo_id=grupo.id, user_id=u.id) }}"
+                        class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button class="btn btn-sm btn-outline-danger">{{ _('Quitar') }}</button>
                     </form>
@@ -91,7 +96,7 @@
     <ul class="list-group">
         {% for categoria in grupo.categorias %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>{{ categoria.nombre }}</span>
+            <span>{{ categoria_paths.get(categoria.id, categoria.nombre) if categoria_paths else categoria.nombre }}</span>
             <span class="badge text-bg-light">{{ categoria.slug or '—' }}</span>
         </li>
         {% endfor %}
@@ -103,43 +108,43 @@
 </div>
 
 <script>
-function selectedUserMap() {
-    const select = document.getElementById('selected-user-ids');
-    const map = new Map();
-    Array.from(select.options).forEach((opt) => {
-        if (opt.selected) map.set(opt.value, opt.textContent);
-    });
-    return map;
-}
+    function selectedUserMap() {
+        const select = document.getElementById('selected-user-ids');
+        const map = new Map();
+        Array.from(select.options).forEach((opt) => {
+            if (opt.selected) map.set(opt.value, opt.textContent);
+        });
+        return map;
+    }
 
-function renderSelectedUsers() {
-    const container = document.getElementById('selected-users');
-    const users = selectedUserMap();
-    container.innerHTML = '';
-    users.forEach((name, id) => {
-        const chip = document.createElement('span');
-        chip.className = 'badge text-bg-light border d-inline-flex align-items-center gap-2 p-2';
-        chip.innerHTML = `${name} <button type="button" class="btn btn-sm p-0" aria-label="remove" onclick="removeUserFromGroup('${id}')">✕</button>`;
-        container.appendChild(chip);
-    });
-}
+    function renderSelectedUsers() {
+        const container = document.getElementById('selected-users');
+        const users = selectedUserMap();
+        container.innerHTML = '';
+        users.forEach((name, id) => {
+            const chip = document.createElement('span');
+            chip.className = 'badge text-bg-light border d-inline-flex align-items-center gap-2 p-2';
+            chip.innerHTML = `${name} <button type="button" class="btn btn-sm p-0" aria-label="remove" onclick="removeUserFromGroup('${id}')">✕</button>`;
+            container.appendChild(chip);
+        });
+    }
 
-function addUserToGroup() {
-    const picker = document.getElementById('available-user');
-    const select = document.getElementById('selected-user-ids');
-    if (!picker.value) return;
-    const target = Array.from(select.options).find((opt) => opt.value === picker.value);
-    if (target) target.selected = true;
-    renderSelectedUsers();
-}
+    function addUserToGroup() {
+        const picker = document.getElementById('available-user');
+        const select = document.getElementById('selected-user-ids');
+        if (!picker.value) return;
+        const target = Array.from(select.options).find((opt) => opt.value === picker.value);
+        if (target) target.selected = true;
+        renderSelectedUsers();
+    }
 
-function removeUserFromGroup(userId) {
-    const select = document.getElementById('selected-user-ids');
-    const target = Array.from(select.options).find((opt) => opt.value === userId);
-    if (target) target.selected = false;
-    renderSelectedUsers();
-}
+    function removeUserFromGroup(userId) {
+        const select = document.getElementById('selected-user-ids');
+        const target = Array.from(select.options).find((opt) => opt.value === userId);
+        if (target) target.selected = false;
+        renderSelectedUsers();
+    }
 
-document.addEventListener('DOMContentLoaded', renderSelectedUsers);
+    document.addEventListener('DOMContentLoaded', renderSelectedUsers);
 </script>
 {% endblock %}

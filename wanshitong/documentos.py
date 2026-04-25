@@ -57,14 +57,89 @@ def preview_api():
 
 
 def _get_categoria_choices():
-    categorias = database.session.execute(database.select(Categoria)).scalars().all()
+    rows = _get_accessible_category_rows()
     choices = [("", _("Sin categoría"))]
     choices += [
-        (c.id, c.nombre)
-        for c in categorias
-        if current_user.tipo == "admin" or puede_acceder_categoria(c, current_user)
+        (row["id"], _indent_label(str(row["nombre"]), int(row["depth"])))
+        for row in rows
     ]
     return choices
+
+
+def _get_categoria_option_rows() -> list[dict[str, str | int]]:
+    return _get_accessible_category_rows()
+
+
+def _get_categoria_label_by_id(categoria_id: str | None) -> str:
+    if not categoria_id:
+        return ""
+    for row in _get_accessible_category_rows():
+        if row["id"] == categoria_id:
+            return str(row["path"])
+    return ""
+
+
+def _get_etiqueta_suggestions() -> list[str]:
+    etiquetas = (
+        database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre))
+        .scalars()
+        .all()
+    )
+    return [etiqueta.nombre for etiqueta in etiquetas]
+
+
+def _get_accessible_category_rows() -> list[dict[str, str | int]]:
+    categorias = database.session.execute(database.select(Categoria)).scalars().all()
+    visibles = [
+        categoria
+        for categoria in categorias
+        if current_user.tipo == "admin"
+        or puede_acceder_categoria(categoria, current_user)
+    ]
+    by_parent: dict[str | None, list[Categoria]] = {}
+    by_id = {categoria.id: categoria for categoria in visibles}
+    for categoria in visibles:
+        parent_id = categoria.parent_id
+        if parent_id and parent_id not in by_id:
+            parent_id = None
+        by_parent.setdefault(parent_id, []).append(categoria)
+
+    for siblings in by_parent.values():
+        siblings.sort(key=lambda c: c.nombre.lower())
+
+    rows: list[dict[str, str | int]] = []
+    visited: set[str] = set()
+
+    def walk(node: Categoria, depth: int, parent_path: str = "") -> None:
+        if node.id in visited:
+            return
+        visited.add(node.id)
+        path = f"{parent_path} / {node.nombre}" if parent_path else node.nombre
+        rows.append(
+            {
+                "id": node.id,
+                "nombre": node.nombre,
+                "depth": depth,
+                "path": path,
+            }
+        )
+        for child in by_parent.get(node.id, []):
+            walk(child, depth + 1, path)
+
+    for root in by_parent.get(None, []):
+        walk(root, 0)
+
+    for categoria in sorted(visibles, key=lambda c: c.nombre.lower()):
+        if categoria.id not in visited:
+            walk(categoria, 0)
+
+    return rows
+
+
+def _indent_label(label: str, depth: int) -> str:
+    if depth <= 0:
+        return label
+    return f"{'- ' * depth}{label}"
 
 
 def _get_or_create_etiqueta(nombre: str) -> Etiqueta:
@@ -164,7 +239,14 @@ def nuevo():
         flash(str(_("Documento creado exitosamente.")), "success")
         return redirect(url_for("documentos.ver", doc_id=doc.id))
 
-    return render_template("documentos/editar.html", form=form, doc=None)
+    return render_template(
+        "documentos/editar.html",
+        form=form,
+        doc=None,
+        categoria_options=_get_categoria_option_rows(),
+        selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+        etiquetas_sugeridas=_get_etiqueta_suggestions(),
+    )
 
 
 @documentos.route("/<doc_id>")
@@ -229,7 +311,14 @@ def editar(doc_id):
         flash(str(_("Documento actualizado exitosamente.")), "success")
         return redirect(url_for("documentos.ver", doc_id=doc.id))
 
-    return render_template("documentos/editar.html", form=form, doc=doc)
+    return render_template(
+        "documentos/editar.html",
+        form=form,
+        doc=doc,
+        categoria_options=_get_categoria_option_rows(),
+        selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+        etiquetas_sugeridas=_get_etiqueta_suggestions(),
+    )
 
 
 @documentos.route("/<doc_id>/delete", methods=["POST"])

@@ -19,20 +19,28 @@
             </tr>
         </thead>
         <tbody>
-            {% for etiqueta in etiquetas %}
+            {% for etiqueta, level, path in etiquetas_rows %}
             <tr>
-                <td>{{ etiqueta.nombre }}</td>
+                <td>
+                    <span style="padding-left: {{ level * 18 }}px; display: inline-block;">
+                        {{ etiqueta.nombre }}
+                    </span>
+                </td>
                 <td>{{ etiqueta.slug or '—' }}</td>
                 <td>{{ etiqueta.parent.nombre if etiqueta.parent else '—' }}</td>
                 <td>
-                    <span style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--border);">
+                    <span
+                        style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--border);">
                         <span>{{ etiqueta.icono or '🏷' }}</span>
-                        <span style="width:10px;height:10px;border-radius:999px;background:{{ etiqueta.color or 'var(--primary)' }};"></span>
+                        <span
+                            style="width:10px;height:10px;border-radius:999px;background:{{ etiqueta.color or 'var(--primary)' }};"></span>
                     </span>
                 </td>
                 <td>
-                    <a href="{{ url_for('admin.editar_etiqueta', tag_id=etiqueta.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
-                    <form method="post" action="{{ url_for('admin.eliminar_etiqueta', tag_id=etiqueta.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar etiqueta?') }}')">
+                    <a href="{{ url_for('admin.editar_etiqueta', tag_id=etiqueta.id) }}"
+                        class="btn btn-sm btn-outline-primary">{{ _('Editar') }}</a>
+                    <form method="post" action="{{ url_for('admin.eliminar_etiqueta', tag_id=etiqueta.id) }}"
+                        class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar etiqueta?') }}')">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
                     </form>

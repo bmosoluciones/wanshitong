@@ -25,7 +25,13 @@
             <div class="col-md-6">
                 {{ form.site_logo.label(class_='form-label') }}
                 {{ form.site_logo(class_='form-control', accept='image/png,image/jpeg,image/webp,image/gif') }}
-                <div class="form-text">{{ _('Si subes un logo personalizado, se utilizará en la barra lateral y el login. El favicon permanecerá estático.') }}</div>
+                <div class="form-text">
+                    {{ _('Si subes un logo personalizado, se utilizará en la barra lateral y el login.') }}</div>
+            </div>
+            <div class="col-md-6">
+                {{ form.site_favicon.label(class_='form-label') }}
+                {{ form.site_favicon(class_='form-control', accept='.ico,image/x-icon,image/vnd.microsoft.icon,image/png') }}
+                <div class="form-text">{{ _('Sube un favicon personalizado en formato .ico o .png.') }}</div>
             </div>
             <div class="col-md-6">
                 {{ form.default_language.label(class_='form-label') }}
@@ -43,10 +49,16 @@
             </div>
             <div class="col-12">
                 <div class="border rounded p-3 d-inline-flex align-items-center gap-3 bg-body-tertiary">
-                    <img src="{{ site_logo_url }}" alt="{{ site_title }}" style="width:64px;height:64px;object-fit:contain;">
+                    <img src="{{ site_logo_url }}" alt="{{ site_title }}"
+                        style="width:64px;height:64px;object-fit:contain;">
                     <div>
                         <div class="fw-semibold">{{ site_title }}</div>
-                        <div class="text-muted small">{% if current_site_logo %}{{ _('Logo personalizado activo') }}{% else %}{{ _('Logo predeterminado activo') }}{% endif %}</div>
+                        <div class="text-muted small">
+                            {% if current_site_logo %}{{ _('Logo personalizado activo') }}{% else %}{{ _('Logo predeterminado activo') }}{% endif %}
+                        </div>
+                        <div class="text-muted small">
+                            {% if current_site_favicon %}{{ _('Favicon personalizado activo') }}{% else %}{{ _('Favicon predeterminado activo') }}{% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

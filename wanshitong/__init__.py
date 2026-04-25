@@ -46,6 +46,8 @@ from wanshitong.utils import (
     avatar_url,
     ensure_default_settings,
     get_setting,
+    site_favicon_mime_type,
+    site_favicon_url,
     site_logo_url,
 )
 from wanshitong.version import __version__
@@ -283,6 +285,8 @@ def create_app(config) -> Flask:
             "get_locale": _flask_get_locale,
             "site_title": get_setting("site_title", app.config["APP_SITE_TITLE"]),
             "site_logo_url": site_logo_url(),
+            "site_favicon_url": site_favicon_url(),
+            "site_favicon_mime_type": site_favicon_mime_type(),
             "app_name": "Wanshitong",
             "app_version": __version__,
             "app_license": APP_LICENSE,
