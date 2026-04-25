@@ -7,10 +7,9 @@ from __future__ import annotations
 
 from flask import Blueprint, render_template
 from flask_login import current_user, login_required
-from sqlalchemy import func
 
 from wanshitong.acl import puede_leer
-from wanshitong.model import Categoria, Documento, Etiqueta, Usuario, database
+from wanshitong.model import Documento, database
 
 app = Blueprint("app", __name__)
 
@@ -20,11 +19,7 @@ app = Blueprint("app", __name__)
 def index():
     stmt = database.select(Documento).where(Documento.estado != "archived")
     stmt = stmt.order_by(Documento.timestamp.desc())
-    documentos = [
-        doc
-        for doc in database.session.execute(stmt).scalars().all()
-        if puede_leer(doc, current_user)
-    ]
+    documentos = [doc for doc in database.session.execute(stmt).scalars().all() if puede_leer(doc, current_user)]
 
     recientes = documentos[:10]
     document_count = len(documentos)

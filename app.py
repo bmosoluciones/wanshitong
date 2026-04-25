@@ -15,8 +15,8 @@
 from os import environ
 
 from wanshitong import create_app, ensure_database_initialized
-from wanshitong.log import log
 from wanshitong.config import configuration
+from wanshitong.log import log
 
 # ---------------------------------------------------------------------------------------
 # Crear aplicación.
@@ -40,9 +40,7 @@ def serve():
             f"ADMIN_USER={'yes' if 'ADMIN_USER' in environ else 'no'}, "
             f"ADMIN_PASSWORD={'yes' if 'ADMIN_PASSWORD' in environ else 'no'}"
         )
-        log.warning(
-            f"serve: Flask SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}"
-        )
+        log.warning(f"serve: Flask SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}")
         ensure_database_initialized(app)
         log.info("serve: ensure_database_initialized completed")
     except Exception as exc:

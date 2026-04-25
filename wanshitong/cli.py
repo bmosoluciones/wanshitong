@@ -65,15 +65,9 @@ def list_users() -> None:
     app = _app()
     with app.app_context():
         ensure_database_initialized(app)
-        users = (
-            database.session.execute(database.select(Usuario).order_by(Usuario.usuario))
-            .scalars()
-            .all()
-        )
+        users = database.session.execute(database.select(Usuario).order_by(Usuario.usuario)).scalars().all()
         for user in users:
-            click.echo(
-                f"{user.usuario}\t{user.tipo}\t{'active' if user.activo else 'inactive'}"
-            )
+            click.echo(f"{user.usuario}\t{user.tipo}\t{'active' if user.activo else 'inactive'}")
 
 
 @main.command("sync-schema")

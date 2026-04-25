@@ -5,7 +5,8 @@
 
 import pytest
 
-from wanshitong import create_app, ensure_database_initialized
+from wanshitong.acl import puede_editar, puede_leer
+from wanshitong.auth import proteger_passwd
 from wanshitong.model import (
     Categoria,
     Documento,
@@ -16,17 +17,13 @@ from wanshitong.model import (
     VersionDocumento,
     db,
 )
-from wanshitong.auth import proteger_passwd
-from wanshitong.acl import puede_leer, puede_editar
 
 
 @pytest.fixture(scope="module")
 def usuarios(app):
     """Create test users."""
     with app.app_context():
-        admin = db.session.execute(
-            db.select(Usuario).filter_by(tipo="admin")
-        ).scalar_one()
+        admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalar_one()
 
         editor = Usuario()
         editor.usuario = "editor1"
@@ -99,9 +96,7 @@ class TestModelos:
     def test_usuario_en_grupo(self, app, usuarios):
         with app.app_context():
             editor = db.session.get(Usuario, usuarios["editor"])
-            grupo = db.session.execute(
-                db.select(Grupo).filter_by(nombre="Devs")
-            ).scalar_one()
+            grupo = db.session.execute(db.select(Grupo).filter_by(nombre="Devs")).scalar_one()
             grupo.usuarios.append(editor)
             db.session.commit()
             assert editor in grupo.usuarios
@@ -325,11 +320,7 @@ class TestVersionado:
             db.session.commit()
 
             versiones = (
-                db.session.execute(
-                    db.select(VersionDocumento).where(
-                        VersionDocumento.documento_id == doc.id
-                    )
-                )
+                db.session.execute(db.select(VersionDocumento).where(VersionDocumento.documento_id == doc.id))
                 .scalars()
                 .all()
             )

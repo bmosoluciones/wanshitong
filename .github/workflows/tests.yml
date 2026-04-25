@@ -30,7 +30,21 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install black ruff flake8 flake8-pyproject mypy
+
+      - name: Check formatting (Black)
+        run: black --check .
+
+      - name: Lint (Ruff)
+        run: ruff check .
+
+      - name: Lint (Flake8)
+        run: flake8 .
+
+      - name: Type check (Mypy)
+        run: mypy wanshitong
 
       - name: Compile translation catalogs
         run: pybabel compile -d wanshitong/translations

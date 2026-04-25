@@ -53,6 +53,4 @@ def render_markdown(text: str) -> str:
     """Convert Markdown text to sanitized HTML."""
     extensions = ["fenced_code", "tables", "nl2br", "sane_lists"]
     html = _md.markdown(text or "", extensions=extensions)
-    return bleach.clean(
-        html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True
-    )
+    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES, strip=True)

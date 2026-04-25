@@ -10,7 +10,6 @@ from flask import current_app, url_for
 
 from wanshitong.model import AppConfig, Usuario, database
 
-
 DEFAULT_SETTINGS = {
     "site_title": {"value": "WanShiTong", "type": "string"},
     "site_logo_filename": {"value": "", "type": "string"},
@@ -59,9 +58,7 @@ def get_setting(key: str, fallback: str) -> str:
 
 
 def set_setting(key: str, value: str, modified_by: str | None = None) -> None:
-    setting = database.session.execute(
-        database.select(AppConfig).where(AppConfig.clave == key)
-    ).scalar_one_or_none()
+    setting = database.session.execute(database.select(AppConfig).where(AppConfig.clave == key)).scalar_one_or_none()
     if setting is None:
         setting = AppConfig()
         setting.clave = key

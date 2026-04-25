@@ -59,10 +59,7 @@ def preview_api():
 def _get_categoria_choices():
     rows = _get_accessible_category_rows()
     choices = [("", _("Sin categoría"))]
-    choices += [
-        (row["id"], _indent_label(str(row["nombre"]), int(row["depth"])))
-        for row in rows
-    ]
+    choices += [(row["id"], _indent_label(str(row["nombre"]), int(row["depth"]))) for row in rows]
     return choices
 
 
@@ -80,11 +77,7 @@ def _get_categoria_label_by_id(categoria_id: str | None) -> str:
 
 
 def _get_etiqueta_suggestions() -> list[str]:
-    etiquetas = (
-        database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre))
-        .scalars()
-        .all()
-    )
+    etiquetas = database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre)).scalars().all()
     return [etiqueta.nombre for etiqueta in etiquetas]
 
 
@@ -93,8 +86,7 @@ def _get_accessible_category_rows() -> list[dict[str, str | int]]:
     visibles = [
         categoria
         for categoria in categorias
-        if current_user.tipo == "admin"
-        or puede_acceder_categoria(categoria, current_user)
+        if current_user.tipo == "admin" or puede_acceder_categoria(categoria, current_user)
     ]
     by_parent: dict[str | None, list[Categoria]] = {}
     by_id = {categoria.id: categoria for categoria in visibles}
@@ -144,9 +136,7 @@ def _indent_label(label: str, depth: int) -> str:
 
 def _get_or_create_etiqueta(nombre: str) -> Etiqueta:
     nombre = nombre.strip().lower()
-    etiqueta = database.session.execute(
-        database.select(Etiqueta).filter_by(nombre=nombre)
-    ).scalar_one_or_none()
+    etiqueta = database.session.execute(database.select(Etiqueta).filter_by(nombre=nombre)).scalar_one_or_none()
     if etiqueta is None:
         etiqueta = Etiqueta()
         etiqueta.nombre = nombre
@@ -185,20 +175,14 @@ def lista():
         stmt = stmt.where(Documento.estado == estado_filtro)
 
     if etiqueta_filtro:
-        stmt = stmt.where(
-            Documento.etiquetas.any(Etiqueta.nombre.ilike(f"%{etiqueta_filtro}%"))
-        )
+        stmt = stmt.where(Documento.etiquetas.any(Etiqueta.nombre.ilike(f"%{etiqueta_filtro}%")))
 
     # Don't show archived by default unless explicitly requested
     if not estado_filtro:
         stmt = stmt.where(Documento.estado != "archived")
 
     stmt = stmt.order_by(Documento.timestamp.desc())
-    docs = [
-        doc
-        for doc in database.session.execute(stmt).scalars().all()
-        if puede_leer(doc, current_user)
-    ]
+    docs = [doc for doc in database.session.execute(stmt).scalars().all() if puede_leer(doc, current_user)]
 
     return render_template("documentos/lista.html", documentos=docs, form=form)
 
@@ -228,9 +212,7 @@ def nuevo():
         database.session.flush()  # Get ID
 
         # Save initial version
-        _guardar_version(
-            doc, current_user, str(form.descripcion_cambio.data or _("Versión inicial"))
-        )
+        _guardar_version(doc, current_user, str(form.descripcion_cambio.data or _("Versión inicial")))
 
         # Process tags
         _actualizar_etiquetas(doc, form.etiquetas.data or "")
@@ -426,7 +408,6 @@ def permisos(doc_id):
     form.grupo_id.choices = [("", _("Ninguno"))] + [(g.id, g.nombre) for g in grupos]
 
     if form.validate_on_submit():
-        usuario_id = form.usuario_id.data or None
         grupo_id = form.grupo_id.data or None
 
         if not grupo_id:
@@ -444,18 +425,12 @@ def permisos(doc_id):
             return redirect(url_for("documentos.permisos", doc_id=doc_id))
 
     permisos_actuales = (
-        database.session.execute(
-            database.select(PermisoDocumento).where(
-                PermisoDocumento.documento_id == doc_id
-            )
-        )
+        database.session.execute(database.select(PermisoDocumento).where(PermisoDocumento.documento_id == doc_id))
         .scalars()
         .all()
     )
 
-    return render_template(
-        "documentos/permisos.html", doc=doc, form=form, permisos=permisos_actuales
-    )
+    return render_template("documentos/permisos.html", doc=doc, form=form, permisos=permisos_actuales)
 
 
 @documentos.route("/<doc_id>/share/<perm_id>/delete", methods=["POST"])

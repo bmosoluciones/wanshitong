@@ -31,3 +31,46 @@ wanshitong = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+include = "\\.pyi?$"
+extend-exclude = "(^|/)(build|dist|venv|\\.venv)/"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+extend-exclude = ["build", "dist", "venv", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]
+exclude = [
+	".git",
+	"__pycache__",
+	".venv",
+	"venv",
+	"build",
+	"dist",
+	".mypy_cache",
+	".ruff_cache",
+]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+follow_imports = "silent"
+exclude = "(?x)(^build/|^dist/|^venv/|^\\.venv/)"
+disable_error_code = [
+	"import-untyped",
+	"attr-defined",
+	"name-defined",
+	"union-attr",
+	"arg-type",
+	"index",
+	"return-value",
+]

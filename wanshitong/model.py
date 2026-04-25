@@ -105,9 +105,7 @@ class Usuario(UserMixin, database.Model, BaseTabla):
         database.UniqueConstraint("correo_electronico", name="correo_usuario_unico"),
     )
 
-    usuario = database.Column(
-        database.String(150), nullable=False, index=True, unique=True
-    )
+    usuario = database.Column(database.String(150), nullable=False, index=True, unique=True)
     acceso = database.Column(database.LargeBinary(), nullable=False)
     nombre = database.Column(database.String(100))
     apellido = database.Column(database.String(100))
@@ -119,12 +117,8 @@ class Usuario(UserMixin, database.Model, BaseTabla):
     theme_preference = database.Column(database.String(10), default="light")
     avatar_extension = database.Column(database.String(10), nullable=True)
 
-    grupos = database.relationship(
-        "Grupo", secondary=usuario_grupo, back_populates="usuarios"
-    )
-    documentos = database.relationship(
-        "Documento", back_populates="autor", foreign_keys="Documento.autor_id"
-    )
+    grupos = database.relationship("Grupo", secondary=usuario_grupo, back_populates="usuarios")
+    documentos = database.relationship("Documento", back_populates="autor", foreign_keys="Documento.autor_id")
 
 
 class Grupo(database.Model, BaseTabla):
@@ -133,12 +127,8 @@ class Grupo(database.Model, BaseTabla):
     nombre = database.Column(database.String(100), nullable=False, unique=True)
     descripcion = database.Column(database.Text, nullable=True)
 
-    usuarios = database.relationship(
-        "Usuario", secondary=usuario_grupo, back_populates="grupos"
-    )
-    categorias = database.relationship(
-        "Categoria", secondary=categoria_grupo, back_populates="grupos"
-    )
+    usuarios = database.relationship("Usuario", secondary=usuario_grupo, back_populates="grupos")
+    categorias = database.relationship("Categoria", secondary=categoria_grupo, back_populates="grupos")
 
 
 class Categoria(database.Model, BaseTabla):
@@ -148,17 +138,11 @@ class Categoria(database.Model, BaseTabla):
     slug = database.Column(database.String(120), nullable=True, unique=True, index=True)
     icono = database.Column(database.String(32), nullable=True)
     color = database.Column(database.String(20), nullable=True)
-    parent_id = database.Column(
-        database.String(26), database.ForeignKey("categoria.id"), nullable=True
-    )
+    parent_id = database.Column(database.String(26), database.ForeignKey("categoria.id"), nullable=True)
 
-    subcategorias = database.relationship(
-        "Categoria", backref=database.backref("parent", remote_side="Categoria.id")
-    )
+    subcategorias = database.relationship("Categoria", backref=database.backref("parent", remote_side="Categoria.id"))
     documentos = database.relationship("Documento", back_populates="categoria")
-    grupos = database.relationship(
-        "Grupo", secondary=categoria_grupo, back_populates="categorias"
-    )
+    grupos = database.relationship("Grupo", secondary=categoria_grupo, back_populates="categorias")
 
 
 class Etiqueta(database.Model, BaseTabla):
@@ -168,13 +152,9 @@ class Etiqueta(database.Model, BaseTabla):
     slug = database.Column(database.String(80), nullable=True, unique=True, index=True)
     icono = database.Column(database.String(32), nullable=True)
     color = database.Column(database.String(20), nullable=True)
-    parent_id = database.Column(
-        database.String(26), database.ForeignKey("etiqueta.id"), nullable=True
-    )
+    parent_id = database.Column(database.String(26), database.ForeignKey("etiqueta.id"), nullable=True)
 
-    subetiquetas = database.relationship(
-        "Etiqueta", backref=database.backref("parent", remote_side="Etiqueta.id")
-    )
+    subetiquetas = database.relationship("Etiqueta", backref=database.backref("parent", remote_side="Etiqueta.id"))
 
 
 class Documento(database.Model, BaseTabla):
@@ -183,37 +163,19 @@ class Documento(database.Model, BaseTabla):
     titulo = database.Column(database.String(200), nullable=False)
     slug = database.Column(database.String(240), nullable=True, unique=True, index=True)
     contenido = database.Column(database.Text, nullable=False, default="")
-    autor_id = database.Column(
-        database.String(26), database.ForeignKey("usuario.id"), nullable=False
-    )
-    categoria_id = database.Column(
-        database.String(26), database.ForeignKey("categoria.id"), nullable=True
-    )
-    estado = database.Column(
-        database.String(20), default="draft", nullable=False
-    )  # draft / public / archived
-    visibilidad = database.Column(
-        database.String(20), default="privado", nullable=False
-    )  # publico / privado
+    autor_id = database.Column(database.String(26), database.ForeignKey("usuario.id"), nullable=False)
+    categoria_id = database.Column(database.String(26), database.ForeignKey("categoria.id"), nullable=True)
+    estado = database.Column(database.String(20), default="draft", nullable=False)  # draft / public / archived
+    visibilidad = database.Column(database.String(20), default="privado", nullable=False)  # publico / privado
     numero_version = database.Column(database.Integer, default=1, nullable=False)
     estado_cambiado_en = database.Column(database.DateTime, nullable=True)
-    estado_cambiado_por_id = database.Column(
-        database.String(26), database.ForeignKey("usuario.id"), nullable=True
-    )
+    estado_cambiado_por_id = database.Column(database.String(26), database.ForeignKey("usuario.id"), nullable=True)
 
-    autor = database.relationship(
-        "Usuario", back_populates="documentos", foreign_keys=[autor_id]
-    )
-    estado_cambiado_por = database.relationship(
-        "Usuario", foreign_keys=[estado_cambiado_por_id]
-    )
+    autor = database.relationship("Usuario", back_populates="documentos", foreign_keys=[autor_id])
+    estado_cambiado_por = database.relationship("Usuario", foreign_keys=[estado_cambiado_por_id])
     categoria = database.relationship("Categoria", back_populates="documentos")
-    etiquetas = database.relationship(
-        "Etiqueta", secondary=documento_etiqueta, backref="documentos"
-    )
-    permisos = database.relationship(
-        "PermisoDocumento", back_populates="documento", cascade="all, delete-orphan"
-    )
+    etiquetas = database.relationship("Etiqueta", secondary=documento_etiqueta, backref="documentos")
+    permisos = database.relationship("PermisoDocumento", back_populates="documento", cascade="all, delete-orphan")
     versiones = database.relationship(
         "VersionDocumento",
         back_populates="documento",
@@ -225,18 +187,10 @@ class Documento(database.Model, BaseTabla):
 class PermisoDocumento(database.Model, BaseTabla):
     __tablename__ = "permiso_documento"
 
-    documento_id = database.Column(
-        database.String(26), database.ForeignKey("documento.id"), nullable=False
-    )
-    usuario_id = database.Column(
-        database.String(26), database.ForeignKey("usuario.id"), nullable=True
-    )
-    grupo_id = database.Column(
-        database.String(26), database.ForeignKey("grupo.id"), nullable=True
-    )
-    tipo_permiso = database.Column(
-        database.String(20), nullable=False
-    )  # lectura / edicion
+    documento_id = database.Column(database.String(26), database.ForeignKey("documento.id"), nullable=False)
+    usuario_id = database.Column(database.String(26), database.ForeignKey("usuario.id"), nullable=True)
+    grupo_id = database.Column(database.String(26), database.ForeignKey("grupo.id"), nullable=True)
+    tipo_permiso = database.Column(database.String(20), nullable=False)  # lectura / edicion
 
     documento = database.relationship("Documento", back_populates="permisos")
     usuario = database.relationship("Usuario")
@@ -246,15 +200,11 @@ class PermisoDocumento(database.Model, BaseTabla):
 class VersionDocumento(database.Model, BaseTabla):
     __tablename__ = "version_documento"
 
-    documento_id = database.Column(
-        database.String(26), database.ForeignKey("documento.id"), nullable=False
-    )
+    documento_id = database.Column(database.String(26), database.ForeignKey("documento.id"), nullable=False)
     titulo = database.Column(database.String(200), nullable=False)
     contenido = database.Column(database.Text, nullable=False)
     numero_version = database.Column(database.Integer, nullable=False)
-    modificado_por_id = database.Column(
-        database.String(26), database.ForeignKey("usuario.id"), nullable=True
-    )
+    modificado_por_id = database.Column(database.String(26), database.ForeignKey("usuario.id"), nullable=True)
     descripcion_cambio = database.Column(database.String(200), nullable=True)
 
     documento = database.relationship("Documento", back_populates="versiones")
@@ -263,13 +213,9 @@ class VersionDocumento(database.Model, BaseTabla):
 
 class AppConfig(database.Model, BaseTabla):
     __tablename__ = "app_config"
-    __table_args__ = (
-        database.UniqueConstraint("clave", name="app_config_clave_unica"),
-    )
+    __table_args__ = (database.UniqueConstraint("clave", name="app_config_clave_unica"),)
 
-    clave = database.Column(
-        database.String(100), nullable=False, unique=True, index=True
-    )
+    clave = database.Column(database.String(100), nullable=False, unique=True, index=True)
     valor = database.Column(database.Text, nullable=True)
     tipo = database.Column(database.String(20), nullable=False, default="string")
     descripcion = database.Column(database.String(255), nullable=True)

@@ -4,15 +4,16 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import (
-    StringField,
+    BooleanField,
     PasswordField,
-    SubmitField,
-    TextAreaField,
     SelectField,
     SelectMultipleField,
-    BooleanField,
+    StringField,
+    SubmitField,
+    TextAreaField,
 )
-from wtforms.validators import DataRequired, Length, Optional, Email
+from wtforms.validators import DataRequired, Email, Length, Optional
+
 from wanshitong.i18n import _
 
 
@@ -40,12 +41,8 @@ class DocumentoForm(FlaskForm):
         ],
         default="draft",
     )
-    etiquetas = StringField(
-        _("Etiquetas (separadas por comas)"), validators=[Optional()]
-    )
-    descripcion_cambio = StringField(
-        _("Descripción del cambio"), validators=[Optional(), Length(max=200)]
-    )
+    etiquetas = StringField(_("Etiquetas (separadas por comas)"), validators=[Optional()])
+    descripcion_cambio = StringField(_("Descripción del cambio"), validators=[Optional(), Length(max=200)])
     submit = SubmitField(_("Guardar"))
 
 
@@ -53,9 +50,7 @@ class UsuarioForm(FlaskForm):
     usuario = StringField(_("Usuario"), validators=[DataRequired(), Length(max=150)])
     nombre = StringField(_("Nombre"), validators=[Optional(), Length(max=100)])
     apellido = StringField(_("Apellido"), validators=[Optional(), Length(max=100)])
-    correo_electronico = StringField(
-        _("Correo electrónico"), validators=[Optional(), Email(), Length(max=150)]
-    )
+    correo_electronico = StringField(_("Correo electrónico"), validators=[Optional(), Email(), Length(max=150)])
     tipo = SelectField(
         _("Rol"),
         choices=[
@@ -73,12 +68,8 @@ class UsuarioForm(FlaskForm):
 class GrupoForm(FlaskForm):
     nombre = StringField(_("Nombre"), validators=[DataRequired(), Length(max=100)])
     descripcion = TextAreaField(_("Descripción"), validators=[Optional()])
-    usuario_ids = SelectMultipleField(
-        _("Miembros"), validators=[Optional()], coerce=str
-    )
-    categoria_ids = SelectMultipleField(
-        _("Categorías accesibles"), validators=[Optional()], coerce=str
-    )
+    usuario_ids = SelectMultipleField(_("Miembros"), validators=[Optional()], coerce=str)
+    categoria_ids = SelectMultipleField(_("Categorías accesibles"), validators=[Optional()], coerce=str)
     submit = SubmitField(_("Guardar"))
 
 
@@ -88,9 +79,7 @@ class CategoriaForm(FlaskForm):
     icono = StringField(_("Ícono"), validators=[Optional(), Length(max=32)])
     color = StringField(_("Color"), validators=[Optional(), Length(max=20)])
     parent_id = SelectField(_("Categoría padre"), validators=[Optional()], coerce=str)
-    grupo_ids = SelectMultipleField(
-        _("Grupos con acceso"), validators=[Optional()], coerce=str
-    )
+    grupo_ids = SelectMultipleField(_("Grupos con acceso"), validators=[Optional()], coerce=str)
     submit = SubmitField(_("Guardar"))
 
 
@@ -104,9 +93,7 @@ class EtiquetaForm(FlaskForm):
 
 
 class AppSettingsForm(FlaskForm):
-    site_title = StringField(
-        _("Título del sitio"), validators=[DataRequired(), Length(max=150)]
-    )
+    site_title = StringField(_("Título del sitio"), validators=[DataRequired(), Length(max=150)])
     site_logo = FileField(_("Logo del sitio"))
     site_favicon = FileField(_("Favicon del sitio"))
     default_language = SelectField(
@@ -126,12 +113,8 @@ class AppSettingsForm(FlaskForm):
 class ProfileForm(FlaskForm):
     nombre = StringField(_("Nombre"), validators=[Optional(), Length(max=100)])
     apellido = StringField(_("Apellido"), validators=[Optional(), Length(max=100)])
-    correo_electronico = StringField(
-        _("Correo electrónico"), validators=[Optional(), Email(), Length(max=150)]
-    )
-    password = PasswordField(
-        _("Nueva contraseña"), validators=[Optional(), Length(min=6)]
-    )
+    correo_electronico = StringField(_("Correo electrónico"), validators=[Optional(), Email(), Length(max=150)])
+    password = PasswordField(_("Nueva contraseña"), validators=[Optional(), Length(min=6)])
     avatar = FileField(_("Imagen de perfil"))
     submit = SubmitField(_("Guardar perfil"))
 

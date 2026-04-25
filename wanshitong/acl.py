@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from wanshitong.model import Categoria, Documento, PermisoDocumento, Usuario, database
+from wanshitong.model import Categoria, Documento, Usuario
 
 
 def puede_acceder_categoria(categoria: Categoria | None, usuario: Usuario) -> bool:

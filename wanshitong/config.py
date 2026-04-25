@@ -54,8 +54,7 @@ FRAMEWORK_VARS = ["FLASK_ENV", "DJANGO_DEBUG", "NODE_ENV"]
 GENERIC_VARS = ["ENV", "APP_ENV"]
 
 DESARROLLO = any(
-    str(environ.get(var, "")).strip().lower() in VALORES_TRUE
-    for var in [*DEBUG_VARS, *FRAMEWORK_VARS, *GENERIC_VARS]
+    str(environ.get(var, "")).strip().lower() in VALORES_TRUE for var in [*DEBUG_VARS, *FRAMEWORK_VARS, *GENERIC_VARS]
 )
 
 DIRECTORIO_ACTUAL: Path = Path(path.abspath(path.dirname(__file__)))
@@ -107,9 +106,7 @@ CONFIGURACION["PRESERVE_CONTEXT_ON_EXCEPTION"] = False
 
 if DESARROLLO:
     log.warning("Using default configuration.")
-    log.info(
-        "Default configuration is not recommended for use in production environments."
-    )
+    log.info("Default configuration is not recommended for use in production environments.")
     CONFIGURACION["SQLALCHEMY_TRACK_MODIFICATIONS"] = "False"
     CONFIGURACION["TEMPLATES_AUTO_RELOAD"] = True
 
@@ -121,9 +118,7 @@ if DATABASE_URL_BASE := CONFIGURACION.get("SQLALCHEMY_DATABASE_URI"):
         parsed = urlparse(DATABASE_URL_BASE)
         query = parse_qs(parsed.query)
         query["sslmode"] = ["require"]
-        DATABASE_URL_CORREGIDA = urlunparse(
-            parsed._replace(scheme="postgresql", query=urlencode(query, doseq=True))
-        )
+        DATABASE_URL_CORREGIDA = urlunparse(parsed._replace(scheme="postgresql", query=urlencode(query, doseq=True)))
     else:
         match prefix:
             case "postgresql":
@@ -133,16 +128,12 @@ if DATABASE_URL_BASE := CONFIGURACION.get("SQLALCHEMY_DATABASE_URI"):
             case "mysql":
                 DATABASE_URL_CORREGIDA = "mysql+pymysql" + DATABASE_URL_BASE[5:]
             case "mariadb":
-                DATABASE_URL_CORREGIDA = (
-                    "mariadb+mariadbconnector" + DATABASE_URL_BASE[7:]
-                )
+                DATABASE_URL_CORREGIDA = "mariadb+mariadbconnector" + DATABASE_URL_BASE[7:]
             case _:
                 pass
 
     if DATABASE_URL_BASE != DATABASE_URL_CORREGIDA:
-        log.info(
-            f"Database URI corrected: {DATABASE_URL_BASE} → {DATABASE_URL_CORREGIDA}"
-        )
+        log.info(f"Database URI corrected: {DATABASE_URL_BASE} → {DATABASE_URL_CORREGIDA}")
         CONFIGURACION["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL_CORREGIDA
 
 configuration = CONFIGURACION

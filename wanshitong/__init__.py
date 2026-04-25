@@ -10,7 +10,6 @@ Minimal app package for template projects.
 from __future__ import annotations
 
 from os import environ
-
 from pathlib import Path
 from platform import platform as os_platform
 from sys import version as py_version
@@ -27,21 +26,20 @@ from flask import (
     url_for,
 )
 from flask_babel import Babel
-from flask_login import current_user
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import inspect, text
 
+from wanshitong.acl import puede_acceder_categoria, puede_leer
+from wanshitong.admin import admin
 from wanshitong.app import app as app_blueprint
 from wanshitong.auth import auth
-from wanshitong.admin import admin
-from wanshitong.documentos import documentos
 from wanshitong.config import DIRECTORIO_ARCHIVOS_BASE, DIRECTORIO_PLANTILLAS_BASE
+from wanshitong.documentos import documentos
 from wanshitong.i18n import _
-from wanshitong.model import AppConfig, Categoria, Documento, Usuario, db
 from wanshitong.log import log
-from wanshitong.acl import puede_acceder_categoria, puede_leer
+from wanshitong.model import Categoria, Documento, Usuario, db
 from wanshitong.utils import (
     avatar_url,
     ensure_default_settings,
@@ -136,21 +134,15 @@ def create_app(config) -> Flask:
     app.config.setdefault("UPLOADS_ENABLED", True)
     app.config.setdefault("MAX_UPLOAD_SIZE_MB", 10)
     app.config.setdefault("AUTO_REBUILD_SCHEMA", not app.config.get("TESTING", False))
-    app.config.setdefault(
-        "UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads"
-    )
+    app.config.setdefault("UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads")
 
     log.info("create_app: initializing app")
     db.init_app(app)
 
     try:
-        log.info(
-            f"create_app: SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}"
-        )
+        log.info(f"create_app: SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}")
     except Exception:
-        log.warning(
-            "create_app: could not read SQLALCHEMY_DATABASE_URI from wanshitong.config"
-        )
+        log.warning("create_app: could not read SQLALCHEMY_DATABASE_URI from wanshitong.config")
 
     try:
         log.warning("create_app: calling ensure_database_initialized")
@@ -177,9 +169,7 @@ def create_app(config) -> Flask:
 
     app.config.setdefault("BABEL_DEFAULT_LOCALE", app.config["APP_DEFAULT_LOCALE"])
     app.config.setdefault("BABEL_SUPPORTED_LOCALES", list(SUPPORTED_LOCALES))
-    app.config.setdefault(
-        "BABEL_TRANSLATION_DIRECTORIES", str(Path(app.root_path) / "translations")
-    )
+    app.config.setdefault("BABEL_TRANSLATION_DIRECTORIES", str(Path(app.root_path) / "translations"))
 
     babel.init_app(app, locale_selector=_get_locale)
     session_manager.init_app(app)
@@ -195,16 +185,10 @@ def create_app(config) -> Flask:
         if getattr(current_user, "is_authenticated", False):
             current_doc_id = (request.view_args or {}).get("doc_id")
             current_category_id = request.args.get("categoria_id")
-            categorias = (
-                db.session.execute(db.select(Categoria).order_by(Categoria.nombre))
-                .scalars()
-                .all()
-            )
+            categorias = db.session.execute(db.select(Categoria).order_by(Categoria.nombre)).scalars().all()
             documentos = (
                 db.session.execute(
-                    db.select(Documento)
-                    .where(Documento.estado != "archived")
-                    .order_by(Documento.titulo)
+                    db.select(Documento).where(Documento.estado != "archived").order_by(Documento.titulo)
                 )
                 .scalars()
                 .all()
@@ -216,9 +200,7 @@ def create_app(config) -> Flask:
 
             for documento in documentos:
                 if puede_leer(documento, current_user):
-                    docs_by_category.setdefault(documento.categoria_id, []).append(
-                        documento
-                    )
+                    docs_by_category.setdefault(documento.categoria_id, []).append(documento)
 
             def build_doc_node(documento: Documento) -> dict:
                 is_active = current_doc_id == documento.id
@@ -237,38 +219,25 @@ def create_app(config) -> Flask:
 
             def build_space_tree(parent_id: str | None, depth: int = 0) -> list[dict]:
                 result: list[dict] = []
-                for categoria in sorted(
-                    by_parent.get(parent_id, []), key=lambda c: c.nombre
-                ):
+                for categoria in sorted(by_parent.get(parent_id, []), key=lambda c: c.nombre):
                     child_nodes = build_space_tree(categoria.id, depth + 1)
-                    document_nodes = [
-                        build_doc_node(documento)
-                        for documento in docs_by_category.get(categoria.id, [])
-                    ]
+                    document_nodes = [build_doc_node(documento) for documento in docs_by_category.get(categoria.id, [])]
                     if not puede_acceder_categoria(categoria, current_user):
                         if not child_nodes and not document_nodes:
                             continue
-                    category_is_active = (
-                        request.endpoint == "documentos.lista"
-                        and current_category_id == categoria.id
-                    )
+                    category_is_active = request.endpoint == "documentos.lista" and current_category_id == categoria.id
                     has_active_descendant = any(
-                        child["is_active"] or child["is_open"]
-                        for child in child_nodes + document_nodes
+                        child["is_active"] or child["is_open"] for child in child_nodes + document_nodes
                     )
                     result.append(
                         {
                             "kind": "category",
                             "id": categoria.id,
                             "label": categoria.nombre,
-                            "url": url_for(
-                                "documentos.lista", categoria_id=categoria.id
-                            ),
+                            "url": url_for("documentos.lista", categoria_id=categoria.id),
                             "children": child_nodes + document_nodes,
                             "is_active": category_is_active,
-                            "is_open": depth == 0
-                            or category_is_active
-                            or has_active_descendant,
+                            "is_open": depth == 0 or category_is_active or has_active_descendant,
                             "is_space": depth == 0,
                             "badge": categoria.icono or categoria.nombre[:1].upper(),
                             "color": categoria.color or "#7c3aed",
@@ -277,10 +246,7 @@ def create_app(config) -> Flask:
                 return result
 
             nav_spaces = build_space_tree(None)
-            nav_spaces.extend(
-                build_doc_node(documento)
-                for documento in docs_by_category.get(None, [])
-            )
+            nav_spaces.extend(build_doc_node(documento) for documento in docs_by_category.get(None, []))
         return {
             "get_locale": _flask_get_locale,
             "site_title": get_setting("site_title", app.config["APP_SITE_TITLE"]),
@@ -293,14 +259,11 @@ def create_app(config) -> Flask:
             "app_source_url": SOURCE_CODE_URL,
             "current_theme": (
                 current_user.theme_preference
-                if getattr(current_user, "is_authenticated", False)
-                and getattr(current_user, "theme_preference", None)
+                if getattr(current_user, "is_authenticated", False) and getattr(current_user, "theme_preference", None)
                 else "light"
             ),
             "current_avatar_url": (
-                avatar_url(current_user)
-                if getattr(current_user, "is_authenticated", False)
-                else None
+                avatar_url(current_user) if getattr(current_user, "is_authenticated", False) else None
             ),
             "nav_spaces": nav_spaces,
         }
@@ -360,9 +323,7 @@ def create_app(config) -> Flask:
 
     @app.route("/media/avatars/<path:filename>")
     def media_avatar(filename: str):
-        return send_from_directory(
-            Path(app.config["UPLOADS_ROOT"]) / "avatars", filename
-        )
+        return send_from_directory(Path(app.config["UPLOADS_ROOT"]) / "avatars", filename)
 
     @app.route("/media/site/<path:filename>")
     def media_site_logo(filename: str):
@@ -377,9 +338,7 @@ def create_app(config) -> Flask:
             return redirect(url_for("auth.login"))
         if not puede_leer(doc, current_user):
             abort(403)
-        return send_from_directory(
-            Path(app.config["UPLOADS_ROOT"]) / "documents" / doc_id, filename
-        )
+        return send_from_directory(Path(app.config["UPLOADS_ROOT"]) / "documents" / doc_id, filename)
 
     app.register_blueprint(auth, url_prefix="")
     app.register_blueprint(app_blueprint, url_prefix="/")
@@ -391,8 +350,10 @@ def create_app(config) -> Flask:
 
 def ensure_database_initialized(app: Flask | None = None) -> None:
     from os import environ as _environ
-    from wanshitong.model import Usuario, db as _db
+
     from wanshitong.auth import proteger_passwd as _proteger_passwd
+    from wanshitong.model import Usuario
+    from wanshitong.model import db as _db
 
     ctx = app
     if ctx is None:
@@ -403,23 +364,15 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
     with ctx.app_context():
         try:
             try:
-                log.warning(
-                    f"ensure_database_initialized: engine.url = {_db.engine.url}"
-                )
+                log.warning(f"ensure_database_initialized: engine.url = {_db.engine.url}")
             except Exception:
-                log.warning(
-                    "ensure_database_initialized: could not read _db.engine.url"
-                )
+                log.warning("ensure_database_initialized: could not read _db.engine.url")
 
             try:
                 db_uri = ctx.config.get("SQLALCHEMY_DATABASE_URI")
-                log.warning(
-                    f"ensure_database_initialized: Flask SQLALCHEMY_DATABASE_URI = {db_uri}"
-                )
+                log.warning(f"ensure_database_initialized: Flask SQLALCHEMY_DATABASE_URI = {db_uri}")
             except Exception:
-                log.warning(
-                    "ensure_database_initialized: could not read SQLALCHEMY_DATABASE_URI from ctx.config"
-                )
+                log.warning("ensure_database_initialized: could not read SQLALCHEMY_DATABASE_URI from ctx.config")
 
             log.warning("ensure_database_initialized: calling create_all()")
             _db.create_all()
@@ -432,9 +385,7 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             except Exception:
                 pass
 
-        registro_admin = _db.session.execute(
-            _db.select(Usuario).filter_by(tipo="admin")
-        ).scalar_one_or_none()
+        registro_admin = _db.session.execute(_db.select(Usuario).filter_by(tipo="admin")).scalar_one_or_none()
 
         if registro_admin is None:
             admin_user = _environ.get("ADMIN_USER", "app-admin")
@@ -457,9 +408,7 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
 
             _db.session.add(nuevo)
             _db.session.commit()
-            log.warning(
-                f"ensure_database_initialized: initial admin user '{admin_user}' created"
-            )
+            log.warning(f"ensure_database_initialized: initial admin user '{admin_user}' created")
         else:
             log.info(
                 "ensure_database_initialized: admin user already exists; "
@@ -485,9 +434,7 @@ def _schema_reset_required(app: Flask) -> bool:
     for table_name, expected_columns in EXPECTED_SCHEMA.items():
         if table_name not in table_names:
             return True
-        existing_columns = {
-            column["name"] for column in inspector.get_columns(table_name)
-        }
+        existing_columns = {column["name"] for column in inspector.get_columns(table_name)}
         if expected_columns - existing_columns:
             return True
 

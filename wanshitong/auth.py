@@ -23,15 +23,14 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.utils import secure_filename
 
-from wanshitong.log import log
-from wanshitong.model import Usuario, database
 from wanshitong.forms import LoginForm, ProfileForm
 from wanshitong.i18n import _
+from wanshitong.log import log
+from wanshitong.model import Usuario, database
 from wanshitong.utils import (
     ALLOWED_IMAGE_EXTENSIONS,
     avatar_dir,
     avatar_filename,
-    get_setting,
     max_upload_size_bytes,
 )
 
@@ -140,9 +139,7 @@ def proteger_passwd(clave: str, /) -> bytes:
 
 def validar_acceso(usuario_id: str, acceso: str, /) -> bool:
     log.trace(f"Verifying access for {usuario_id}")
-    registro = database.session.execute(
-        database.select(Usuario).filter_by(usuario=usuario_id)
-    ).scalar_one_or_none()
+    registro = database.session.execute(database.select(Usuario).filter_by(usuario=usuario_id)).scalar_one_or_none()
 
     if not registro:
         registro = database.session.execute(

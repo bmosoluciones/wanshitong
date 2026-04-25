@@ -58,15 +58,11 @@ def solo_admin(f):
 
 
 def _ensure_settings() -> None:
-    ensure_default_settings(
-        current_user.usuario if current_user.is_authenticated else None
-    )
+    ensure_default_settings(current_user.usuario if current_user.is_authenticated else None)
 
 
 def _get_setting_value(key: str, fallback: str) -> str:
-    setting = database.session.execute(
-        database.select(AppConfig).where(AppConfig.clave == key)
-    ).scalar_one_or_none()
+    setting = database.session.execute(database.select(AppConfig).where(AppConfig.clave == key)).scalar_one_or_none()
     if setting is None or setting.valor is None:
         return fallback
     return setting.valor
@@ -79,11 +75,7 @@ def _get_setting_value(key: str, fallback: str) -> str:
 @login_required
 @solo_admin
 def usuarios():
-    lista = (
-        database.session.execute(database.select(Usuario).order_by(Usuario.usuario))
-        .scalars()
-        .all()
-    )
+    lista = database.session.execute(database.select(Usuario).order_by(Usuario.usuario)).scalars().all()
     return render_template("admin/usuarios.html", usuarios=lista)
 
 
@@ -113,9 +105,7 @@ def configuracion():
                     "admin/configuracion.html",
                     form=form,
                     current_site_logo=_get_setting_value("site_logo_filename", ""),
-                    current_site_favicon=_get_setting_value(
-                        "site_favicon_filename", ""
-                    ),
+                    current_site_favicon=_get_setting_value("site_favicon_filename", ""),
                 )
             filename = _store_site_logo(logo_file, extension)
             set_setting("site_logo_filename", filename, current_user.usuario)
@@ -124,16 +114,12 @@ def configuracion():
         if favicon_file and favicon_file.filename:
             extension = _validated_favicon_extension(favicon_file.filename)
             if extension is None:
-                flash(
-                    str(_("Formato de favicon no soportado. Use .ico o .png.")), "error"
-                )
+                flash(str(_("Formato de favicon no soportado. Use .ico o .png.")), "error")
                 return render_template(
                     "admin/configuracion.html",
                     form=form,
                     current_site_logo=_get_setting_value("site_logo_filename", ""),
-                    current_site_favicon=_get_setting_value(
-                        "site_favicon_filename", ""
-                    ),
+                    current_site_favicon=_get_setting_value("site_favicon_filename", ""),
                 )
             filename = _store_site_favicon(favicon_file, extension)
             set_setting("site_favicon_filename", filename, current_user.usuario)
@@ -313,11 +299,7 @@ def eliminar_usuario(user_id):
 @login_required
 @solo_admin
 def grupos():
-    lista = (
-        database.session.execute(database.select(Grupo).order_by(Grupo.nombre))
-        .scalars()
-        .all()
-    )
+    lista = database.session.execute(database.select(Grupo).order_by(Grupo.nombre)).scalars().all()
     return render_template("admin/grupos.html", grupos=lista)
 
 
@@ -367,10 +349,7 @@ def editar_grupo(grupo_id):
         "admin/grupo_form.html",
         form=form,
         grupo=grupo,
-        categoria_paths={
-            categoria.id: _categoria_path_label(categoria)
-            for categoria in grupo.categorias
-        },
+        categoria_paths={categoria.id: _categoria_path_label(categoria) for categoria in grupo.categorias},
     )
 
 
@@ -424,11 +403,7 @@ def eliminar_miembro(grupo_id, user_id):
 @login_required
 @solo_admin
 def categorias():
-    lista = (
-        database.session.execute(database.select(Categoria).order_by(Categoria.nombre))
-        .scalars()
-        .all()
-    )
+    lista = database.session.execute(database.select(Categoria).order_by(Categoria.nombre)).scalars().all()
     categorias_rows = _categoria_hierarchy_rows(lista)
     return render_template("admin/categorias.html", categorias_rows=categorias_rows)
 
@@ -438,19 +413,13 @@ def categorias():
 @solo_admin
 def nueva_categoria():
     form = CategoriaForm()
-    todas = (
-        database.session.execute(database.select(Categoria).order_by(Categoria.nombre))
-        .scalars()
-        .all()
-    )
+    todas = database.session.execute(database.select(Categoria).order_by(Categoria.nombre)).scalars().all()
     form.parent_id.choices = _categoria_parent_choices(todas)
     form.grupo_ids.choices = _grupo_choices()
     if form.validate_on_submit():
         cat = Categoria()
         cat.nombre = form.nombre.data
-        cat.slug = slugify(
-            (form.slug.data or "").strip() or form.nombre.data, "category"
-        )
+        cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
         cat.icono = (form.icono.data or "").strip() or None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
@@ -473,11 +442,7 @@ def editar_categoria(cat_id):
 
     form = CategoriaForm(obj=cat)
     todas = (
-        database.session.execute(
-            database.select(Categoria)
-            .where(Categoria.id != cat_id)
-            .order_by(Categoria.nombre)
-        )
+        database.session.execute(database.select(Categoria).where(Categoria.id != cat_id).order_by(Categoria.nombre))
         .scalars()
         .all()
     )
@@ -487,9 +452,7 @@ def editar_categoria(cat_id):
         form.grupo_ids.data = [grupo.id for grupo in cat.grupos]
     if form.validate_on_submit():
         cat.nombre = form.nombre.data
-        cat.slug = slugify(
-            (form.slug.data or "").strip() or form.nombre.data, "category"
-        )
+        cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
         cat.icono = (form.icono.data or "").strip() or None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
@@ -518,11 +481,7 @@ def eliminar_categoria(cat_id):
 @login_required
 @solo_admin
 def etiquetas():
-    lista = (
-        database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre))
-        .scalars()
-        .all()
-    )
+    lista = database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre)).scalars().all()
     etiquetas_rows = _etiqueta_hierarchy_rows(lista)
     return render_template("admin/etiquetas.html", etiquetas_rows=etiquetas_rows)
 
@@ -532,11 +491,7 @@ def etiquetas():
 @solo_admin
 def nueva_etiqueta():
     form = EtiquetaForm()
-    todas = (
-        database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre))
-        .scalars()
-        .all()
-    )
+    todas = database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre)).scalars().all()
     form.parent_id.choices = _etiqueta_parent_choices(todas)
     if form.validate_on_submit():
         tag = Etiqueta()
@@ -563,11 +518,7 @@ def editar_etiqueta(tag_id):
 
     form = EtiquetaForm(obj=tag)
     todas = (
-        database.session.execute(
-            database.select(Etiqueta)
-            .where(Etiqueta.id != tag_id)
-            .order_by(Etiqueta.nombre)
-        )
+        database.session.execute(database.select(Etiqueta).where(Etiqueta.id != tag_id).order_by(Etiqueta.nombre))
         .scalars()
         .all()
     )
@@ -599,31 +550,16 @@ def eliminar_etiqueta(tag_id):
 
 
 def _grupo_choices() -> list[tuple[str, str]]:
-    grupos = (
-        database.session.execute(database.select(Grupo).order_by(Grupo.nombre))
-        .scalars()
-        .all()
-    )
+    grupos = database.session.execute(database.select(Grupo).order_by(Grupo.nombre)).scalars().all()
     return [(grupo.id, grupo.nombre) for grupo in grupos]
 
 
 def _populate_group_form_choices(form: GrupoForm) -> None:
-    usuarios = (
-        database.session.execute(database.select(Usuario).order_by(Usuario.usuario))
-        .scalars()
-        .all()
-    )
-    categorias = (
-        database.session.execute(database.select(Categoria).order_by(Categoria.nombre))
-        .scalars()
-        .all()
-    )
-    form.usuario_ids.choices = [
-        (usuario.id, usuario.usuario) for usuario in usuarios if usuario.activo
-    ]
+    usuarios = database.session.execute(database.select(Usuario).order_by(Usuario.usuario)).scalars().all()
+    categorias = database.session.execute(database.select(Categoria).order_by(Categoria.nombre)).scalars().all()
+    form.usuario_ids.choices = [(usuario.id, usuario.usuario) for usuario in usuarios if usuario.activo]
     form.categoria_ids.choices = [
-        (categoria.id, _categoria_path_label(categoria))
-        for categoria, _, _ in _categoria_hierarchy_rows(categorias)
+        (categoria.id, _categoria_path_label(categoria)) for categoria, _, _ in _categoria_hierarchy_rows(categorias)
     ]
 
 
@@ -636,7 +572,9 @@ def _hierarchy_rows(items, name_attr: str = "nombre") -> list[tuple[object, int,
         by_id[item_id] = item
         by_parent.setdefault(item_parent_id, []).append(item)
 
-    key_fn = lambda obj: cast(str, getattr(obj, name_attr)).lower()
+    def key_fn(obj: object) -> str:
+        return cast(str, getattr(obj, name_attr)).lower()
+
     for siblings in by_parent.values():
         siblings.sort(key=key_fn)
 
@@ -717,32 +655,16 @@ def _categoria_path_label(categoria: Categoria) -> str:
 def _get_selected_usuarios(usuario_ids: list[str]) -> list[Usuario]:
     if not usuario_ids:
         return []
-    return (
-        database.session.execute(
-            database.select(Usuario).where(Usuario.id.in_(usuario_ids))
-        )
-        .scalars()
-        .all()
-    )
+    return database.session.execute(database.select(Usuario).where(Usuario.id.in_(usuario_ids))).scalars().all()
 
 
 def _get_selected_categorias(categoria_ids: list[str]) -> list[Categoria]:
     if not categoria_ids:
         return []
-    return (
-        database.session.execute(
-            database.select(Categoria).where(Categoria.id.in_(categoria_ids))
-        )
-        .scalars()
-        .all()
-    )
+    return database.session.execute(database.select(Categoria).where(Categoria.id.in_(categoria_ids))).scalars().all()
 
 
 def _get_selected_grupos(grupo_ids: list[str]) -> list[Grupo]:
     if not grupo_ids:
         return []
-    return (
-        database.session.execute(database.select(Grupo).where(Grupo.id.in_(grupo_ids)))
-        .scalars()
-        .all()
-    )
+    return database.session.execute(database.select(Grupo).where(Grupo.id.in_(grupo_ids))).scalars().all()
