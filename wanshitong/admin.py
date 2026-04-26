@@ -35,6 +35,7 @@ from wanshitong.forms import (
     UsuarioForm,
 )
 from wanshitong.i18n import _
+from wanshitong.icon_catalog import normalize_icon_name
 from wanshitong.model import AppConfig, Categoria, Etiqueta, Grupo, Usuario, database
 from wanshitong.utils import (
     ALLOWED_IMAGE_EXTENSIONS,
@@ -420,7 +421,8 @@ def nueva_categoria():
         cat = Categoria()
         cat.nombre = form.nombre.data
         cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
-        cat.icono = (form.icono.data or "").strip() or None
+        raw_icon = (form.icono.data or "").strip()
+        cat.icono = normalize_icon_name(raw_icon, fallback="folder") if raw_icon else None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
         cat.grupos = _get_selected_grupos(form.grupo_ids.data)
@@ -453,7 +455,8 @@ def editar_categoria(cat_id):
     if form.validate_on_submit():
         cat.nombre = form.nombre.data
         cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
-        cat.icono = (form.icono.data or "").strip() or None
+        raw_icon = (form.icono.data or "").strip()
+        cat.icono = normalize_icon_name(raw_icon, fallback="folder") if raw_icon else None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
         cat.grupos = _get_selected_grupos(form.grupo_ids.data)
@@ -497,7 +500,8 @@ def nueva_etiqueta():
         tag = Etiqueta()
         tag.nombre = form.nombre.data.strip().lower()
         tag.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
-        tag.icono = (form.icono.data or "").strip() or None
+        raw_icon = (form.icono.data or "").strip()
+        tag.icono = normalize_icon_name(raw_icon, fallback="tag") if raw_icon else None
         tag.color = (form.color.data or "").strip() or None
         tag.parent_id = form.parent_id.data or None
         tag.creado_por = current_user.usuario
@@ -526,7 +530,8 @@ def editar_etiqueta(tag_id):
     if form.validate_on_submit():
         tag.nombre = form.nombre.data.strip().lower()
         tag.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
-        tag.icono = (form.icono.data or "").strip() or None
+        raw_icon = (form.icono.data or "").strip()
+        tag.icono = normalize_icon_name(raw_icon, fallback="tag") if raw_icon else None
         tag.color = (form.color.data or "").strip() or None
         tag.parent_id = form.parent_id.data or None
         tag.modificado_por = current_user.usuario

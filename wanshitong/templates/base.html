@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Bootstrap (solo para grid) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom minimalista -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     {% block head %}{% endblock %}
@@ -98,37 +99,19 @@
                             {% if node.children %}
                             <button type="button" class="sidebar-tree-toggle" @click="open = !open"
                                 :aria-expanded="open">
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
-                                    :style="open ? 'transform: rotate(90deg)' : ''">
-                                    <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.4"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
+                                <span x-text="open ? '-' : '+'"></span>
                             </button>
                             {% else %}
                             <span class="sidebar-tree-toggle spacer"></span>
                             {% endif %}
                             <a href="{{ node.url }}"
                                 class="sidebar-tree-link{% if node.is_active %} is-active{% endif %}{% if node.kind == 'document' %} is-document{% endif %}{% if node.is_space %} is-space{% endif %}">
-                                {% if node.is_space %}
-                                <span class="sidebar-space-badge" style="background-color: {{ node.color }};">
-                                    {{ node.badge }}
-                                </span>
-                                {% elif node.kind == 'category' %}
-                                <span class="sidebar-tree-icon sidebar-tree-icon-folder">
-                                    {{ node.badge }}
-                                </span>
+                                {% if node.kind == 'document' %}
+                                <span class="sidebar-tree-icon sidebar-tree-icon-doc"><i
+                                        class="bi bi-file-earmark-text"></i></span>
                                 {% else %}
-                                <span class="sidebar-tree-icon sidebar-tree-icon-doc">
-                                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-                                        <path
-                                            d="M4 2.5h6.4L12.5 4.6V13a1 1 0 0 1-1 1H4.9a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"
-                                            stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
-                                        <path d="M10.4 2.5V4.6H12.5" stroke="currentColor" stroke-width="1.2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M6.1 7.1h4.4M6.1 9.1h4.4M6.1 11.1h3" stroke="currentColor"
-                                            stroke-width="1.1" stroke-linecap="round" />
-                                    </svg>
-                                </span>
+                                <span class="sidebar-tree-icon sidebar-tree-icon-folder"
+                                    style="color: {{ node.icon_color }};"><i class="{{ node.icon_class }}"></i></span>
                                 {% endif %}
                                 <span class="sidebar-tree-label">{{ node.label }}</span>
                             </a>

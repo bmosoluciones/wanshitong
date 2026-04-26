@@ -9,10 +9,11 @@ from wanshitong import create_app, ensure_database_initialized
 
 
 @pytest.fixture(scope="session")
-def app():
+def app(tmp_path_factory):
     """Single application instance shared across the entire test session."""
+    database_path = tmp_path_factory.mktemp("db") / "test.db"
     cfg = {
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database_path.as_posix()}",
         "TESTING": True,
         "SECRET_KEY": "test-secret",
         "WTF_CSRF_ENABLED": False,

@@ -29,11 +29,10 @@
                 <td>{{ etiqueta.slug or '—' }}</td>
                 <td>{{ etiqueta.parent.nombre if etiqueta.parent else '—' }}</td>
                 <td>
-                    <span
-                        style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--border);">
-                        <span>{{ etiqueta.icono or '🏷' }}</span>
-                        <span
-                            style="width:10px;height:10px;border-radius:999px;background:{{ etiqueta.color or 'var(--primary)' }};"></span>
+                    <span style="display:inline-flex;align-items:center;gap:8px;">
+                        <i class="bi bi-{{ etiqueta.icono or 'tag' }}"
+                            style="color: {{ etiqueta.color or '#6b7280' }};"></i>
+                        <span style="color: var(--muted);">{{ etiqueta.icono or 'tag' }}</span>
                     </span>
                 </td>
                 <td>

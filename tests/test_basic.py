@@ -16,9 +16,9 @@ def test_ensure_database_creates_admin(app):
     # Ensure database initialized creates admin user
     with app.app_context():
         ensure_database_initialized(app)
-        admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalar_one_or_none()
-        assert admin is not None
-        assert admin.tipo == "admin"
+        admins = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalars().all()
+        assert admins
+        assert all(user.tipo == "admin" for user in admins)
 
 
 def test_login_uses_default_site_logo(app):

@@ -24,6 +24,7 @@ include = ["wanshitong*"]
 wanshitong = [
 	"templates/**/*.html",
 	"static/**/*",
+	"migrations/**/*",
 	"translations/**/*.po",
 	"translations/**/*.mo",
 	"translations/**/*.pot",

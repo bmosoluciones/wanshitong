@@ -25,12 +25,14 @@ from flask import (
     session,
     url_for,
 )
+from flask_alembic import Alembic
 from flask_babel import Babel
 from flask_login import LoginManager, current_user
-from flask_session import Session
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import inspect, text
+from sqlalchemy.pool import StaticPool
 
+from flask_session import Session
 from wanshitong.acl import puede_acceder_categoria, puede_leer
 from wanshitong.admin import admin
 from wanshitong.app import app as app_blueprint
@@ -38,6 +40,7 @@ from wanshitong.auth import auth
 from wanshitong.config import DIRECTORIO_ARCHIVOS_BASE, DIRECTORIO_PLANTILLAS_BASE
 from wanshitong.documentos import documentos
 from wanshitong.i18n import _
+from wanshitong.icon_catalog import icon_picker_catalog, icon_to_css_class
 from wanshitong.log import log
 from wanshitong.model import Categoria, Documento, Usuario, db
 from wanshitong.utils import (
@@ -54,6 +57,7 @@ session_manager = Session()
 login_manager = LoginManager()
 babel = Babel()
 csrf = CSRFProtect()
+alembic = Alembic(run_mkdir=False, metadatas=db.metadata)
 
 SUPPORTED_LOCALES = ("es", "en")
 DEFAULT_LOCALE = "es"
@@ -136,8 +140,18 @@ def create_app(config) -> Flask:
     app.config.setdefault("AUTO_REBUILD_SCHEMA", not app.config.get("TESTING", False))
     app.config.setdefault("UPLOADS_ROOT", Path(app.root_path).parent / "data" / "uploads")
 
+    db_uri = str(app.config.get("SQLALCHEMY_DATABASE_URI", ""))
+    if app.config.get("TESTING") and db_uri.startswith("sqlite") and ":memory:" in db_uri:
+        engine_options = dict(app.config.get("SQLALCHEMY_ENGINE_OPTIONS") or {})
+        engine_options.setdefault("poolclass", StaticPool)
+        connect_args = dict(engine_options.get("connect_args") or {})
+        connect_args.setdefault("check_same_thread", False)
+        engine_options["connect_args"] = connect_args
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = engine_options
+
     log.info("create_app: initializing app")
     db.init_app(app)
+    alembic.init_app(app)
 
     try:
         log.info(f"create_app: SQLALCHEMY_DATABASE_URI = {app.config.get('SQLALCHEMY_DATABASE_URI')}")
@@ -155,7 +169,11 @@ def create_app(config) -> Flask:
         except Exception:
             pass
 
-    if session_redis_url := environ.get("SESSION_REDIS_URL", None):
+    if app.config.get("TESTING"):
+        app.config["SESSION_TYPE"] = "filesystem"
+        app.config["SESSION_PERMANENT"] = False
+        app.config["SESSION_USE_SIGNER"] = True
+    elif session_redis_url := environ.get("SESSION_REDIS_URL", None):
         from redis import Redis
 
         app.config["SESSION_TYPE"] = "redis"
@@ -239,8 +257,8 @@ def create_app(config) -> Flask:
                             "is_active": category_is_active,
                             "is_open": depth == 0 or category_is_active or has_active_descendant,
                             "is_space": depth == 0,
-                            "badge": categoria.icono or categoria.nombre[:1].upper(),
-                            "color": categoria.color or "#7c3aed",
+                            "icon_class": icon_to_css_class(categoria.icono, fallback="folder"),
+                            "icon_color": categoria.color or "#6b7280",
                         }
                     )
                 return result
@@ -266,6 +284,7 @@ def create_app(config) -> Flask:
                 avatar_url(current_user) if getattr(current_user, "is_authenticated", False) else None
             ),
             "nav_spaces": nav_spaces,
+            "icon_picker_catalog": icon_picker_catalog(),
         }
 
     @app.route("/health")
@@ -378,6 +397,10 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             _db.create_all()
             log.info("ensure_database_initialized: create_all() completed")
             ensure_default_settings()
+            _db.session.commit()
+            log.warning("ensure_database_initialized: applying migrations with Flask-Alembic upgrade()")
+            alembic.upgrade()
+            log.info("ensure_database_initialized: migrations applied")
         except Exception as exc:
             log.warning(f"ensure_database_initialized: create_all() raised: {exc}")
             try:
@@ -385,7 +408,7 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             except Exception:
                 pass
 
-        registro_admin = _db.session.execute(_db.select(Usuario).filter_by(tipo="admin")).scalar_one_or_none()
+        registro_admin = _db.session.execute(_db.select(Usuario).filter_by(tipo="admin")).scalars().first()
 
         if registro_admin is None:
             admin_user = _environ.get("ADMIN_USER", "app-admin")

@@ -26,13 +26,13 @@ WanShiTong{% endblock %}
             </div>
             <div class="col-md-4" x-data="iconPicker('{{ form.icono.id }}')" x-init="init()">
                 {{ form.icono.label(class_='form-label') }}
-                {{ form.icono(class_='form-control icon-picker-input', autocomplete='off', placeholder=_('Buscar icono...')) }}
+                {{ form.icono(class_='form-control icon-picker-input', autocomplete='off', placeholder=_('Buscar icono... (home/inicio, lock/candado, mail/correo)')) }}
                 <div class="icon-suggestion-list mt-2" x-show="suggestions.length" x-cloak>
-                    <template x-for="item in suggestions" :key="item.char">
+                    <template x-for="item in suggestions" :key="item.value">
                         <button type="button" class="icon-suggestion btn btn-sm btn-outline-secondary mb-1 me-1"
-                            @click.prevent="select(item.char)">
-                            <span x-text="item.char"></span>
-                            <span x-text="item.name"></span>
+                            @click.prevent="select(item.value)">
+                            <i :class="'bi bi-' + item.value"></i>
+                            <span x-text="item.value"></span>
                         </button>
                     </template>
                 </div>
@@ -47,16 +47,18 @@ WanShiTong{% endblock %}
                 return {
                     filter: '',
                     icons: [
-                        { char: '📁', name: 'Folder' },
-                        { char: '🏛️', name: 'Architecture' },
-                        { char: '📊', name: 'Metrics' },
-                        { char: '🧩', name: 'Components' },
-                        { char: '🔐', name: 'Security' },
-                        { char: '🧠', name: 'Knowledge' },
-                        { char: '⚙️', name: 'Ops' },
-                        { char: '🛠️', name: 'Tools' },
-                        { char: '💼', name: 'Business' },
-                        { char: '📚', name: 'Handbook' },
+                        { value: 'house', keywords: 'house home inicio casa hogar' },
+                        { value: 'lock', keywords: 'lock candado seguridad security' },
+                        { value: 'envelope', keywords: 'mail correo email mensaje' },
+                        { value: 'folder', keywords: 'folder carpeta categoria categoría category' },
+                        { value: 'tag', keywords: 'tag etiqueta label' },
+                        { value: 'tags', keywords: 'tags etiquetas labels' },
+                        { value: 'file-earmark-text', keywords: 'file documento archivo text texto' },
+                        { value: 'book', keywords: 'book libro manual' },
+                        { value: 'gear', keywords: 'gear configuracion configuración settings ajustes' },
+                        { value: 'database', keywords: 'database base de datos db' },
+                        { value: 'calendar', keywords: 'calendar calendario fecha date' },
+                        { value: 'person', keywords: 'person usuario persona user' },
                     ],
                     init() {
                         const input = document.getElementById(inputId);
@@ -67,7 +69,8 @@ WanShiTong{% endblock %}
                     get suggestions() {
                         const term = this.filter.trim().toLowerCase();
                         return this.icons.filter((item) => {
-                            return term === '' || item.name.toLowerCase().includes(term) || item.char.includes(term);
+                            if (term === '') return true;
+                            return item.value.toLowerCase().includes(term) || item.keywords.toLowerCase().includes(term);
                         }).slice(0, 10);
                     },
                     select(value) {

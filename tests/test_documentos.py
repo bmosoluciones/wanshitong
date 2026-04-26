@@ -23,7 +23,10 @@ from wanshitong.model import (
 def usuarios(app):
     """Create test users."""
     with app.app_context():
-        admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalar_one()
+        admin = db.session.execute(db.select(Usuario).filter_by(usuario="app-admin")).scalar_one_or_none()
+        if admin is None:
+            admin = db.session.execute(db.select(Usuario).filter_by(tipo="admin")).scalars().first()
+        assert admin is not None
 
         editor = Usuario()
         editor.usuario = "editor1"

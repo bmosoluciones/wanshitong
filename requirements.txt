@@ -5,6 +5,7 @@ configobj
 cryptography
 email-validator
 flask
+flask-alembic
 flask-babel
 flask-caching
 flask-login
