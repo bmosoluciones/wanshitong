@@ -229,15 +229,16 @@
                 this.content = ta ? ta.value : '';
                 const titleEl = document.getElementById('doc-title');
                 this.titleText = titleEl ? titleEl.textContent.trim() : '';
-                this.categoryOptions = {{ categoria_options | tojson }};
-                this.syncCategoryInput({ target: document.getElementById('field-categoria-text') });
-                this.schedulePreview(0);
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('#selection-toolbar') && !e.target.closest('#md-editor')) {
-                        this.toolbarVisible = false;
-                    }
-                });
-            },
+                this.categoryOptions = {{ categoria_options | tojson }
+            };
+            this.syncCategoryInput({ target: document.getElementById('field-categoria-text') });
+            this.schedulePreview(0);
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#selection-toolbar') && !e.target.closest('#md-editor')) {
+                    this.toolbarVisible = false;
+                }
+            });
+        },
 
             syncCategoryInput(event) {
             const input = event?.target;
