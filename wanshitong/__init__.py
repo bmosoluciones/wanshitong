@@ -397,12 +397,20 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             _db.create_all()
             log.info("ensure_database_initialized: create_all() completed")
             ensure_default_settings()
-            _db.session.commit()
+            try:
+                _db.session.commit()
+            except Exception:
+                _db.session.rollback()
+                raise
             log.warning("ensure_database_initialized: applying migrations with Flask-Alembic upgrade()")
             alembic.upgrade()
             log.info("ensure_database_initialized: migrations applied")
         except Exception as exc:
             log.warning(f"ensure_database_initialized: create_all() raised: {exc}")
+            try:
+                _db.session.rollback()
+            except Exception:
+                pass
             try:
                 log.exception("ensure_database_initialized: create_all() exception")
             except Exception:
@@ -430,7 +438,11 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             nuevo.activo = True
 
             _db.session.add(nuevo)
-            _db.session.commit()
+            try:
+                _db.session.commit()
+            except Exception:
+                _db.session.rollback()
+                raise
             log.warning(f"ensure_database_initialized: initial admin user '{admin_user}' created")
         else:
             log.info(

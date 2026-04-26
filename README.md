@@ -11,6 +11,8 @@ Store, organise, and share Markdown documents inside your team.
 
 ![Editor page](docs/images/editor.png)
 
+![Setup](docs/images/setup.png)
+
 ---
 
 ## Features
@@ -32,21 +34,6 @@ Store, organise, and share Markdown documents inside your team.
 |---|---|
 | Python | 3.11 |
 | pip | 22+ |
-
-Key Python dependencies (see `requirements.txt` for the full list):
-
-| Package | Purpose |
-|---|---|
-| Flask | Web framework |
-| Flask-SQLAlchemy | ORM (SQLite in development, PostgreSQL/MySQL in production) |
-| Flask-Login | Session management |
-| Flask-WTF | CSRF-protected forms |
-| Flask-Babel | Internationalisation (i18n) |
-| Flask-Session | Server-side sessions |
-| argon2-cffi | Password hashing |
-| Markdown + bleach | Markdown rendering with XSS sanitisation |
-| python-ulid | ULID primary keys |
-| waitress | WSGI server for production |
 
 ---
 
@@ -145,7 +132,9 @@ pybabel compile -d wanshitong/translations
 
 ### Why the name?
 
- > [Wan Shi Tong](https://avatar.fandom.com/wiki/Wan_Shi_Tong) is an ancient, wise, and powerful spirit who collect information for his Library.
+ [Wan Shi Tong](https://avatar.fandom.com/wiki/Wan_Shi_Tong) is an fictional, ancient, wise, and powerful spirit who collect information for his Library.
+
+ > I am Wan Shi Tong, he who knows ten thousand things.
 
 ## Content
 

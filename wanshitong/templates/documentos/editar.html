@@ -229,6 +229,7 @@
                 this.content = ta ? ta.value : '';
                 const titleEl = document.getElementById('doc-title');
                 this.titleText = titleEl ? titleEl.textContent.trim() : '';
+                this.categoryOptions = {{ categoria_options | tojson }};
                 this.syncCategoryInput({ target: document.getElementById('field-categoria-text') });
                 this.schedulePreview(0);
                 document.addEventListener('click', (e) => {
@@ -239,168 +240,170 @@
             },
 
             syncCategoryInput(event) {
-                const input = event?.target;
-                const hidden = document.getElementById('field-categoria-id');
-                if (!input || !hidden) return;
+            const input = event?.target;
+            const hidden = document.getElementById('field-categoria-id');
+            if (!input || !hidden) return;
 
-                const value = (input.value || '').trim();
-                if (!value) {
-                    hidden.value = '';
-                    return;
-                }
+            const value = (input.value || '').trim();
+            if (!value) {
+                hidden.value = '';
+                return;
+            }
 
-                const match = this.categoryOptions.find((option) => {
-                    return String(option.path || '').toLowerCase() === value.toLowerCase();
-                });
-                if (match && match.id) {
-                    hidden.value = String(match.id);
-                }
-            },
+            const match = this.categoryOptions.find((option) => {
+                return String(option.path || '').toLowerCase() === value.toLowerCase();
+            });
+            if (match && match.id) {
+                hidden.value = String(match.id);
+                return;
+            }
+            hidden.value = '';
+        },
 
-            focusEditor() {
-                document.getElementById('md-editor')?.focus();
-            },
+        focusEditor() {
+            document.getElementById('md-editor')?.focus();
+        },
 
-            onContentInput(e) {
-                this.content = e.target.value;
-                this.schedulePreview();
-            },
+        onContentInput(e) {
+            this.content = e.target.value;
+            this.schedulePreview();
+        },
 
-            schedulePreview(delay = 350) {
-                clearTimeout(this._previewTimer);
-                this._previewTimer = setTimeout(() => this.fetchPreview(), delay);
-            },
+        schedulePreview(delay = 350) {
+            clearTimeout(this._previewTimer);
+            this._previewTimer = setTimeout(() => this.fetchPreview(), delay);
+        },
 
             async fetchPreview() {
-                if (!this.content) { this.previewHtml = ''; return; }
-                try {
-                    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('[name=csrf_token]')?.value || '';
-                    const resp = await fetch('{{ url_for("documentos.preview_api") }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
-                        body: JSON.stringify({ markdown: this.content }),
-                    });
-                    if (resp.ok) this.previewHtml = (await resp.json()).html;
-                } catch (_) { }
-            },
+            if (!this.content) { this.previewHtml = ''; return; }
+            try {
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('[name=csrf_token]')?.value || '';
+                const resp = await fetch('{{ url_for("documentos.preview_api") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+                    body: JSON.stringify({ markdown: this.content }),
+                });
+                if (resp.ok) this.previewHtml = (await resp.json()).html;
+            } catch (_) { }
+        },
 
             async handleDrop(event) {
-                this.dragOver = false;
-                const files = Array.from(event.dataTransfer?.files || []);
-                const image = files.find((file) => file.type.startsWith('image/'));
-                if (!image) return;
-                if (false) {
-                    this.saveStatus = '{{ _("Guarda primero el documento para subir imágenes") }}';
-                    this.saveStatusClass = 'status-error';
-                    return;
-                }
+            this.dragOver = false;
+            const files = Array.from(event.dataTransfer?.files || []);
+            const image = files.find((file) => file.type.startsWith('image/'));
+            if (!image) return;
+            if (false) {
+                this.saveStatus = '{{ _("Guarda primero el documento para subir imágenes") }}';
+                this.saveStatusClass = 'status-error';
+                return;
+            }
 
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('[name=csrf_token]')?.value || '';
-                const payload = new FormData();
-                payload.append('file', image);
-                this.saveStatus = '{{ _("Subiendo imagen…") }}';
-                this.saveStatusClass = 'status-saving';
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('[name=csrf_token]')?.value || '';
+            const payload = new FormData();
+            payload.append('file', image);
+            this.saveStatus = '{{ _("Subiendo imagen…") }}';
+            this.saveStatusClass = 'status-saving';
 
-                try {
-                    const resp = await fetch('{{ url_for("documentos.upload_image", doc_id=doc.id if doc else "new") }}', {
-                        method: 'POST',
-                        headers: { 'X-CSRFToken': csrf },
-                        body: payload,
-                    });
-                    const data = await resp.json();
-                    if (!resp.ok || !data.url) {
-                        this.saveStatus = '{{ _("No se pudo subir la imagen") }}';
-                        this.saveStatusClass = 'status-error';
-                        return;
-                    }
-                    const ta = document.getElementById('md-editor');
-                    const markdown = `\n![${image.name}](${data.url})\n`;
-                    const start = typeof ta.selectionStart === 'number' ? ta.selectionStart : this.getDropIndex(ta, event);
-                    ta.setRangeText(markdown, start, start, 'end');
-                    this.content = ta.value;
-                    this.schedulePreview(0);
-                    this.saveStatus = '{{ _("Imagen subida") }}';
-                    this.saveStatusClass = 'status-saved';
-                } catch (_) {
+            try {
+                const resp = await fetch('{{ url_for("documentos.upload_image", doc_id=doc.id if doc else "new") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrf },
+                    body: payload,
+                });
+                const data = await resp.json();
+                if (!resp.ok || !data.url) {
                     this.saveStatus = '{{ _("No se pudo subir la imagen") }}';
                     this.saveStatusClass = 'status-error';
-                }
-            },
-
-            getDropIndex(textarea, event) {
-                if (!textarea) return 0;
-                const rect = textarea.getBoundingClientRect();
-                const styles = window.getComputedStyle(textarea);
-                const lineHeight = parseFloat(styles.lineHeight) || 22;
-                const paddingLeft = parseFloat(styles.paddingLeft) || 0;
-                const paddingTop = parseFloat(styles.paddingTop) || 0;
-
-                const relativeY = Math.max(0, event.clientY - rect.top - paddingTop + textarea.scrollTop);
-                const targetLine = Math.max(0, Math.floor(relativeY / lineHeight));
-
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.font = styles.font;
-                const charWidth = Math.max(7, ctx.measureText('M').width || 8);
-                const relativeX = Math.max(0, event.clientX - rect.left - paddingLeft + textarea.scrollLeft);
-                const targetCol = Math.max(0, Math.floor(relativeX / charWidth));
-
-                const lines = textarea.value.split('\n');
-                const lineIndex = Math.min(targetLine, Math.max(0, lines.length - 1));
-
-                let index = 0;
-                for (let i = 0; i < lineIndex; i += 1) {
-                    index += lines[i].length + 1;
-                }
-                index += Math.min(targetCol, lines[lineIndex]?.length || 0);
-                return index;
-            },
-
-            save() {
-                const titleEl = document.getElementById('doc-title');
-                const titleVal = (titleEl?.textContent || '').trim();
-                if (!titleVal) {
-                    titleEl?.focus();
-                    this.saveStatus = '{{ _("Escribe un título") }}';
-                    this.saveStatusClass = 'status-error';
                     return;
                 }
-                document.getElementById('field-titulo').value = titleVal;
-                document.getElementById('field-contenido').value = this.content;
-                this.saveStatus = '{{ _("Guardando…") }}';
-                this.saveStatusClass = 'status-saving';
-                document.getElementById('doc-form').submit();
-            },
-
-            checkSelection() {
                 const ta = document.getElementById('md-editor');
-                if (!ta) return;
-                this.toolbarVisible = ta.selectionEnd > ta.selectionStart;
-            },
-
-            wrapSelection(before, after) {
-                const ta = document.getElementById('md-editor');
-                if (!ta) return;
-                const s = ta.selectionStart, e = ta.selectionEnd;
-                ta.setRangeText(before + ta.value.substring(s, e) + after, s, e, 'end');
+                const markdown = `\n![${image.name}](${data.url})\n`;
+                const start = typeof ta.selectionStart === 'number' ? ta.selectionStart : this.getDropIndex(ta, event);
+                ta.setRangeText(markdown, start, start, 'end');
                 this.content = ta.value;
-                this.schedulePreview();
-                this.toolbarVisible = false;
-                ta.focus();
-            },
+                this.schedulePreview(0);
+                this.saveStatus = '{{ _("Imagen subida") }}';
+                this.saveStatusClass = 'status-saved';
+            } catch (_) {
+                this.saveStatus = '{{ _("No se pudo subir la imagen") }}';
+                this.saveStatusClass = 'status-error';
+            }
+        },
 
-            insertLink() {
-                const url = prompt('{{ _("URL del enlace:") }}');
-                if (!url) return;
-                const ta = document.getElementById('md-editor');
-                const s = ta.selectionStart, e = ta.selectionEnd;
-                const text = ta.value.substring(s, e) || 'enlace';
-                ta.setRangeText(`[${text}](${url})`, s, e, 'end');
-                this.content = ta.value;
-                this.schedulePreview();
-                ta.focus();
-            },
-        };
+        getDropIndex(textarea, event) {
+            if (!textarea) return 0;
+            const rect = textarea.getBoundingClientRect();
+            const styles = window.getComputedStyle(textarea);
+            const lineHeight = parseFloat(styles.lineHeight) || 22;
+            const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+            const paddingTop = parseFloat(styles.paddingTop) || 0;
+
+            const relativeY = Math.max(0, event.clientY - rect.top - paddingTop + textarea.scrollTop);
+            const targetLine = Math.max(0, Math.floor(relativeY / lineHeight));
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.font = styles.font;
+            const charWidth = Math.max(7, ctx.measureText('M').width || 8);
+            const relativeX = Math.max(0, event.clientX - rect.left - paddingLeft + textarea.scrollLeft);
+            const targetCol = Math.max(0, Math.floor(relativeX / charWidth));
+
+            const lines = textarea.value.split('\n');
+            const lineIndex = Math.min(targetLine, Math.max(0, lines.length - 1));
+
+            let index = 0;
+            for (let i = 0; i < lineIndex; i += 1) {
+                index += lines[i].length + 1;
+            }
+            index += Math.min(targetCol, lines[lineIndex]?.length || 0);
+            return index;
+        },
+
+        save() {
+            const titleEl = document.getElementById('doc-title');
+            const titleVal = (titleEl?.textContent || '').trim();
+            if (!titleVal) {
+                titleEl?.focus();
+                this.saveStatus = '{{ _("Escribe un título") }}';
+                this.saveStatusClass = 'status-error';
+                return;
+            }
+            document.getElementById('field-titulo').value = titleVal;
+            document.getElementById('field-contenido').value = this.content;
+            this.saveStatus = '{{ _("Guardando…") }}';
+            this.saveStatusClass = 'status-saving';
+            document.getElementById('doc-form').submit();
+        },
+
+        checkSelection() {
+            const ta = document.getElementById('md-editor');
+            if (!ta) return;
+            this.toolbarVisible = ta.selectionEnd > ta.selectionStart;
+        },
+
+        wrapSelection(before, after) {
+            const ta = document.getElementById('md-editor');
+            if (!ta) return;
+            const s = ta.selectionStart, e = ta.selectionEnd;
+            ta.setRangeText(before + ta.value.substring(s, e) + after, s, e, 'end');
+            this.content = ta.value;
+            this.schedulePreview();
+            this.toolbarVisible = false;
+            ta.focus();
+        },
+
+        insertLink() {
+            const url = prompt('{{ _("URL del enlace:") }}');
+            if (!url) return;
+            const ta = document.getElementById('md-editor');
+            const s = ta.selectionStart, e = ta.selectionEnd;
+            const text = ta.value.substring(s, e) || 'enlace';
+            ta.setRangeText(`[${text}](${url})`, s, e, 'end');
+            this.content = ta.value;
+            this.schedulePreview();
+            ta.focus();
+        },
+    };
     }
 </script>
 

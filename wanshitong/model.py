@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Index, text
 from sqlalchemy.orm import DeclarativeBase
 from ulid import ULID
 
@@ -133,9 +134,18 @@ class Grupo(database.Model, BaseTabla):
 
 class Categoria(database.Model, BaseTabla):
     __tablename__ = "categoria"
+    __table_args__ = (
+        Index(
+            "ux_categoria_slug_root",
+            "slug",
+            unique=True,
+            sqlite_where=text("parent_id IS NULL"),
+            postgresql_where=text("parent_id IS NULL"),
+        ),
+    )
 
     nombre = database.Column(database.String(100), nullable=False)
-    slug = database.Column(database.String(120), nullable=True, unique=True, index=True)
+    slug = database.Column(database.String(120), nullable=True, index=True)
     icono = database.Column(database.String(32), nullable=True)
     color = database.Column(database.String(20), nullable=True)
     parent_id = database.Column(database.String(26), database.ForeignKey("categoria.id"), nullable=True)
@@ -147,9 +157,18 @@ class Categoria(database.Model, BaseTabla):
 
 class Etiqueta(database.Model, BaseTabla):
     __tablename__ = "etiqueta"
+    __table_args__ = (
+        Index(
+            "ux_etiqueta_slug_root",
+            "slug",
+            unique=True,
+            sqlite_where=text("parent_id IS NULL"),
+            postgresql_where=text("parent_id IS NULL"),
+        ),
+    )
 
     nombre = database.Column(database.String(50), nullable=False, unique=True)
-    slug = database.Column(database.String(80), nullable=True, unique=True, index=True)
+    slug = database.Column(database.String(80), nullable=True, index=True)
     icono = database.Column(database.String(32), nullable=True)
     color = database.Column(database.String(20), nullable=True)
     parent_id = database.Column(database.String(26), database.ForeignKey("etiqueta.id"), nullable=True)

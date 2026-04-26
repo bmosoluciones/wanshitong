@@ -37,6 +37,14 @@ from wanshitong.utils import (
 auth = Blueprint("auth", __name__)
 
 
+def _commit_or_rollback() -> None:
+    try:
+        database.session.commit()
+    except Exception:
+        database.session.rollback()
+        raise
+
+
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -107,7 +115,7 @@ def profile():
                 return render_template("auth/profile.html", form=form, usuario=usuario)
             _store_avatar(usuario, avatar, extension)
 
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Perfil actualizado exitosamente.")), "success")
         return redirect(url_for("auth.profile"))
 
@@ -125,7 +133,7 @@ def set_theme():
         return jsonify({"error": "not-found"}), 404
     usuario.theme_preference = theme
     usuario.modificado_por = usuario.usuario
-    database.session.commit()
+    _commit_or_rollback()
     return jsonify({"theme": theme})
 
 
@@ -159,7 +167,7 @@ def validar_acceso(usuario_id: str, acceso: str, /) -> bool:
     log.trace(f"Access validation result is {clave_validada}")
     if clave_validada:
         registro.ultimo_acceso = datetime.now()
-        database.session.commit()
+        _commit_or_rollback()
 
     return clave_validada
 

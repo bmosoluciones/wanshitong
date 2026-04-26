@@ -208,3 +208,5 @@ __marimo__/
 
 *.db
 data/
+
+flask_session/*

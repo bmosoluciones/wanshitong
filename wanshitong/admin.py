@@ -24,6 +24,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from wanshitong.auth import proteger_passwd
@@ -56,6 +57,24 @@ def solo_admin(f):
         return f(*args, **kwargs)
 
     return decorated
+
+
+def solo_admin_o_editor(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if current_user.tipo not in {"admin", "editor"}:
+            abort(403)
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def _commit_or_rollback() -> None:
+    try:
+        database.session.commit()
+    except Exception:
+        database.session.rollback()
+        raise
 
 
 def _ensure_settings() -> None:
@@ -127,7 +146,7 @@ def configuracion():
 
         session["lang"] = updates["default_language"]
         session.modified = True
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Configuración actualizada exitosamente.")), "success")
         return redirect(url_for("admin.configuracion"))
 
@@ -244,7 +263,7 @@ def nuevo_usuario():
         usuario.acceso = proteger_passwd(password)
         usuario.creado_por = current_user.usuario
         database.session.add(usuario)
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Usuario creado exitosamente.")), "success")
         return redirect(url_for("admin.usuarios"))
     return render_template("admin/usuario_form.html", form=form, usuario=None)
@@ -269,7 +288,7 @@ def editar_usuario(user_id):
         usuario.modificado_por = current_user.usuario
         if form.password.data:
             usuario.acceso = proteger_passwd(form.password.data)
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Usuario actualizado exitosamente.")), "success")
         return redirect(url_for("admin.usuarios"))
 
@@ -288,7 +307,7 @@ def eliminar_usuario(user_id):
         flash(str(_("No puede eliminar su propio usuario.")), "warning")
         return redirect(url_for("admin.usuarios"))
     database.session.delete(usuario)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Usuario eliminado.")), "info")
     return redirect(url_for("admin.usuarios"))
 
@@ -318,7 +337,7 @@ def nuevo_grupo():
         grupo.usuarios = _get_selected_usuarios(form.usuario_ids.data)
         grupo.categorias = _get_selected_categorias(form.categoria_ids.data)
         database.session.add(grupo)
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Grupo creado exitosamente.")), "success")
         return redirect(url_for("admin.grupos"))
     return render_template("admin/grupo_form.html", form=form, grupo=None)
@@ -343,7 +362,7 @@ def editar_grupo(grupo_id):
         grupo.usuarios = _get_selected_usuarios(form.usuario_ids.data)
         grupo.categorias = _get_selected_categorias(form.categoria_ids.data)
         grupo.modificado_por = current_user.usuario
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Grupo actualizado exitosamente.")), "success")
         return redirect(url_for("admin.grupos"))
     return render_template(
@@ -362,7 +381,7 @@ def eliminar_grupo(grupo_id):
     if grupo is None:
         abort(404)
     database.session.delete(grupo)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Grupo eliminado.")), "info")
     return redirect(url_for("admin.grupos"))
 
@@ -377,7 +396,7 @@ def agregar_miembro(grupo_id, user_id):
         abort(404)
     if usuario not in grupo.usuarios:
         grupo.usuarios.append(usuario)
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Usuario agregado al grupo.")), "success")
     return redirect(url_for("admin.editar_grupo", grupo_id=grupo_id))
 
@@ -392,7 +411,7 @@ def eliminar_miembro(grupo_id, user_id):
         abort(404)
     if usuario in grupo.usuarios:
         grupo.usuarios.remove(usuario)
-        database.session.commit()
+        _commit_or_rollback()
         flash(str(_("Usuario removido del grupo.")), "info")
     return redirect(url_for("admin.editar_grupo", grupo_id=grupo_id))
 
@@ -425,10 +444,20 @@ def nueva_categoria():
         cat.icono = normalize_icon_name(raw_icon, fallback="folder") if raw_icon else None
         cat.color = (form.color.data or "").strip() or None
         cat.parent_id = form.parent_id.data or None
+        if cat.parent_id is None and _root_slug_exists_categoria(cat.slug):
+            flash(
+                str(_("El slug ya existe en una categoría de primer nivel. Use uno diferente.")),
+                "error",
+            )
+            return render_template("admin/categoria_form.html", form=form, categoria=None)
         cat.grupos = _get_selected_grupos(form.grupo_ids.data)
         cat.creado_por = current_user.usuario
         database.session.add(cat)
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo crear la categoría por un conflicto de unicidad.")), "error")
+            return render_template("admin/categoria_form.html", form=form, categoria=None)
         flash(str(_("Categoría creada exitosamente.")), "success")
         return redirect(url_for("admin.categorias"))
     return render_template("admin/categoria_form.html", form=form, categoria=None)
@@ -453,15 +482,28 @@ def editar_categoria(cat_id):
     if not form.is_submitted():
         form.grupo_ids.data = [grupo.id for grupo in cat.grupos]
     if form.validate_on_submit():
+        new_parent_id = form.parent_id.data or None
+        new_slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
+        if new_parent_id is None and _root_slug_exists_categoria(new_slug, exclude_id=cat.id):
+            flash(
+                str(_("Este slug ya está en uso en primer nivel. Antes de mover la categoría a raíz, cambie el slug.")),
+                "error",
+            )
+            return render_template("admin/categoria_form.html", form=form, categoria=cat)
+
         cat.nombre = form.nombre.data
-        cat.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
+        cat.slug = new_slug
         raw_icon = (form.icono.data or "").strip()
         cat.icono = normalize_icon_name(raw_icon, fallback="folder") if raw_icon else None
         cat.color = (form.color.data or "").strip() or None
-        cat.parent_id = form.parent_id.data or None
+        cat.parent_id = new_parent_id
         cat.grupos = _get_selected_grupos(form.grupo_ids.data)
         cat.modificado_por = current_user.usuario
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo actualizar la categoría por un conflicto de unicidad.")), "error")
+            return render_template("admin/categoria_form.html", form=form, categoria=cat)
         flash(str(_("Categoría actualizada exitosamente.")), "success")
         return redirect(url_for("admin.categorias"))
     return render_template("admin/categoria_form.html", form=form, categoria=cat)
@@ -475,14 +517,14 @@ def eliminar_categoria(cat_id):
     if cat is None:
         abort(404)
     database.session.delete(cat)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Categoría eliminada.")), "info")
     return redirect(url_for("admin.categorias"))
 
 
 @admin.route("/t")
 @login_required
-@solo_admin
+@solo_admin_o_editor
 def etiquetas():
     lista = database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre)).scalars().all()
     etiquetas_rows = _etiqueta_hierarchy_rows(lista)
@@ -491,7 +533,7 @@ def etiquetas():
 
 @admin.route("/t/new", methods=["GET", "POST"])
 @login_required
-@solo_admin
+@solo_admin_o_editor
 def nueva_etiqueta():
     form = EtiquetaForm()
     todas = database.session.execute(database.select(Etiqueta).order_by(Etiqueta.nombre)).scalars().all()
@@ -504,9 +546,19 @@ def nueva_etiqueta():
         tag.icono = normalize_icon_name(raw_icon, fallback="tag") if raw_icon else None
         tag.color = (form.color.data or "").strip() or None
         tag.parent_id = form.parent_id.data or None
+        if tag.parent_id is None and _root_slug_exists_etiqueta(tag.slug):
+            flash(
+                str(_("El slug ya existe en una etiqueta de primer nivel. Use uno diferente.")),
+                "error",
+            )
+            return render_template("admin/etiqueta_form.html", form=form, etiqueta=None)
         tag.creado_por = current_user.usuario
         database.session.add(tag)
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo crear la etiqueta por un conflicto de unicidad.")), "error")
+            return render_template("admin/etiqueta_form.html", form=form, etiqueta=None)
         flash(str(_("Etiqueta creada exitosamente.")), "success")
         return redirect(url_for("admin.etiquetas"))
     return render_template("admin/etiqueta_form.html", form=form, etiqueta=None)
@@ -514,7 +566,7 @@ def nueva_etiqueta():
 
 @admin.route("/t/<tag_id>/edit", methods=["GET", "POST"])
 @login_required
-@solo_admin
+@solo_admin_o_editor
 def editar_etiqueta(tag_id):
     tag = database.session.get(Etiqueta, tag_id)
     if tag is None:
@@ -528,14 +580,27 @@ def editar_etiqueta(tag_id):
     )
     form.parent_id.choices = _etiqueta_parent_choices(todas)
     if form.validate_on_submit():
+        new_parent_id = form.parent_id.data or None
+        new_slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
+        if new_parent_id is None and _root_slug_exists_etiqueta(new_slug, exclude_id=tag.id):
+            flash(
+                str(_("Este slug ya está en uso en primer nivel. Antes de mover la etiqueta a raíz, cambie el slug.")),
+                "error",
+            )
+            return render_template("admin/etiqueta_form.html", form=form, etiqueta=tag)
+
         tag.nombre = form.nombre.data.strip().lower()
-        tag.slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
+        tag.slug = new_slug
         raw_icon = (form.icono.data or "").strip()
         tag.icono = normalize_icon_name(raw_icon, fallback="tag") if raw_icon else None
         tag.color = (form.color.data or "").strip() or None
-        tag.parent_id = form.parent_id.data or None
+        tag.parent_id = new_parent_id
         tag.modificado_por = current_user.usuario
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo actualizar la etiqueta por un conflicto de unicidad.")), "error")
+            return render_template("admin/etiqueta_form.html", form=form, etiqueta=tag)
         flash(str(_("Etiqueta actualizada exitosamente.")), "success")
         return redirect(url_for("admin.etiquetas"))
     return render_template("admin/etiqueta_form.html", form=form, etiqueta=tag)
@@ -543,13 +608,13 @@ def editar_etiqueta(tag_id):
 
 @admin.route("/t/<tag_id>/delete", methods=["POST"])
 @login_required
-@solo_admin
+@solo_admin_o_editor
 def eliminar_etiqueta(tag_id):
     tag = database.session.get(Etiqueta, tag_id)
     if tag is None:
         abort(404)
     database.session.delete(tag)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Etiqueta eliminada.")), "info")
     return redirect(url_for("admin.etiquetas"))
 
@@ -673,3 +738,17 @@ def _get_selected_grupos(grupo_ids: list[str]) -> list[Grupo]:
     if not grupo_ids:
         return []
     return database.session.execute(database.select(Grupo).where(Grupo.id.in_(grupo_ids))).scalars().all()
+
+
+def _root_slug_exists_categoria(slug: str, exclude_id: str | None = None) -> bool:
+    stmt = database.select(Categoria).where(Categoria.slug == slug, Categoria.parent_id.is_(None))
+    if exclude_id:
+        stmt = stmt.where(Categoria.id != exclude_id)
+    return database.session.execute(stmt).scalar_one_or_none() is not None
+
+
+def _root_slug_exists_etiqueta(slug: str, exclude_id: str | None = None) -> bool:
+    stmt = database.select(Etiqueta).where(Etiqueta.slug == slug, Etiqueta.parent_id.is_(None))
+    if exclude_id:
+        stmt = stmt.where(Etiqueta.id != exclude_id)
+    return database.session.execute(stmt).scalar_one_or_none() is not None

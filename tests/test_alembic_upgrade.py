@@ -9,6 +9,8 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from wanshitong import alembic, create_app
 from wanshitong.model import Categoria, Etiqueta, db
 
+ALEMBIC_HEAD_REVISION = "20260426_02"
+
 
 def test_alembic_upgrade_app_context(tmp_path, monkeypatch):
     database_path = tmp_path / "alembic_roundtrip.db"
@@ -60,12 +62,12 @@ def test_alembic_upgrade_app_context(tmp_path, monkeypatch):
         assert etiqueta_upgraded.icono == "tag"
 
         version_after_upgrade = db.session.execute(text("SELECT version_num FROM alembic_version")).scalar()
-        assert version_after_upgrade == "20260425_01"
+        assert version_after_upgrade == ALEMBIC_HEAD_REVISION
 
         alembic.upgrade()
         db.session.commit()
         version_after_second_upgrade = db.session.execute(text("SELECT version_num FROM alembic_version")).scalar()
-        assert version_after_second_upgrade == "20260425_01"
+        assert version_after_second_upgrade == ALEMBIC_HEAD_REVISION
 
         alembic.downgrade("base")
         db.session.commit()
@@ -96,4 +98,4 @@ def test_alembic_upgrade_app_context(tmp_path, monkeypatch):
         assert etiqueta_upgraded_again.icono == "tag"
 
         version_after_final_upgrade = db.session.execute(text("SELECT version_num FROM alembic_version")).scalar()
-        assert version_after_final_upgrade == "20260425_01"
+        assert version_after_final_upgrade == ALEMBIC_HEAD_REVISION

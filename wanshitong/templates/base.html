@@ -146,6 +146,13 @@
                             class="sidebar-admin-link">{{ _('Configuración') }}</a>
                     </div>
                 </div>
+                {% elif current_user.tipo == 'editor' %}
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-admin" x-data="{ open: true }">
+                    <div class="sidebar-admin-links" x-show="open" x-cloak>
+                        <a href="{{ url_for('admin.etiquetas') }}" class="sidebar-admin-link">{{ _('Etiquetas') }}</a>
+                    </div>
+                </div>
                 {% endif %}
             </nav>
         </aside>

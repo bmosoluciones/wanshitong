@@ -372,5 +372,16 @@ def test_all_routes_without_internal_server_error(app):
                 response = client.post(path, follow_redirects=False, **kwargs)
 
             assert (
+                response.status_code != 500
+            ), f"Ruta {rule.rule} ({rule.endpoint}) metodo {method} devolvio Internal Server Error"
+
+            location = response.headers.get("Location", "")
+            if response.status_code in {301, 302, 303, 307, 308} and location.startswith("/"):
+                redirected = client.get(location, follow_redirects=False)
+                assert (
+                    redirected.status_code != 500
+                ), f"Ruta {rule.rule} ({rule.endpoint}) metodo {method} redirige a {location} y devolvio 500"
+
+            assert (
                 response.status_code in OK_OR_REDIRECT
             ), f"Ruta {rule.rule} ({rule.endpoint}) metodo {method} devolvio {response.status_code}"

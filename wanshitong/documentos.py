@@ -19,6 +19,7 @@ from flask import (
     url_for,
 )
 from flask_login import current_user, login_required
+from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from wanshitong.acl import puede_acceder_categoria, puede_editar, puede_leer
@@ -44,6 +45,22 @@ from wanshitong.utils import (
 )
 
 documentos = Blueprint("documentos", __name__)
+
+
+def _commit_or_rollback() -> None:
+    try:
+        database.session.commit()
+    except Exception:
+        database.session.rollback()
+        raise
+
+
+def _flush_or_rollback() -> None:
+    try:
+        database.session.flush()
+    except Exception:
+        database.session.rollback()
+        raise
 
 
 @documentos.route("/preview", methods=["POST"])
@@ -74,6 +91,15 @@ def _get_categoria_label_by_id(categoria_id: str | None) -> str:
         if row["id"] == categoria_id:
             return str(row["path"])
     return ""
+
+
+def _can_assign_category(categoria_id: str | None) -> bool:
+    if not categoria_id:
+        return True
+    categoria = database.session.get(Categoria, categoria_id)
+    if categoria is None:
+        return False
+    return current_user.tipo == "admin" or puede_acceder_categoria(categoria, current_user)
 
 
 def _get_etiqueta_suggestions() -> list[str]:
@@ -197,6 +223,17 @@ def nuevo():
     form.categoria_id.choices = _get_categoria_choices()
 
     if form.validate_on_submit():
+        if not _can_assign_category(form.categoria_id.data):
+            flash(str(_("La categoría seleccionada no es válida o no tiene acceso.")), "error")
+            return render_template(
+                "documentos/editar.html",
+                form=form,
+                doc=None,
+                categoria_options=_get_categoria_option_rows(),
+                selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+                etiquetas_sugeridas=_get_etiqueta_suggestions(),
+            )
+
         doc = Documento()
         doc.titulo = form.titulo.data
         doc.contenido = form.contenido.data
@@ -209,7 +246,18 @@ def nuevo():
         doc.numero_version = 1
 
         database.session.add(doc)
-        database.session.flush()  # Get ID
+        try:
+            _flush_or_rollback()  # Get ID
+        except IntegrityError:
+            flash(str(_("No se pudo preparar el documento por un conflicto de datos.")), "error")
+            return render_template(
+                "documentos/editar.html",
+                form=form,
+                doc=None,
+                categoria_options=_get_categoria_option_rows(),
+                selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+                etiquetas_sugeridas=_get_etiqueta_suggestions(),
+            )
 
         # Save initial version
         _guardar_version(doc, current_user, str(form.descripcion_cambio.data or _("Versión inicial")))
@@ -217,7 +265,18 @@ def nuevo():
         # Process tags
         _actualizar_etiquetas(doc, form.etiquetas.data or "")
 
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo crear el documento por un conflicto de datos.")), "error")
+            return render_template(
+                "documentos/editar.html",
+                form=form,
+                doc=None,
+                categoria_options=_get_categoria_option_rows(),
+                selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+                etiquetas_sugeridas=_get_etiqueta_suggestions(),
+            )
         flash(str(_("Documento creado exitosamente.")), "success")
         return redirect(url_for("documentos.ver", doc_id=doc.id))
 
@@ -268,6 +327,17 @@ def editar(doc_id):
         form.etiquetas.data = ", ".join(e.nombre for e in doc.etiquetas)
 
     if form.validate_on_submit():
+        if not _can_assign_category(form.categoria_id.data):
+            flash(str(_("La categoría seleccionada no es válida o no tiene acceso.")), "error")
+            return render_template(
+                "documentos/editar.html",
+                form=form,
+                doc=doc,
+                categoria_options=_get_categoria_option_rows(),
+                selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+                etiquetas_sugeridas=_get_etiqueta_suggestions(),
+            )
+
         # Save current version before changing
         _guardar_version(doc, current_user, form.descripcion_cambio.data or "")
 
@@ -289,7 +359,18 @@ def editar(doc_id):
         # Process tags
         _actualizar_etiquetas(doc, form.etiquetas.data or "")
 
-        database.session.commit()
+        try:
+            _commit_or_rollback()
+        except IntegrityError:
+            flash(str(_("No se pudo actualizar el documento por un conflicto de datos.")), "error")
+            return render_template(
+                "documentos/editar.html",
+                form=form,
+                doc=doc,
+                categoria_options=_get_categoria_option_rows(),
+                selected_categoria_label=_get_categoria_label_by_id(form.categoria_id.data),
+                etiquetas_sugeridas=_get_etiqueta_suggestions(),
+            )
         flash(str(_("Documento actualizado exitosamente.")), "success")
         return redirect(url_for("documentos.ver", doc_id=doc.id))
 
@@ -313,7 +394,7 @@ def eliminar(doc_id):
         abort(403)
 
     database.session.delete(doc)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Documento eliminado.")), "info")
     return redirect(url_for("documentos.lista"))
 
@@ -387,7 +468,7 @@ def restaurar_version(doc_id, ver_id):
     doc.numero_version += 1
     doc.modificado_por = current_user.usuario
 
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Versión restaurada exitosamente.")), "success")
     return redirect(url_for("documentos.ver", doc_id=doc.id))
 
@@ -420,7 +501,7 @@ def permisos(doc_id):
             permiso.tipo_permiso = form.tipo_permiso.data
             permiso.creado_por = current_user.usuario
             database.session.add(permiso)
-            database.session.commit()
+            _commit_or_rollback()
             flash(str(_("Permiso agregado.")), "success")
             return redirect(url_for("documentos.permisos", doc_id=doc_id))
 
@@ -447,7 +528,7 @@ def eliminar_permiso(doc_id, perm_id):
         abort(404)
 
     database.session.delete(permiso)
-    database.session.commit()
+    _commit_or_rollback()
     flash(str(_("Permiso eliminado.")), "info")
     return redirect(url_for("documentos.permisos", doc_id=doc_id))
 

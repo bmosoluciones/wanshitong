@@ -14,6 +14,14 @@ from wanshitong.model import Usuario, database
 from wanshitong.version import __version__
 
 
+def _commit_or_rollback() -> None:
+    try:
+        database.session.commit()
+    except Exception:
+        database.session.rollback()
+        raise
+
+
 def _app():
     return create_app(configuration)
 
@@ -55,7 +63,7 @@ def admin_reset(username: str, password: str | None) -> None:
         user.tipo = "admin"
         user.activo = True
         user.modificado_por = "docsctl"
-        database.session.commit()
+        _commit_or_rollback()
         click.echo(f"username={username}")
         click.echo(f"password={generated_password}")
 

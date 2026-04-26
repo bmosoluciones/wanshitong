@@ -42,7 +42,11 @@ def ensure_default_settings(created_by: str | None = None) -> None:
         setting.tipo = definition["type"]
         setting.creado_por = created_by
         database.session.add(setting)
-    database.session.flush()
+    try:
+        database.session.flush()
+    except Exception:
+        database.session.rollback()
+        raise
 
 
 def get_setting(key: str, fallback: str) -> str:
