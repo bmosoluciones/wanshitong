@@ -11,40 +11,18 @@ from platform import platform as os_platform
 from sys import version as py_version
 from typing import cast
 
-from flask import (
-    Blueprint,
-    abort,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from wanshitong.auth import proteger_passwd
-from wanshitong.forms import (
-    AppSettingsForm,
-    CategoriaForm,
-    EtiquetaForm,
-    GrupoForm,
-    UsuarioForm,
-)
+from wanshitong.forms import AppSettingsForm, CategoriaForm, EtiquetaForm, GrupoForm, UsuarioForm
 from wanshitong.i18n import _
 from wanshitong.icon_catalog import normalize_icon_name
 from wanshitong.model import AppConfig, Categoria, Etiqueta, Grupo, Usuario, database
-from wanshitong.utils import (
-    ALLOWED_IMAGE_EXTENSIONS,
-    ensure_default_settings,
-    set_setting,
-    site_asset_dir,
-    slugify,
-)
+from wanshitong.utils import ALLOWED_IMAGE_EXTENSIONS, ensure_default_settings, set_setting, site_asset_dir, slugify
 
 admin = Blueprint("admin", __name__)
 

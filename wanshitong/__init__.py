@@ -14,17 +14,7 @@ from pathlib import Path
 from platform import platform as os_platform
 from sys import version as py_version
 
-from flask import (
-    Flask,
-    abort,
-    flash,
-    jsonify,
-    redirect,
-    request,
-    send_from_directory,
-    session,
-    url_for,
-)
+from flask import Flask, abort, flash, jsonify, redirect, request, send_from_directory, session, url_for
 from flask_alembic import Alembic
 from flask_babel import Babel
 from flask_login import LoginManager, current_user

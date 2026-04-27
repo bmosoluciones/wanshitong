@@ -10,16 +10,7 @@ from pathlib import Path
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from flask import (
-    Blueprint,
-    abort,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.utils import secure_filename
 
@@ -27,12 +18,7 @@ from wanshitong.forms import LoginForm, ProfileForm
 from wanshitong.i18n import _
 from wanshitong.log import log
 from wanshitong.model import Usuario, database
-from wanshitong.utils import (
-    ALLOWED_IMAGE_EXTENSIONS,
-    avatar_dir,
-    avatar_filename,
-    max_upload_size_bytes,
-)
+from wanshitong.utils import ALLOWED_IMAGE_EXTENSIONS, avatar_dir, avatar_filename, max_upload_size_bytes
 
 auth = Blueprint("auth", __name__)
 
