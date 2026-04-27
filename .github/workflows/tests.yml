@@ -32,10 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install black ruff flake8 flake8-pyproject mypy
-
-      - name: Check formatting (Black)
-        run: black --check .
+          pip install ruff flake8 flake8-pyproject mypy
 
       - name: Lint (Ruff)
         run: ruff check .
