@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-4" x-data="iconPicker('{{ form.icono.id }}')" x-init="init()">
                 {{ form.icono.label(class_='form-label') }}
-                {{ form.icono(class_='form-control icon-picker-input', autocomplete='off', placeholder=_('Buscar icono... (home/inicio, lock/candado, mail/correo)')) }}
+                {{ form.icono(class_='form-control icon-picker-input', autocomplete='off', placeholder=_('Buscar icono... (nombre o palabra clave)')) }}
                 <div class="icon-suggestion-list mt-2" x-show="suggestions.length" x-cloak>
                     <template x-for="item in suggestions" :key="item.value">
                         <button type="button" class="btn btn-sm btn-outline-secondary mb-1 me-1"
@@ -47,20 +47,7 @@
             function iconPicker(inputId) {
                 return {
                     filter: '',
-                    icons: [
-                        { value: 'house', keywords: 'house home inicio casa hogar' },
-                        { value: 'lock', keywords: 'lock candado seguridad security' },
-                        { value: 'envelope', keywords: 'mail correo email mensaje' },
-                        { value: 'folder', keywords: 'folder carpeta categoria categoría category' },
-                        { value: 'tag', keywords: 'tag etiqueta label' },
-                        { value: 'tags', keywords: 'tags etiquetas labels' },
-                        { value: 'file-earmark-text', keywords: 'file documento archivo text texto' },
-                        { value: 'book', keywords: 'book libro manual' },
-                        { value: 'gear', keywords: 'gear configuracion configuración settings ajustes' },
-                        { value: 'database', keywords: 'database base de datos db' },
-                        { value: 'calendar', keywords: 'calendar calendario fecha date' },
-                        { value: 'person', keywords: 'person usuario persona user' },
-                    ],
+                    icons: {{ icon_picker_catalog | tojson | safe }},
                     init() {
                         const input = document.getElementById(inputId);
                         if (!input) return;

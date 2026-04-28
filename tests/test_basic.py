@@ -6,6 +6,7 @@ import re
 
 from wanshitong import ensure_database_initialized
 from wanshitong.auth import proteger_passwd
+from wanshitong.icon_catalog import BOOTSTRAP_ICON_NAMES, icon_picker_catalog
 from wanshitong.model import Categoria, Documento, Etiqueta, Grupo, Usuario, db
 
 
@@ -66,6 +67,14 @@ def test_health_endpoint_is_public_and_ok(app):
     assert response.status_code == 200
     assert response.is_json
     assert response.get_json() == {"status": "ok"}
+
+
+def test_icon_picker_catalog_contains_all_bootstrap_icons():
+    icons = icon_picker_catalog()
+    assert len(icons) == len(BOOTSTRAP_ICON_NAMES)
+    assert {icon["value"] for icon in icons} == set(BOOTSTRAP_ICON_NAMES)
+    for icon in icons:
+        assert icon["keywords"].strip()
 
 
 def test_ready_endpoint_checks_database_connection(app):
