@@ -84,6 +84,20 @@
                     <a href="{{ url_for('app.index') }}" class="sidebar-site-link">{{ site_title }}</a>
                 </div>
 
+                <form method="get" action="{{ url_for('documentos.lista') }}" class="sidebar-search-form">
+                    <div class="sidebar-search-row">
+                        <input
+                            type="search"
+                            name="q"
+                            class="sidebar-search-input"
+                            placeholder="{{ _('Buscar documentos...') }}"
+                            aria-label="{{ _('Buscar documentos') }}"
+                            value="{{ request.args.get('q', '') }}"
+                        />
+                        <button type="submit" class="sidebar-search-button">{{ _('Buscar') }}</button>
+                    </div>
+                </form>
+
                 <div class="sidebar-panel-title-row">
                     <span class="sidebar-panel-title">{{ _('Espacios') }}</span>
                     {% if current_user.tipo in ('admin', 'editor') %}
