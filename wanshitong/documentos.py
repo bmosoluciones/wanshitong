@@ -7,9 +7,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from markupsafe import Markup, escape
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
@@ -162,6 +164,36 @@ def _get_or_create_etiqueta(nombre: str) -> Etiqueta:
     return etiqueta
 
 
+def _build_search_snippet(text: str, query: str) -> Markup | None:
+    query = query.strip()
+    if not query or not text:
+        return None
+
+    pattern = re.compile(re.escape(query), re.IGNORECASE)
+    match = pattern.search(text)
+    if not match:
+        return None
+
+    excerpt_radius = 60
+    start_index = max(match.start() - excerpt_radius, 0)
+    end_index = min(match.end() + excerpt_radius, len(text))
+    snippet_text = text[start_index:end_index]
+
+    before = snippet_text[: match.start() - start_index]
+    matched = snippet_text[match.start() - start_index : match.end() - start_index]
+    after = snippet_text[match.end() - start_index :]
+
+    escaped_before = escape(before)
+    escaped_matched = escape(matched)
+    escaped_after = escape(after)
+
+    prefix = "..." if start_index > 0 else ""
+    suffix = "..." if end_index < len(text) else ""
+
+    snippet_html = f"{prefix}{escaped_before}<mark>{escaped_matched}</mark>{escaped_after}{suffix}"
+    return Markup(snippet_html)
+
+
 @documentos.route("/")
 @login_required
 def lista():
@@ -201,7 +233,14 @@ def lista():
     stmt = stmt.order_by(Documento.timestamp.desc())
     docs = [doc for doc in database.session.execute(stmt).scalars().all() if puede_leer(doc, current_user)]
 
-    return render_template("documentos/lista.html", documentos=docs, form=form)
+    snippets = {}
+    if q:
+        for doc in docs:
+            snippet = _build_search_snippet(doc.contenido or "", q)
+            if snippet:
+                snippets[doc.id] = snippet
+
+    return render_template("documentos/lista.html", documentos=docs, form=form, snippets=snippets)
 
 
 @documentos.route("/new", methods=["GET", "POST"])

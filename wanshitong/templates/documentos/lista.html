@@ -47,6 +47,9 @@
                 {% if doc.categoria %}
                 <p class="document-category">{{ doc.categoria.nombre }}</p>
                 {% endif %}
+                {% if request.args.get('q') and snippets.get(doc.id) %}
+                <p class="document-snippet">{{ snippets[doc.id] | safe }}</p>
+                {% endif %}
             </div>
             <div class="document-badges">
                 {% if doc.estado == 'draft' %}

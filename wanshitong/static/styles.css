@@ -418,12 +418,28 @@ body {
 }
 
 .sidebar-search-button:hover {
-    background: var(--surface-hover);
+    background: var(--surface);
     border-color: var(--primary);
 }
 
 .sidebar-site-title {
     display: none;
+}
+
+.document-snippet {
+    margin: 0.5rem 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-height: 5.4em;
+    overflow: hidden;
+}
+
+.document-snippet mark {
+    background: rgba(255, 229, 100, 0.5);
+    color: inherit;
+    border-radius: 0.25rem;
+    padding: 0 0.1rem;
 }
 
 .sidebar-panel-title-row {

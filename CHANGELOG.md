@@ -5,6 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-04-28
+
+### Added
+
+- Sidebar document search form below the site brand, linking to the existing document list.
+- Highlighted content snippets in document list results when a search query is active (`q=`).
+
+### Changed
+
+- Navbar brand now includes both the application logo and the configured site title.
+- Document search results remain ACL-filtered so users only see documents they are authorized to access.
+
 ## [0.0.4] - 2026-04-26
 
 ### Changed
