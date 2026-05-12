@@ -21,10 +21,6 @@
                 <form method="post">
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
-                        {{ form.usuario_id.label(class_='form-label') }}
-                        {{ form.usuario_id(class_='form-select') }}
-                    </div>
-                    <div class="mb-3">
                         {{ form.grupo_id.label(class_='form-label') }}
                         {{ form.grupo_id(class_='form-select') }}
                     </div>
@@ -52,9 +48,7 @@
                     {% for p in permisos %}
                     <tr>
                         <td>
-                            {% if p.usuario %}
-                            👤 {{ p.usuario.usuario }}
-                            {% elif p.grupo %}
+                            {% if p.grupo %}
                             👥 {{ p.grupo.nombre }}
                             {% else %}—{% endif %}
                         </td>

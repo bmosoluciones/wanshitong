@@ -137,7 +137,6 @@ class BusquedaForm(FlaskForm):
 
 
 class PermisoForm(FlaskForm):
-    usuario_id = SelectField(_("Usuario"), validators=[Optional()], coerce=str)
     grupo_id = SelectField(_("Grupo"), validators=[Optional()], coerce=str)
     tipo_permiso = SelectField(
         _("Permiso"),
