@@ -1,9 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
 
-import pytest
 from uuid import uuid4
-from flask import url_for
 from wanshitong.model import Usuario, Grupo, Categoria, Documento, PermisoDocumento, db
 from wanshitong.auth import proteger_passwd
 
@@ -132,15 +130,15 @@ def test_search_results_filtering(app):
         db.session.commit()
 
     # Doc 1: accessible via group
-    doc1_id = create_document(app, f"Visible Search {suffix}", user_id, group_permissions={group_id: "lectura"})
+    create_document(app, f"Visible Search {suffix}", user_id, group_permissions={group_id: "lectura"})
     # Doc 2: not accessible
-    doc2_id = create_document(app, f"Hidden Search {suffix}", user_id)
+    create_document(app, f"Hidden Search {suffix}", user_id)
 
     client = app.test_client()
     login(client, f"searcher-{suffix}")
 
     # Search for common term 'Search'
-    response = client.get(f"/d/?q=Search")
+    response = client.get("/d/?q=Search")
     data = response.get_data(as_text=True)
     assert f"Visible Search {suffix}" in data
     assert f"Hidden Search {suffix}" not in data
