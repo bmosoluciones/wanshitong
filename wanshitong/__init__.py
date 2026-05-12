@@ -392,6 +392,18 @@ def ensure_database_initialized(app: Flask | None = None) -> None:
             except Exception:
                 _db.session.rollback()
                 raise
+        except Exception as exc:
+            log.warning(f"ensure_database_initialized: create_all() raised: {exc}")
+            try:
+                _db.session.rollback()
+            except Exception:
+                pass
+            try:
+                log.exception("ensure_database_initialized: create_all() exception")
+            except Exception:
+                pass
+
+        try:
             log.warning("ensure_database_initialized: applying migrations with Flask-Alembic upgrade()")
             alembic.upgrade()
             log.info("ensure_database_initialized: migrations applied")
