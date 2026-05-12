@@ -5,6 +5,7 @@ from uuid import uuid4
 from wanshitong.model import Usuario, Grupo, Categoria, Documento, PermisoDocumento, db
 from wanshitong.auth import proteger_passwd
 
+
 def create_user(app, username, password="password123", tipo="editor"):
     with app.app_context():
         user = Usuario()
@@ -16,12 +17,14 @@ def create_user(app, username, password="password123", tipo="editor"):
         db.session.commit()
         return user.id
 
+
 def create_group(app, name):
     with app.app_context():
         group = Grupo(nombre=name)
         db.session.add(group)
         db.session.commit()
         return group.id
+
 
 def create_category(app, name, group_ids=None):
     with app.app_context():
@@ -33,6 +36,7 @@ def create_category(app, name, group_ids=None):
         db.session.commit()
         return cat.id
 
+
 def create_document(app, titulo, autor_id, categoria_id=None, group_permissions=None):
     with app.app_context():
         doc = Documento(
@@ -42,7 +46,7 @@ def create_document(app, titulo, autor_id, categoria_id=None, group_permissions=
             categoria_id=categoria_id,
             estado="public",
             visibilidad="privado",
-            slug=f"{titulo.lower().replace(' ', '-')}-{uuid4().hex[:6]}"
+            slug=f"{titulo.lower().replace(' ', '-')}-{uuid4().hex[:6]}",
         )
         db.session.add(doc)
         db.session.flush()
@@ -53,8 +57,10 @@ def create_document(app, titulo, autor_id, categoria_id=None, group_permissions=
         db.session.commit()
         return doc.id
 
+
 def login(client, username, password="password123"):
     return client.post("/login", data={"email": username, "password": password}, follow_redirects=True)
+
 
 def test_anonymous_access_denied(app):
     client = app.test_client()
@@ -70,6 +76,7 @@ def test_anonymous_access_denied(app):
         response = client.get(route)
         assert response.status_code == 302
         assert "/login" in response.location
+
 
 def test_authenticated_user_no_groups_cannot_see_restricted_docs(app):
     suffix = uuid4().hex[:6]
@@ -87,6 +94,7 @@ def test_authenticated_user_no_groups_cannot_see_restricted_docs(app):
     response = client.get("/d/")
     assert f"Secret Doc {suffix}" not in response.get_data(as_text=True)
 
+
 def test_author_access_strictly_by_groups(app):
     """Even if I am the author, I cannot see it if I am not in the allowed group."""
     suffix = uuid4().hex[:6]
@@ -98,6 +106,7 @@ def test_author_access_strictly_by_groups(app):
     login(client, f"author-{suffix}")
 
     assert client.get(f"/d/{doc_id}").status_code == 403
+
 
 def test_group_access_works(app):
     suffix = uuid4().hex[:6]
@@ -117,6 +126,7 @@ def test_group_access_works(app):
 
     assert client.get(f"/d/{doc_id}").status_code == 200
     assert f"Group Doc {suffix}" in client.get("/d/").get_data(as_text=True)
+
 
 def test_search_results_filtering(app):
     suffix = uuid4().hex[:6]
@@ -142,6 +152,7 @@ def test_search_results_filtering(app):
     data = response.get_data(as_text=True)
     assert f"Visible Search {suffix}" in data
     assert f"Hidden Search {suffix}" not in data
+
 
 def test_sidebar_navigation_filtering(app):
     suffix = uuid4().hex[:6]
@@ -170,6 +181,7 @@ def test_sidebar_navigation_filtering(app):
     assert f"Doc in Visible Cat {suffix}" in data
     assert f"Doc in Hidden Cat {suffix}" not in data
 
+
 def test_media_access_protection(app):
     suffix = uuid4().hex[:6]
     user_id = create_user(app, f"media-user-{suffix}")
@@ -186,9 +198,11 @@ def test_media_access_protection(app):
     response = client.get(f"/media/documents/{doc_id}/test.png")
     assert response.status_code == 403
 
+
 def test_no_individual_user_permissions_allowed(app):
     """Verify that PermisoDocumento does not have usuario_id anymore."""
     with app.app_context():
         from wanshitong.model import PermisoDocumento
+
         assert not hasattr(PermisoDocumento, "usuario_id")
         assert not hasattr(PermisoDocumento, "usuario")

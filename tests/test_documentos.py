@@ -211,7 +211,6 @@ class TestACL:
             doc = db.session.get(Documento, doc_id)
             assert puede_editar(doc, lector) is False
 
-
     def test_permiso_explicito_grupo(self, app, usuarios):
         doc_id = self._crear_doc(app, usuarios["editor"], "draft", "privado")
         with app.app_context():

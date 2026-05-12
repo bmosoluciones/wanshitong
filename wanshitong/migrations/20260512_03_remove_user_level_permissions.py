@@ -17,6 +17,7 @@ down_revision = "20260426_02"
 branch_labels = None
 depends_on = None
 
+
 def upgrade() -> None:
     bind = op.get_bind()
     inspector = sa.inspect(bind)
@@ -26,6 +27,7 @@ def upgrade() -> None:
         with op.batch_alter_table("permiso_documento", schema=None) as batch_op:
             batch_op.drop_column("usuario_id")
 
+
 def downgrade() -> None:
     bind = op.get_bind()
     inspector = sa.inspect(bind)
@@ -34,9 +36,4 @@ def downgrade() -> None:
     if "usuario_id" not in columns:
         with op.batch_alter_table("permiso_documento", schema=None) as batch_op:
             batch_op.add_column(sa.Column("usuario_id", sa.String(length=26), nullable=True))
-            batch_op.create_foreign_key(
-                "fk_permiso_documento_usuario_id_usuario",
-                "usuario",
-                ["usuario_id"],
-                ["id"]
-            )
+            batch_op.create_foreign_key("fk_permiso_documento_usuario_id_usuario", "usuario", ["usuario_id"], ["id"])
