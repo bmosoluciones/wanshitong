@@ -173,26 +173,29 @@ class TestACL:
             doc = db.session.get(Documento, doc_id)
             assert puede_editar(doc, admin) is True
 
-    def test_autor_puede_leer_propio(self, app, usuarios):
+    def test_autor_no_puede_leer_propio_sin_grupo(self, app, usuarios):
         doc_id = self._crear_doc(app, usuarios["editor"], "draft", "privado")
         with app.app_context():
             editor = db.session.get(Usuario, usuarios["editor"])
             doc = db.session.get(Documento, doc_id)
-            assert puede_leer(doc, editor) is True
+            # Now requires group/category access
+            assert puede_leer(doc, editor) is False
 
-    def test_autor_puede_editar_propio(self, app, usuarios):
+    def test_autor_no_puede_editar_propio_sin_grupo(self, app, usuarios):
         doc_id = self._crear_doc(app, usuarios["editor"], "draft", "privado")
         with app.app_context():
             editor = db.session.get(Usuario, usuarios["editor"])
             doc = db.session.get(Documento, doc_id)
-            assert puede_editar(doc, editor) is True
+            # Now requires group/category access
+            assert puede_editar(doc, editor) is False
 
-    def test_publico_visible_para_lector(self, app, usuarios):
+    def test_publico_no_visible_sin_acceso_explicito(self, app, usuarios):
         doc_id = self._crear_doc(app, usuarios["editor"], "public", "publico")
         with app.app_context():
             lector = db.session.get(Usuario, usuarios["lector"])
             doc = db.session.get(Documento, doc_id)
-            assert puede_leer(doc, lector) is True
+            # visibilidad=publico no longer grants access
+            assert puede_leer(doc, lector) is False
 
     def test_privado_no_visible_para_lector_sin_permiso(self, app, usuarios):
         doc_id = self._crear_doc(app, usuarios["editor"], "draft", "privado")
@@ -206,22 +209,6 @@ class TestACL:
         with app.app_context():
             lector = db.session.get(Usuario, usuarios["lector"])
             doc = db.session.get(Documento, doc_id)
-            assert puede_editar(doc, lector) is False
-
-    def test_permiso_explicito_lectura(self, app, usuarios):
-        doc_id = self._crear_doc(app, usuarios["editor"], "draft", "privado")
-        with app.app_context():
-            lector = db.session.get(Usuario, usuarios["lector"])
-            # Grant explicit read permission
-            permiso = PermisoDocumento()
-            permiso.documento_id = doc_id
-            permiso.usuario_id = lector.id
-            permiso.tipo_permiso = "lectura"
-            db.session.add(permiso)
-            db.session.commit()
-
-            doc = db.session.get(Documento, doc_id)
-            assert puede_leer(doc, lector) is True
             assert puede_editar(doc, lector) is False
 
     def test_permiso_explicito_grupo(self, app, usuarios):

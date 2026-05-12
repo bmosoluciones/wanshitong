@@ -9,7 +9,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from wanshitong import alembic, create_app
 from wanshitong.model import Categoria, Etiqueta, db
 
-ALEMBIC_HEAD_REVISION = "20260426_02"
+ALEMBIC_HEAD_REVISION = "20260512_03"
 
 
 def test_alembic_upgrade_app_context(tmp_path, monkeypatch):

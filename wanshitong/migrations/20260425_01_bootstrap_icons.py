@@ -95,11 +95,17 @@ def downgrade() -> None:
     if not inspector.has_table("icon_migration_backup"):
         return
 
-    rows = bind.execute(sa.text("""
+    rows = (
+        bind.execute(
+            sa.text("""
             SELECT entity_type, entity_id, old_icon
             FROM icon_migration_backup
             ORDER BY entity_type, entity_id
-            """)).mappings().all()
+            """)
+        )
+        .mappings()
+        .all()
+    )
 
     for row in rows:
         table_name = "categoria" if row["entity_type"] == "categoria" else "etiqueta"

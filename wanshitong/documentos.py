@@ -515,7 +515,6 @@ def permisos(doc_id):
     form = PermisoForm()
 
     grupos = database.session.execute(database.select(Grupo)).scalars().all()
-    form.usuario_id.choices = [("", _("Ninguno"))]
     form.grupo_id.choices = [("", _("Ninguno"))] + [(g.id, g.nombre) for g in grupos]
 
     if form.validate_on_submit():
@@ -526,7 +525,6 @@ def permisos(doc_id):
         else:
             permiso = PermisoDocumento()
             permiso.documento_id = doc_id
-            permiso.usuario_id = None
             permiso.grupo_id = grupo_id
             permiso.tipo_permiso = form.tipo_permiso.data
             permiso.creado_por = current_user.usuario

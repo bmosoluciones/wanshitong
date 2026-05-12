@@ -207,12 +207,10 @@ class PermisoDocumento(database.Model, BaseTabla):
     __tablename__ = "permiso_documento"
 
     documento_id = database.Column(database.String(26), database.ForeignKey("documento.id"), nullable=False)
-    usuario_id = database.Column(database.String(26), database.ForeignKey("usuario.id"), nullable=True)
     grupo_id = database.Column(database.String(26), database.ForeignKey("grupo.id"), nullable=True)
     tipo_permiso = database.Column(database.String(20), nullable=False)  # lectura / edicion
 
     documento = database.relationship("Documento", back_populates="permisos")
-    usuario = database.relationship("Usuario")
     grupo = database.relationship("Grupo")
 
 
