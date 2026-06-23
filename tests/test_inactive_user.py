@@ -5,6 +5,7 @@ from uuid import uuid4
 from wanshitong.model import Usuario, Grupo, Documento, PermisoDocumento, db
 from wanshitong.auth import proteger_passwd
 
+
 def create_user(app, username, password="password123", tipo="editor", activo=True):
     with app.app_context():
         user = Usuario()
@@ -16,6 +17,7 @@ def create_user(app, username, password="password123", tipo="editor", activo=Tru
         db.session.commit()
         return user.id
 
+
 def create_group(app, name):
     with app.app_context():
         group = Grupo(nombre=name)
@@ -23,12 +25,14 @@ def create_group(app, name):
         db.session.commit()
         return group.id
 
+
 def add_user_to_group(app, user_id, group_id):
     with app.app_context():
         user = db.session.get(Usuario, user_id)
         group = db.session.get(Grupo, group_id)
         user.grupos.append(group)
         db.session.commit()
+
 
 def create_document(app, titulo, autor_id, group_permissions=None):
     with app.app_context():
@@ -49,11 +53,13 @@ def create_document(app, titulo, autor_id, group_permissions=None):
         db.session.commit()
         return doc.id
 
+
 def test_inactive_user_cannot_login(app):
     create_user(app, "inactive_user", activo=False)
     client = app.test_client()
     response = client.post("/login", data={"email": "inactive_user", "password": "password123"}, follow_redirects=True)
     assert "Usuario o contraseña incorrectos." in response.get_data(as_text=True)
+
 
 def test_inactive_user_session_invalidated(app):
     user_id = create_user(app, "active_then_inactive", activo=True)
@@ -71,6 +77,7 @@ def test_inactive_user_session_invalidated(app):
     response = client.get("/")
     assert response.status_code == 302
     assert "/login" in response.location
+
 
 def test_group_isolation_enforced(app):
     """User in Group A cannot see Doc in Group B."""
@@ -95,6 +102,7 @@ def test_group_isolation_enforced(app):
     response = client.get("/d/")
     assert "Doc B" not in response.get_data(as_text=True)
 
+
 def test_inactive_user_cannot_access_even_with_group(app):
     """An inactive user cannot access anything, even if they are in an allowed group."""
     user_id = create_user(app, "inactive_with_group", activo=False)
@@ -108,4 +116,4 @@ def test_inactive_user_cannot_access_even_with_group(app):
     client.post("/login", data={"email": "inactive_with_group", "password": "password123"}, follow_redirects=True)
 
     response = client.get(f"/d/{doc_id}")
-    assert response.status_code == 302 # Redirected to login because session was not established or invalidated
+    assert response.status_code == 302  # Redirected to login because session was not established or invalidated
