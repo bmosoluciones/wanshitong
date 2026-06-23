@@ -118,6 +118,10 @@ class Usuario(UserMixin, database.Model, BaseTabla):
     theme_preference = database.Column(database.String(10), default="light")
     avatar_extension = database.Column(database.String(10), nullable=True)
 
+    @property
+    def is_active(self) -> bool:
+        return bool(self.activo)
+
     grupos = database.relationship("Grupo", secondary=usuario_grupo, back_populates="usuarios")
     documentos = database.relationship("Documento", back_populates="autor", foreign_keys="Documento.autor_id")
 

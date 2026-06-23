@@ -141,6 +141,10 @@ def validar_acceso(usuario_id: str, acceso: str, /) -> bool:
         ).scalar_one_or_none()
 
     if registro is not None:
+        if not registro.activo:
+            log.trace(f"User {usuario_id} is inactive")
+            return False
+
         try:
             ph.verify(registro.acceso, acceso.encode())
             clave_validada = True

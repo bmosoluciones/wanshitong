@@ -10,6 +10,8 @@ from wanshitong.model import Categoria, Documento, Usuario
 
 def puede_acceder_categoria(categoria: Categoria | None, usuario: Usuario) -> bool:
     """Return True when the user can access a category."""
+    if not usuario.activo:
+        return False
     if usuario.tipo == "admin":
         return True
     if categoria is None:
@@ -24,6 +26,8 @@ def puede_acceder_categoria(categoria: Categoria | None, usuario: Usuario) -> bo
 
 def puede_leer(doc: Documento, usuario: Usuario) -> bool:
     """Return True if the user can read the document."""
+    if not usuario.activo:
+        return False
     if usuario.tipo == "admin":
         return True
     if doc.categoria and puede_acceder_categoria(doc.categoria, usuario):
@@ -33,6 +37,8 @@ def puede_leer(doc: Documento, usuario: Usuario) -> bool:
 
 def puede_editar(doc: Documento, usuario: Usuario) -> bool:
     """Return True if the user can edit the document."""
+    if not usuario.activo:
+        return False
     if usuario.tipo == "admin":
         return True
     if usuario.tipo == "consulta":
