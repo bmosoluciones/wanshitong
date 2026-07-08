@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-07-08
+
+### Changed
+
+- Maintenance release: updated Python and JavaScript dependencies.
+
 ## [0.0.5] - 2026-04-28
 
 ### Added
