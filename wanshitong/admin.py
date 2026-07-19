@@ -309,12 +309,12 @@ def nuevo_grupo():
     _populate_group_form_choices(form)
     if form.validate_on_submit():
         grupo = Grupo()
+        database.session.add(grupo)
         grupo.nombre = form.nombre.data
         grupo.descripcion = form.descripcion.data
         grupo.creado_por = current_user.usuario
         grupo.usuarios = _get_selected_usuarios(form.usuario_ids.data)
         grupo.categorias = _get_selected_categorias(form.categoria_ids.data)
-        database.session.add(grupo)
         _commit_or_rollback()
         flash(str(_("Grupo creado exitosamente.")), "success")
         return redirect(url_for("admin.grupos"))
