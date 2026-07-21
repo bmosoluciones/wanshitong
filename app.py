@@ -50,9 +50,10 @@ def serve():
         except Exception:
             pass
 
+    host = environ.get("HOST", "0.0.0.0")
     port = int(environ.get("PORT", "9099"))
-    log.warning(f"serve: starting waitress on 0.0.0.0:{port}")
-    serve(app, host="0.0.0.0", port=port)
+    log.warning(f"serve: starting waitress on {host}:{port}")
+    serve(app, host=host, port=port)
 
 
 if __name__ == "__main__":
