@@ -4,6 +4,9 @@
 
 > A lightweight, private knowledge-management system.
 
+[![Tests](https://github.com/bmosoluciones/wanshitong/actions/workflows/tests.yml/badge.svg)](https://github.com/bmosoluciones/wanshitong/actions/workflows/tests.yml)
+[![Docker Repository on Quay](https://quay.io/repository/bmosoluciones/wanshitong/status "Docker Repository on Quay")](https://quay.io/repository/bmosoluciones/wanshitong)
+
 Store, organise, and share Markdown documents inside your team.
 
 ![Home page](docs/images/home.png)
