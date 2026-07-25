@@ -11,6 +11,7 @@ import re
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from flask_weasyprint import HTML, render_pdf
 from markupsafe import Markup, escape
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
@@ -339,6 +340,31 @@ def ver(doc_id):
         puede_editar=puede_edit,
         category_path=category_path,
     )
+
+
+@documentos.route("/<doc_id>/pdf")
+@login_required
+def descargar_pdf(doc_id):
+    doc = database.session.get(Documento, doc_id)
+    if doc is None:
+        abort(404)
+    if not puede_leer(doc, current_user):
+        abort(403)
+
+    html_contenido = render_markdown(doc.contenido)
+    category_path = _category_path(doc.categoria)
+
+    rendered_html = render_template(
+        "documentos/ver_pdf.html",
+        doc=doc,
+        html_contenido=html_contenido,
+        category_path=category_path,
+    )
+
+    html_obj = HTML(string=rendered_html, base_url=request.url_root)
+    filename = f"{doc.slug}.pdf" if doc.slug else f"documento-{doc.id}.pdf"
+
+    return render_pdf(html_obj, download_filename=filename)
 
 
 @documentos.route("/<doc_id>/edit", methods=["GET", "POST"])

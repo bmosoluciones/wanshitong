@@ -315,3 +315,65 @@ class TestVersionado:
                 .all()
             )
             assert len(versiones) == 2
+
+
+# ─── PDF Download tests ──────────────────────────────────────────────────────
+
+
+class TestDescargarPDF:
+    def test_pdf_unauthenticated(self, app):
+        client = app.test_client()
+        response = client.get("/d/some-doc-id/pdf")
+        # should redirect to login
+        assert response.status_code == 302
+        assert "/login" in response.headers.get("Location", "")
+
+    def test_pdf_unauthorized(self, app, usuarios):
+        # Create a private draft document belonging to editor
+        with app.app_context():
+            editor = db.session.get(Usuario, usuarios["editor"])
+            doc = Documento()
+            doc.titulo = "Private Note"
+            doc.contenido = "Very secret information"
+            doc.autor_id = editor.id
+            doc.estado = "draft"
+            doc.visibilidad = "privado"
+            doc.numero_version = 1
+            db.session.add(doc)
+            db.session.commit()
+            doc_id = doc.id
+
+        # Login as lector (has no permission to read editor's private doc without explicit access)
+        client = app.test_client()
+        client.post("/login", data={"email": "lector1", "password": "password123"})
+
+        response = client.get(f"/d/{doc_id}/pdf")
+        # should be 403 Forbidden
+        assert response.status_code == 403
+
+    def test_pdf_authorized(self, app, usuarios):
+        # Create a document accessible to editor
+        with app.app_context():
+            admin = db.session.get(Usuario, usuarios["admin"])
+            doc = Documento()
+            doc.titulo = "Public Note for Export"
+            doc.contenido = "This is a beautiful markdown note with a **bold** word."
+            doc.autor_id = admin.id
+            doc.estado = "public"
+            doc.visibilidad = "publico"
+            doc.numero_version = 1
+            db.session.add(doc)
+            db.session.commit()
+            doc_id = doc.id
+
+        # Login as admin
+        client = app.test_client()
+        with app.app_context():
+            admin_user = db.session.get(Usuario, usuarios["admin"]).usuario
+
+        client.post("/login", data={"email": admin_user, "password": "app-admin"})
+
+        response = client.get(f"/d/{doc_id}/pdf")
+        assert response.status_code == 200
+        assert response.mimetype == "application/pdf"
+        assert response.headers.get("Content-Disposition", "").startswith("attachment; filename=")

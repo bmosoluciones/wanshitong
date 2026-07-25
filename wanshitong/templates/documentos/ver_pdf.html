@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="utf-8">
+    <title>{{ doc.titulo }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            @bottom-left {
+                content: "{{ site_title }}";
+                font-family: 'Inter', -apple-system, sans-serif;
+                font-size: 8pt;
+                color: #717171;
+            }
+            @bottom-right {
+                content: counter(page) " / " counter(pages);
+                font-family: 'Inter', -apple-system, sans-serif;
+                font-size: 8pt;
+                color: #717171;
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Document Header */
+        .doc-header {
+            margin-bottom: 20px;
+        }
+
+        .doc-title {
+            font-size: 26pt;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0 0 10px 0;
+            color: #1a1a1a;
+        }
+
+        .doc-meta {
+            display: block;
+            font-size: 9.5pt;
+            color: #555555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .meta-item {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #333333;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 15px 0 25px 0;
+        }
+
+        /* Markdown Content Styling */
+        .markdown-body h1 {
+            font-size: 20pt;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            page-break-after: avoid;
+        }
+
+        .markdown-body h2 {
+            font-size: 16pt;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #2c2c2c;
+            page-break-after: avoid;
+        }
+
+        .markdown-body h3 {
+            font-size: 13pt;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #333333;
+            page-break-after: avoid;
+        }
+
+        .markdown-body p {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        .markdown-body ul, .markdown-body ol {
+            margin-top: 0;
+            margin-bottom: 12px;
+            padding-left: 25px;
+        }
+
+        .markdown-body li {
+            margin-bottom: 6px;
+        }
+
+        .markdown-body blockquote {
+            margin: 15px 0;
+            padding: 5px 15px;
+            color: #555555;
+            border-left: 4px solid #cccccc;
+            background-color: #f9f9f9;
+            font-style: italic;
+        }
+
+        .markdown-body pre {
+            background-color: #f5f5f5;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 12px;
+            overflow: auto;
+            font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 9pt;
+            line-height: 1.4;
+            margin-top: 0;
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+
+        .markdown-body code {
+            font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-size: 9pt;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .markdown-body pre code {
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .markdown-body table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 0;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .markdown-body th, .markdown-body td {
+            border: 1px solid #cccccc;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 10pt;
+        }
+
+        .markdown-body th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .markdown-body tr:nth-child(even) td {
+            background-color: #fafafa;
+        }
+
+        .markdown-body img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <header class="doc-header">
+        <h1 class="doc-title">{{ doc.titulo }}</h1>
+        <div class="doc-meta">
+            <span class="meta-item">
+                <span class="meta-label">{{ _('Autor') }}:</span> {{ doc.autor.usuario }}
+            </span>
+            <span class="meta-item">
+                <span class="meta-label">{{ _('Versión') }}:</span> v{{ doc.numero_version }}
+            </span>
+            {% if doc.categoria %}
+            <span class="meta-item">
+                <span class="meta-label">{{ _('Categoría') }}:</span> {{ doc.categoria.nombre }}
+            </span>
+            {% endif %}
+            {% if doc.etiquetas %}
+            <span class="meta-item">
+                <span class="meta-label">{{ _('Etiquetas') }}:</span>
+                {% for tag in doc.etiquetas %}
+                    #{{ tag.nombre }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </span>
+            {% endif %}
+            {% if doc.modificado %}
+            <span class="meta-item">
+                <span class="meta-label">{{ _('Última modificación') }}:</span> {{ doc.modificado.strftime('%Y-%m-%d') }}
+            </span>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="divider"></div>
+
+    <main class="markdown-body">
+        {{ html_contenido | safe }}
+    </main>
+</body>
+</html>
