@@ -377,3 +377,44 @@ class TestDescargarPDF:
         assert response.status_code == 200
         assert response.mimetype == "application/pdf"
         assert response.headers.get("Content-Disposition", "").startswith("attachment; filename=")
+
+
+class TestImageUploadGuards:
+    def test_image_upload_guards_on_new_and_edit_forms(self, app, usuarios):
+        # 1. Create a document first to use for the edit page test
+        with app.app_context():
+            editor = db.session.get(Usuario, usuarios["editor"])
+            admin = db.session.get(Usuario, usuarios["admin"])
+            doc = Documento()
+            doc.titulo = "Test Doc for Image Upload Guard"
+            doc.contenido = "Existing content"
+            doc.autor_id = editor.id
+            doc.estado = "draft"
+            doc.visibilidad = "privado"
+            doc.numero_version = 1
+            db.session.add(doc)
+            db.session.commit()
+            doc_id = doc.id
+            admin_user = admin.usuario
+
+        client = app.test_client()
+        # Login as admin
+        client.post("/login", data={"email": admin_user, "password": "app-admin"})
+
+        # 2. Test /d/new (creation form)
+        response_new = client.get("/d/new")
+        assert response_new.status_code == 200
+        html_new = response_new.get_data(as_text=True)
+        # Should render 'if (!false) {' to guard against upload when document doesn't exist yet
+        assert "if (!false) {" in html_new
+
+        # 3. Test /d/<doc_id>/edit (editing form)
+        response_edit = client.get(f"/d/{doc_id}/edit")
+        assert response_edit.status_code == 200
+        html_edit = response_edit.get_data(as_text=True)
+        # Should render 'if (!true) {' because document exists and upload is allowed
+        assert "if (!true) {" in html_edit
+
+        # 4. Test backend upload endpoint with "new" as doc_id returns 404
+        response_upload_new = client.post(f"/d/new/image", data={"file": (None, "")})
+        assert response_upload_new.status_code == 404
