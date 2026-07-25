@@ -19,6 +19,10 @@
         </nav>
 
         <div class="doc-view-actions">
+            <a href="{{ url_for('documentos.descargar_pdf', doc_id=doc.id) }}"
+                class="btn btn-outline btn-small">
+                <i class="bi bi-file-earmark-pdf"></i> {{ _('Descargar PDF') }}
+            </a>
             {% if puede_editar %}
             <a href="{{ url_for('documentos.editar', doc_id=doc.id) }}"
                 class="btn btn-primary btn-small">{{ _('Editar') }}</a>
