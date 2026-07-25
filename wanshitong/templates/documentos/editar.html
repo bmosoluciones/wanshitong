@@ -292,7 +292,7 @@
             const files = Array.from(event.dataTransfer?.files || []);
             const image = files.find((file) => file.type.startsWith('image/'));
             if (!image) return;
-            if (false) {
+            if (!{{ 'true' if doc else 'false' }}) {
                 this.saveStatus = '{{ _("Guarda primero el documento para subir imágenes") }}';
                 this.saveStatusClass = 'status-error';
                 return;
