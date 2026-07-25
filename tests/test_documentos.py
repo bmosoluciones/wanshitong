@@ -416,5 +416,5 @@ class TestImageUploadGuards:
         assert "if (!true) {" in html_edit
 
         # 4. Test backend upload endpoint with "new" as doc_id returns 404
-        response_upload_new = client.post(f"/d/new/image", data={"file": (None, "")})
+        response_upload_new = client.post("/d/new/image", data={"file": (None, "")})
         assert response_upload_new.status_code == 404
