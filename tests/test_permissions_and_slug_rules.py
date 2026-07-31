@@ -124,3 +124,101 @@ def test_document_view_shows_category_links_and_filtered_list(app):
     response_lista = client.get(f"/d/?categoria_id={categoria_id}")
     assert response_lista.status_code == 200
     assert f"Documento {suffix}" in response_lista.get_data(as_text=True)
+
+
+def test_category_cycle_prevention(app):
+    admin_username = f"admin-cycle-{uuid4().hex[:8]}"
+    with app.app_context():
+        admin = Usuario()
+        admin.usuario = admin_username
+        admin.acceso = proteger_passwd("password123")
+        admin.tipo = "admin"
+        admin.activo = True
+        db.session.add(admin)
+
+        cat_a = Categoria()
+        cat_a.nombre = f"Category A {uuid4().hex[:4]}"
+        cat_a.slug = f"cat-a-{uuid4().hex[:4]}"
+        db.session.add(cat_a)
+        db.session.flush()
+
+        cat_b = Categoria()
+        cat_b.nombre = f"Category B {uuid4().hex[:4]}"
+        cat_b.slug = f"cat-b-{uuid4().hex[:4]}"
+        cat_b.parent_id = cat_a.id
+        db.session.add(cat_b)
+        db.session.commit()
+
+        cat_a_id = cat_a.id
+        cat_b_id = cat_b.id
+
+    client = app.test_client()
+    _login(client, admin_username, "password123")
+
+    response = client.post(
+        f"/a/c/{cat_a_id}/edit",
+        data={
+            "nombre": "Category A Modified",
+            "slug": "cat-a-mod",
+            "parent_id": cat_b_id,
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    if "crearía un ciclo de dependencias" not in html:
+        print("HTML WAS:")
+        print(html)
+    assert "crearía un ciclo de dependencias" in html
+
+    with app.app_context():
+        refreshed_a = db.session.get(Categoria, cat_a_id)
+        assert refreshed_a.parent_id is None
+
+
+def test_tag_cycle_prevention(app):
+    from wanshitong.model import Etiqueta
+    admin_username = f"admin-cycle-{uuid4().hex[:8]}"
+    with app.app_context():
+        admin = Usuario()
+        admin.usuario = admin_username
+        admin.acceso = proteger_passwd("password123")
+        admin.tipo = "admin"
+        admin.activo = True
+        db.session.add(admin)
+
+        tag_a = Etiqueta()
+        tag_a.nombre = f"Tag A {uuid4().hex[:4]}".lower()
+        tag_a.slug = f"tag-a-{uuid4().hex[:4]}"
+        db.session.add(tag_a)
+        db.session.flush()
+
+        tag_b = Etiqueta()
+        tag_b.nombre = f"Tag B {uuid4().hex[:4]}".lower()
+        tag_b.slug = f"tag-b-{uuid4().hex[:4]}"
+        tag_b.parent_id = tag_a.id
+        db.session.add(tag_b)
+        db.session.commit()
+
+        tag_a_id = tag_a.id
+        tag_b_id = tag_b.id
+
+    client = app.test_client()
+    _login(client, admin_username, "password123")
+
+    response = client.post(
+        f"/a/t/{tag_a_id}/edit",
+        data={
+            "nombre": "tag a modified",
+            "slug": "tag-a-mod",
+            "parent_id": tag_b_id,
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "crearía un ciclo de dependencias" in html
+
+    with app.app_context():
+        refreshed_a = db.session.get(Etiqueta, tag_a_id)
+        assert refreshed_a.parent_id is None

@@ -461,6 +461,12 @@ def editar_categoria(cat_id):
         form.grupo_ids.data = [grupo.id for grupo in cat.grupos]
     if form.validate_on_submit():
         new_parent_id = form.parent_id.data or None
+        if _would_create_cycle_categoria(cat_id, new_parent_id):
+            flash(
+                str(_("No se puede asignar esa categoría padre porque crearía un ciclo de dependencias.")),
+                "error",
+            )
+            return render_template("admin/categoria_form.html", form=form, categoria=cat)
         new_slug = slugify((form.slug.data or "").strip() or form.nombre.data, "category")
         if new_parent_id is None and _root_slug_exists_categoria(new_slug, exclude_id=cat.id):
             flash(
@@ -559,6 +565,12 @@ def editar_etiqueta(tag_id):
     form.parent_id.choices = _etiqueta_parent_choices(todas)
     if form.validate_on_submit():
         new_parent_id = form.parent_id.data or None
+        if _would_create_cycle_etiqueta(tag_id, new_parent_id):
+            flash(
+                str(_("No se puede asignar esa etiqueta padre porque crearía un ciclo de dependencias.")),
+                "error",
+            )
+            return render_template("admin/etiqueta_form.html", form=form, etiqueta=tag)
         new_slug = slugify((form.slug.data or "").strip() or form.nombre.data, "tag")
         if new_parent_id is None and _root_slug_exists_etiqueta(new_slug, exclude_id=tag.id):
             flash(
@@ -693,7 +705,11 @@ def _etiqueta_parent_choices(etiquetas: list[Etiqueta]) -> list[tuple[str, str]]
 def _categoria_path_label(categoria: Categoria) -> str:
     path: list[str] = []
     current = categoria
+    visited = set()
     while current is not None:
+        if current.id in visited:
+            break
+        visited.add(current.id)
         path.append(current.nombre)
         current = current.parent
     path.reverse()
@@ -730,3 +746,39 @@ def _root_slug_exists_etiqueta(slug: str, exclude_id: str | None = None) -> bool
     if exclude_id:
         stmt = stmt.where(Etiqueta.id != exclude_id)
     return database.session.execute(stmt).scalar_one_or_none() is not None
+
+
+def _would_create_cycle_categoria(cat_id: str, proposed_parent_id: str | None) -> bool:
+    if not proposed_parent_id:
+        return False
+    if cat_id == proposed_parent_id:
+        return True
+    current_id: str | None = proposed_parent_id
+    visited = {cat_id}
+    while current_id is not None:
+        if current_id in visited:
+            return True
+        visited.add(current_id)
+        parent = database.session.execute(
+            database.select(Categoria.parent_id).where(Categoria.id == current_id)
+        ).scalar()
+        current_id = parent
+    return False
+
+
+def _would_create_cycle_etiqueta(tag_id: str, proposed_parent_id: str | None) -> bool:
+    if not proposed_parent_id:
+        return False
+    if tag_id == proposed_parent_id:
+        return True
+    current_id: str | None = proposed_parent_id
+    visited = {tag_id}
+    while current_id is not None:
+        if current_id in visited:
+            return True
+        visited.add(current_id)
+        parent = database.session.execute(
+            database.select(Etiqueta.parent_id).where(Etiqueta.id == current_id)
+        ).scalar()
+        current_id = parent
+    return False
