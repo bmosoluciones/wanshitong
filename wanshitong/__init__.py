@@ -329,6 +329,7 @@ def create_app(config) -> Flask:
         if not getattr(current_user, "is_authenticated", False) or not getattr(current_user, "is_active", False):
             if getattr(current_user, "is_authenticated", False):
                 from flask_login import logout_user
+
                 logout_user()
             return redirect(url_for("auth.login", next=request.path))
         return None
