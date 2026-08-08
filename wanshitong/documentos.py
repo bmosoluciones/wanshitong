@@ -668,7 +668,11 @@ def _category_path(categoria: Categoria | None) -> list[Categoria]:
 
     path: list[Categoria] = []
     current = categoria
+    visited = set()
     while current is not None:
+        if current.id in visited:
+            break
+        visited.add(current.id)
         path.append(current)
         current = current.parent
     path.reverse()
