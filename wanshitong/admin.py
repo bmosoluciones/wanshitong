@@ -777,8 +777,6 @@ def _would_create_cycle_etiqueta(tag_id: str, proposed_parent_id: str | None) ->
         if current_id in visited:
             return True
         visited.add(current_id)
-        parent = database.session.execute(
-            database.select(Etiqueta.parent_id).where(Etiqueta.id == current_id)
-        ).scalar()
+        parent = database.session.execute(database.select(Etiqueta.parent_id).where(Etiqueta.id == current_id)).scalar()
         current_id = parent
     return False

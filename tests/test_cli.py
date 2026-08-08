@@ -3,13 +3,14 @@
 
 from click.testing import CliRunner
 from wanshitong.cli import main
+from wanshitong.version import __version__
 
 
 def test_cli_version():
     runner = CliRunner()
     result = runner.invoke(main, ["version"])
     assert result.exit_code == 0
-    assert "0.0.7" in result.output
+    assert __version__ in result.output
 
 
 def test_cli_user_list(app, monkeypatch):

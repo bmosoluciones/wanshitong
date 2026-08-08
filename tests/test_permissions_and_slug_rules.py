@@ -178,6 +178,7 @@ def test_category_cycle_prevention(app):
 
 def test_tag_cycle_prevention(app):
     from wanshitong.model import Etiqueta
+
     admin_username = f"admin-cycle-{uuid4().hex[:8]}"
     with app.app_context():
         admin = Usuario()
