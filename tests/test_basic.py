@@ -7,6 +7,7 @@ import re
 from wanshitong import ensure_database_initialized
 from wanshitong.auth import proteger_passwd
 from wanshitong.icon_catalog import BOOTSTRAP_ICON_NAMES, icon_picker_catalog
+from wanshitong.log import SimpleLogger
 from wanshitong.model import Categoria, Documento, Etiqueta, Grupo, Usuario, db
 
 
@@ -241,3 +242,16 @@ def test_dashboard_shows_global_counts_for_admin(app):
     assert _extract_dashboard_value(html, "Categorías") == expected_categories
     assert _extract_dashboard_value(html, "Etiquetas") == expected_tags
     assert _extract_dashboard_value(html, "Usuarios") == expected_users
+
+
+def test_simple_logger_methods():
+    logger = SimpleLogger("test")
+    logger.trace("test trace")
+    logger.debug("test debug")
+    logger.info("test info")
+    logger.warning("test warning")
+    logger.error("test error")
+    try:
+        raise ValueError("test exception")
+    except ValueError:
+        logger.exception("caught exception")
