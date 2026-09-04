@@ -13,11 +13,17 @@ class SimpleLogger:
     def trace(self, *args, **kwargs):
         self._log.debug(" ".join(str(a) for a in args))
 
+    def debug(self, *args, **kwargs):
+        self._log.debug(" ".join(str(a) for a in args))
+
     def info(self, *args, **kwargs):
         self._log.info(" ".join(str(a) for a in args))
 
     def warning(self, *args, **kwargs):
         self._log.warning(" ".join(str(a) for a in args))
+
+    def error(self, *args, **kwargs):
+        self._log.error(" ".join(str(a) for a in args))
 
     def exception(self, *args, **kwargs):
         self._log.exception(" ".join(str(a) for a in args))
