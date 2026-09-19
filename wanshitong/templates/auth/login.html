@@ -8,10 +8,6 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <title>{{ _('Iniciar sesión') }} — {{ site_title }}</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom minimalista -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
@@ -152,6 +148,16 @@
         .language-selector a:hover {
             color: var(--primary);
         }
+
+        .login-disclosure {
+            margin-top: var(--spacing-xl);
+            color: var(--muted);
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .login-disclosure a { color: var(--primary); }
     </style>
 </head>
 
@@ -200,6 +206,14 @@
 
                 <button type="submit" class="login-button">{{ form.submit.label }}</button>
             </form>
+
+            <footer class="login-disclosure">
+                <strong>{{ operator_name }}</strong><br>
+                {{ _('Sistema privado. Acceso exclusivo para usuarios autorizados.') }}
+                {% if security_contact.startswith(('mailto:', 'https://', 'http://')) %}
+                <br><a href="{{ security_contact }}">{{ _('Reportar un problema de seguridad') }}</a>
+                {% endif %}
+            </footer>
         </div>
     </div>
 </body>

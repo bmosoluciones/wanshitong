@@ -100,6 +100,13 @@ A file-based config (`app.conf`) is also supported — see `wanshitong/config.py
 | `ADMIN_USER` | `app-admin` | Username for the automatically created admin account |
 | `ADMIN_PASSWORD` | `app-admin` | Password for the automatically created admin account |
 | `SESSION_REDIS_URL` | *(unset)* | Redis URL for session storage (defaults to SQLAlchemy sessions) |
+The administrator can edit the operator name, security contact and canonical
+public origin under **Configuración → Identidad del despliegue**. For an
+Internet-facing deployment, configure all three values. The visible
+operator attribution and standard security contact help users and abuse teams
+distinguish the private application from a credential-harvesting page. The public
+origin must be a hostname controlled by the operator; avoid names that could be
+confused with an unrelated organization or financial institution.
 
 ---
 

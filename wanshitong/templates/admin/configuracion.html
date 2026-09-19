@@ -47,6 +47,24 @@
                     {{ form.uploads_enabled.label(class_='form-check-label') }}
                 </div>
             </div>
+            <div class="col-12"><hr><h3 class="h5">{{ _('Identidad del despliegue') }}</h3></div>
+            <div class="col-md-6">
+                {{ form.operator_name.label(class_='form-label') }}
+                {{ form.operator_name(class_='form-control') }}
+                {% for error in form.operator_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+                {{ form.security_contact.label(class_='form-label') }}
+                {{ form.security_contact(class_='form-control', placeholder='mailto:security@example.com') }}
+                <div class="form-text">{{ _('Se muestra en el login y se publica en /.well-known/security.txt.') }}</div>
+                {% for error in form.security_contact.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6">
+                {{ form.public_origin.label(class_='form-label') }}
+                {{ form.public_origin(class_='form-control', placeholder='https://docs.example.com') }}
+                <div class="form-text">{{ _('URL HTTPS pública, sin ninguna ruta. Se usa como origen canónico del documento security.txt.') }}</div>
+                {% for error in form.public_origin.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
             <div class="col-12">
                 <div class="border rounded p-3 d-inline-flex align-items-center gap-3 bg-body-tertiary">
                     <img src="{{ site_logo_url }}" alt="{{ site_title }}"
