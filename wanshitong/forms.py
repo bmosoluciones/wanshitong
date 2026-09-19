@@ -121,7 +121,7 @@ class AppSettingsForm(FlaskForm):
         validators=[
             Optional(),
             Length(max=500),
-            Regexp(r"^https://[^/]+/?$", message=_("Use un origen HTTPS sin ruta, por ejemplo https://docs.example.com.")),
+            Regexp(r"^https://[^/]+/?$", message=_("Use un origen HTTPS sin ruta como https://docs.example.com.")),
         ],
     )
     submit = SubmitField(_("Guardar configuración"))
