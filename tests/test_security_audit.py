@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 BMO Soluciones, S.A.
 
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 from wanshitong.model import Usuario, Grupo, Categoria, Documento, PermisoDocumento, db
 from wanshitong.auth import proteger_passwd
+from wanshitong.utils import set_setting
 
 
 def create_user(app, username, password="password123", tipo="editor"):
@@ -206,3 +208,110 @@ def test_no_individual_user_permissions_allowed(app):
 
         assert not hasattr(PermisoDocumento, "usuario_id")
         assert not hasattr(PermisoDocumento, "usuario")
+
+
+def test_robots_txt_route(app):
+    client = app.test_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200
+    assert "text/plain" in response.content_type
+    assert "User-agent: *" in response.get_data(as_text=True)
+    assert "Disallow: /" in response.get_data(as_text=True)
+
+
+def test_security_contact_and_operator_attribution(app):
+    with app.app_context():
+        set_setting("operator_name", "Example Knowledge Team")
+        set_setting("security_contact", "mailto:security@example.com")
+        set_setting("public_origin", "https://docs.example.com")
+        db.session.commit()
+    client = app.test_client()
+
+    login_response = client.get("/login")
+    assert b"Example Knowledge Team" in login_response.data
+    assert b'mailto:security@example.com' in login_response.data
+
+    response = client.get("/.well-known/security.txt")
+    assert response.status_code == 200
+    assert response.mimetype == "text/plain"
+    body = response.get_data(as_text=True)
+    assert "Contact: mailto:security@example.com" in body
+    assert "Canonical: https://docs.example.com/.well-known/security.txt" in body
+    expires_line = next(line for line in body.splitlines() if line.startswith("Expires: "))
+    expires = datetime.fromisoformat(expires_line.removeprefix("Expires: ").replace("Z", "+00:00"))
+    now = datetime.now(timezone.utc)
+    assert now + timedelta(days=179) < expires <= now + timedelta(days=180)
+
+
+def test_security_txt_is_not_published_with_invalid_contact(app):
+    with app.app_context():
+        set_setting("security_contact", "security@example.com")
+        db.session.commit()
+    response = app.test_client().get("/.well-known/security.txt")
+    assert response.status_code == 404
+
+
+def test_admin_can_edit_deployment_identity(app):
+    client = app.test_client()
+    login(client, "app-admin", "app-admin")
+    response = client.post(
+        "/a/s",
+        data={
+            "site_title": "WanShiTong",
+            "default_language": "es",
+            "uploads_enabled": "y",
+            "max_upload_size_mb": "10",
+            "operator_name": "Example Operations, S.A.",
+            "security_contact": "mailto:abuse@example.com",
+            "public_origin": "https://knowledge.example.com",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    login_page = client.get("/login").get_data(as_text=True)
+    assert "Example Operations, S.A." in login_page
+    assert "mailto:abuse@example.com" in login_page
+    security_txt = client.get("/.well-known/security.txt").get_data(as_text=True)
+    assert "Canonical: https://knowledge.example.com/.well-known/security.txt" in security_txt
+
+
+def test_security_headers_and_noindex(app):
+    client = app.test_client()
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert response.headers.get("X-Frame-Options") == "DENY"
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
+    assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+    html = response.get_data(as_text=True)
+    assert '<meta name="robots" content="noindex, nofollow, noarchive"' in html
+
+
+def test_open_redirect_prevention(app):
+    suffix = uuid4().hex[:6]
+    username = f"redirect-user-{suffix}"
+    create_user(app, username, "password123")
+
+    client = app.test_client()
+
+    malicious_targets = [
+        "https://evil.com",
+        "http://evil.com",
+        "//evil.com",
+        "\\\\evil.com",
+        "javascript:alert(1)",
+    ]
+
+    for target in malicious_targets:
+        response = client.post(
+            f"/login?next={target}",
+            data={"email": username, "password": "password123"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+        assert response.location != target
+        assert not response.location.startswith("http://evil.com")
+        assert not response.location.startswith("https://evil.com")
+        assert not response.location.startswith("//evil.com")

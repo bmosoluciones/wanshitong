@@ -9,6 +9,7 @@ Minimal app package for template projects.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from os import environ
 from pathlib import Path
 from platform import platform as os_platform
@@ -37,6 +38,7 @@ from wanshitong.utils import (
     avatar_url,
     ensure_default_settings,
     get_setting,
+    is_safe_url,
     site_favicon_mime_type,
     site_favicon_url,
     site_logo_url,
@@ -259,6 +261,8 @@ def create_app(config) -> Flask:
             "get_locale": _flask_get_locale,
             "site_title": get_setting("site_title", app.config["APP_SITE_TITLE"]),
             "site_logo_url": site_logo_url(),
+            "operator_name": get_setting("operator_name"),
+            "security_contact": get_setting("security_contact"),
             "site_favicon_url": site_favicon_url(),
             "site_favicon_mime_type": site_favicon_mime_type(),
             "app_name": "Wanshitong",
@@ -280,6 +284,28 @@ def create_app(config) -> Flask:
     @app.route("/health")
     def health_check():
         return jsonify({"status": "ok"}), 200
+
+    @app.route("/robots.txt")
+    def robots_txt():
+        return app.response_class("User-agent: *\nDisallow: /\n", mimetype="text/plain")
+
+    @app.route("/.well-known/security.txt")
+    def security_txt():
+        """Publish the operator's security contact when one is configured."""
+        contact = get_setting("security_contact").strip()
+        if not contact.startswith(("mailto:", "https://", "http://")):
+            abort(404)
+
+        expires = datetime.now(timezone.utc) + timedelta(days=180)
+        lines = [
+            f"Contact: {contact}",
+            f"Expires: {expires.isoformat(timespec='seconds').replace('+00:00', 'Z')}",
+            "Preferred-Languages: es, en",
+        ]
+        origin = get_setting("public_origin").strip().rstrip("/")
+        if origin.startswith("https://"):
+            lines.append(f"Canonical: {origin}/.well-known/security.txt")
+        return app.response_class("\n".join(lines) + "\n", mimetype="text/plain")
 
     @app.route("/ready")
     def readiness_check():
@@ -311,13 +337,21 @@ def create_app(config) -> Flask:
             200,
         )
 
+    @app.after_request
+    def set_security_headers(response):
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
     @app.before_request
     def require_login_by_default():
         if request.endpoint is None:
             return None
         if request.endpoint == "static":
             return None
-        if request.endpoint in {"health_check", "readiness_check"}:
+        if request.endpoint in {"health_check", "readiness_check", "robots_txt", "security_txt"}:
             return None
         if request.endpoint.startswith("auth.") and request.endpoint == "auth.login":
             return None
@@ -331,7 +365,10 @@ def create_app(config) -> Flask:
                 from flask_login import logout_user
 
                 logout_user()
-            return redirect(url_for("auth.login", next=request.path))
+            next_target = request.path if is_safe_url(request.path) and request.path != "/" else None
+            if next_target:
+                return redirect(url_for("auth.login", next=next_target))
+            return redirect(url_for("auth.login"))
         return None
 
     @app.route("/media/avatars/<path:filename>")
