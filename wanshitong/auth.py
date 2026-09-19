@@ -18,7 +18,13 @@ from wanshitong.forms import LoginForm, ProfileForm
 from wanshitong.i18n import _
 from wanshitong.log import log
 from wanshitong.model import Usuario, database
-from wanshitong.utils import ALLOWED_IMAGE_EXTENSIONS, avatar_dir, avatar_filename, max_upload_size_bytes
+from wanshitong.utils import (
+    ALLOWED_IMAGE_EXTENSIONS,
+    avatar_dir,
+    avatar_filename,
+    is_safe_url,
+    max_upload_size_bytes,
+)
 
 auth = Blueprint("auth", __name__)
 
@@ -34,6 +40,8 @@ def _commit_or_rollback() -> None:
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
+    raw_next = request.args.get("next") or request.form.get("next")
+    next_url = raw_next if is_safe_url(raw_next) else None
 
     if form.validate_on_submit():
         usuario_id = form.email.data or ""
@@ -50,11 +58,13 @@ def login():
 
             if registro is not None:
                 login_user(registro)
+                if next_url:
+                    return redirect(next_url)
                 return redirect(url_for("app.index"))
 
         flash(str(_("Usuario o contraseña incorrectos.")), "error")
 
-    return render_template("auth/login.html", form=form)
+    return render_template("auth/login.html", form=form, next_url=next_url)
 
 
 @auth.route("/logout")

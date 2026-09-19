@@ -206,3 +206,53 @@ def test_no_individual_user_permissions_allowed(app):
 
         assert not hasattr(PermisoDocumento, "usuario_id")
         assert not hasattr(PermisoDocumento, "usuario")
+
+
+def test_robots_txt_route(app):
+    client = app.test_client()
+    response = client.get("/robots.txt")
+    assert response.status_code == 200
+    assert "text/plain" in response.content_type
+    assert "User-agent: *" in response.get_data(as_text=True)
+    assert "Disallow: /" in response.get_data(as_text=True)
+
+
+def test_security_headers_and_noindex(app):
+    client = app.test_client()
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert response.headers.get("X-Frame-Options") == "DENY"
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("X-Robots-Tag") == "noindex, nofollow, noarchive"
+    assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+    html = response.get_data(as_text=True)
+    assert '<meta name="robots" content="noindex, nofollow, noarchive"' in html
+
+
+def test_open_redirect_prevention(app):
+    suffix = uuid4().hex[:6]
+    username = f"redirect-user-{suffix}"
+    create_user(app, username, "password123")
+
+    client = app.test_client()
+
+    malicious_targets = [
+        "https://evil.com",
+        "http://evil.com",
+        "//evil.com",
+        "\\\\evil.com",
+        "javascript:alert(1)",
+    ]
+
+    for target in malicious_targets:
+        response = client.post(
+            f"/login?next={target}",
+            data={"email": username, "password": "password123"},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+        assert response.location != target
+        assert not response.location.startswith("http://evil.com")
+        assert not response.location.startswith("https://evil.com")
+        assert not response.location.startswith("//evil.com")

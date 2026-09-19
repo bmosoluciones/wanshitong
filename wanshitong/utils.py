@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from flask import current_app, url_for
 
@@ -141,3 +142,14 @@ def site_favicon_mime_type() -> str:
     if suffix == ".png":
         return "image/png"
     return "image/x-icon"
+
+
+def is_safe_url(target: str | None) -> bool:
+    if not target:
+        return False
+    if target.startswith("//") or target.startswith("\\"):
+        return False
+    if not target.startswith("/"):
+        return False
+    parts = urlsplit(target)
+    return not parts.netloc and not parts.scheme
