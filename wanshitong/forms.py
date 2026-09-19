@@ -12,7 +12,7 @@ from wtforms import (
     SubmitField,
     TextAreaField,
 )
-from wtforms.validators import DataRequired, Email, Length, Optional
+from wtforms.validators import DataRequired, Email, Length, Optional, Regexp
 
 from wanshitong.i18n import _
 
@@ -106,6 +106,23 @@ class AppSettingsForm(FlaskForm):
         _("Tamaño máximo de archivos (MB)"),
         validators=[DataRequired(), Length(max=10)],
         default="10",
+    )
+    operator_name = StringField(_("Organización operadora"), validators=[DataRequired(), Length(max=150)])
+    security_contact = StringField(
+        _("Contacto de seguridad"),
+        validators=[
+            DataRequired(),
+            Length(max=500),
+            Regexp(r"^(?:mailto:|https?://).+", message=_("Use una dirección mailto: o una URL HTTP(S).")),
+        ],
+    )
+    public_origin = StringField(
+        _("Origen público"),
+        validators=[
+            Optional(),
+            Length(max=500),
+            Regexp(r"^https://[^/]+/?$", message=_("Use un origen HTTPS sin ruta, por ejemplo https://docs.example.com.")),
+        ],
     )
     submit = SubmitField(_("Guardar configuración"))
 

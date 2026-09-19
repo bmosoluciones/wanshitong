@@ -260,6 +260,8 @@ def create_app(config) -> Flask:
             "get_locale": _flask_get_locale,
             "site_title": get_setting("site_title", app.config["APP_SITE_TITLE"]),
             "site_logo_url": site_logo_url(),
+            "operator_name": get_setting("operator_name"),
+            "security_contact": get_setting("security_contact"),
             "site_favicon_url": site_favicon_url(),
             "site_favicon_mime_type": site_favicon_mime_type(),
             "app_name": "Wanshitong",
@@ -285,6 +287,19 @@ def create_app(config) -> Flask:
     @app.route("/robots.txt")
     def robots_txt():
         return app.response_class("User-agent: *\nDisallow: /\n", mimetype="text/plain")
+
+    @app.route("/.well-known/security.txt")
+    def security_txt():
+        """Publish the operator's security contact when one is configured."""
+        contact = get_setting("security_contact").strip()
+        if not contact.startswith(("mailto:", "https://", "http://")):
+            abort(404)
+
+        lines = [f"Contact: {contact}", "Preferred-Languages: es, en"]
+        origin = get_setting("public_origin").strip().rstrip("/")
+        if origin.startswith("https://"):
+            lines.append(f"Canonical: {origin}/.well-known/security.txt")
+        return app.response_class("\n".join(lines) + "\n", mimetype="text/plain")
 
     @app.route("/ready")
     def readiness_check():
@@ -330,7 +345,7 @@ def create_app(config) -> Flask:
             return None
         if request.endpoint == "static":
             return None
-        if request.endpoint in {"health_check", "readiness_check", "robots_txt"}:
+        if request.endpoint in {"health_check", "readiness_check", "robots_txt", "security_txt"}:
             return None
         if request.endpoint.startswith("auth.") and request.endpoint == "auth.login":
             return None
