@@ -22,7 +22,14 @@ from wanshitong.forms import AppSettingsForm, CategoriaForm, EtiquetaForm, Grupo
 from wanshitong.i18n import _
 from wanshitong.icon_catalog import normalize_icon_name
 from wanshitong.model import AppConfig, Categoria, Etiqueta, Grupo, Usuario, database
-from wanshitong.utils import ALLOWED_IMAGE_EXTENSIONS, ensure_default_settings, set_setting, site_asset_dir, slugify
+from wanshitong.utils import (
+    ALLOWED_IMAGE_EXTENSIONS,
+    ensure_default_settings,
+    get_setting,
+    set_setting,
+    site_asset_dir,
+    slugify,
+)
 
 admin = Blueprint("admin", __name__)
 
@@ -90,6 +97,9 @@ def configuracion():
             "default_language": form.default_language.data,
             "uploads_enabled": "1" if form.uploads_enabled.data else "0",
             "max_upload_size_mb": form.max_upload_size_mb.data.strip(),
+            "operator_name": form.operator_name.data.strip(),
+            "security_contact": form.security_contact.data.strip(),
+            "public_origin": (form.public_origin.data or "").strip().rstrip("/"),
         }
         for key, value in updates.items():
             set_setting(key, value, current_user.usuario)
@@ -133,6 +143,9 @@ def configuracion():
         form.default_language.data = _get_setting_value("default_language", "en")
         form.uploads_enabled.data = _get_setting_value("uploads_enabled", "1") == "1"
         form.max_upload_size_mb.data = _get_setting_value("max_upload_size_mb", "10")
+        form.operator_name.data = get_setting("operator_name")
+        form.security_contact.data = get_setting("security_contact")
+        form.public_origin.data = get_setting("public_origin")
 
     return render_template(
         "admin/configuracion.html",

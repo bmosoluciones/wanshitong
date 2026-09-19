@@ -7,9 +7,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 
 from wanshitong import alembic, create_app
-from wanshitong.model import Categoria, Etiqueta, db
+from wanshitong.model import AppConfig, Categoria, Etiqueta, db
 
-ALEMBIC_HEAD_REVISION = "20260512_03"
+ALEMBIC_HEAD_REVISION = "20260919_04"
 
 
 def test_alembic_upgrade_app_context(tmp_path, monkeypatch):
@@ -60,6 +60,19 @@ def test_alembic_upgrade_app_context(tmp_path, monkeypatch):
         assert etiqueta_upgraded is not None
         assert categoria_upgraded.icono == "folder"
         assert etiqueta_upgraded.icono == "tag"
+        identity_settings = {
+            row.clave: row.valor
+            for row in db.session.execute(
+                db.select(AppConfig).where(
+                    AppConfig.clave.in_({"operator_name", "security_contact", "public_origin"})
+                )
+            ).scalars()
+        }
+        assert identity_settings == {
+            "operator_name": "BMO Soluciones, S.A.",
+            "security_contact": "https://github.com/bmosoluciones/wanshitong/security/advisories/new",
+            "public_origin": "",
+        }
 
         version_after_upgrade = db.session.execute(text("SELECT version_num FROM alembic_version")).scalar()
         assert version_after_upgrade == ALEMBIC_HEAD_REVISION

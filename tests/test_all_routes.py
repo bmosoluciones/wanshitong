@@ -282,6 +282,9 @@ def _post_kwargs(endpoint: str) -> dict:
                 "default_language": "es",
                 "uploads_enabled": "y",
                 "max_upload_size_mb": "10",
+                "operator_name": "BMO Soluciones, S.A.",
+                "security_contact": "mailto:security@example.com",
+                "public_origin": "https://docs.example.com",
             }
         }
     if endpoint == "admin.nueva_categoria" or endpoint == "admin.editar_categoria":

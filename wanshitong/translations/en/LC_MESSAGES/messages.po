@@ -1338,3 +1338,32 @@ msgstr "Restore this version"
 #~ msgid "Restaurar esta versión"
 #~ msgstr "Restore this version"
 
+msgid "Sistema privado. Acceso exclusivo para usuarios autorizados."
+msgstr "Private system. Access is restricted to authorized users."
+
+msgid "Reportar un problema de seguridad"
+msgstr "Report a security issue"
+
+msgid "Organización operadora"
+msgstr "Operating organization"
+
+msgid "Contacto de seguridad"
+msgstr "Security contact"
+
+msgid "Origen público"
+msgstr "Public origin"
+
+msgid "Identidad del despliegue"
+msgstr "Deployment identity"
+
+msgid "Use una dirección mailto: o una URL HTTP(S)."
+msgstr "Use a mailto: address or an HTTP(S) URL."
+
+msgid "Use un origen HTTPS sin ruta, por ejemplo https://docs.example.com."
+msgstr "Use an HTTPS origin without a path, for example https://docs.example.com."
+
+msgid "Se muestra en el login y se publica en /.well-known/security.txt."
+msgstr "Shown on the login page and published at /.well-known/security.txt."
+
+msgid "URL HTTPS pública, sin ninguna ruta. Se usa como origen canónico del documento security.txt."
+msgstr "Public HTTPS URL without a path. Used as the canonical origin for security.txt."

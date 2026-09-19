@@ -18,6 +18,12 @@ DEFAULT_SETTINGS = {
     "default_language": {"value": "es", "type": "string"},
     "uploads_enabled": {"value": "1", "type": "bool"},
     "max_upload_size_mb": {"value": "10", "type": "int"},
+    "operator_name": {"value": "BMO Soluciones, S.A.", "type": "string"},
+    "security_contact": {
+        "value": "https://github.com/bmosoluciones/wanshitong/security/advisories/new",
+        "type": "string",
+    },
+    "public_origin": {"value": "", "type": "string"},
 }
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -50,7 +56,9 @@ def ensure_default_settings(created_by: str | None = None) -> None:
         raise
 
 
-def get_setting(key: str, fallback: str) -> str:
+def get_setting(key: str, fallback: str | None = None) -> str:
+    if fallback is None:
+        fallback = str(DEFAULT_SETTINGS.get(key, {"value": ""})["value"])
     try:
         setting = database.session.execute(
             database.select(AppConfig).where(AppConfig.clave == key)
